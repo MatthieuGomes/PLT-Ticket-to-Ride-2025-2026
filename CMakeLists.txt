@@ -118,6 +118,7 @@ find_library(
 add_subdirectory(src/shared)
 add_subdirectory(src/client)
 #add_subdirectory(src/server)
+add_subdirectory(src/graph)
 
 # Rapport generation
 
