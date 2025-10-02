@@ -1,0 +1,2 @@
+/usr/bin/ar qc libclient_static.a "CMakeFiles/client_static.dir/__/__/extern/jsoncpp-1.8.0/jsoncpp.cpp.o"
+/usr/bin/ranlib libclient_static.a
