@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/cmake_install.cmake",
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/extern/dia2code/cmake_install.cmake",
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/src/shared/cmake_install.cmake",
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/src/client/cmake_install.cmake",
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/test/cmake_install.cmake",
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/test/shared/cmake_install.cmake",
+		"/home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/test/client/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
