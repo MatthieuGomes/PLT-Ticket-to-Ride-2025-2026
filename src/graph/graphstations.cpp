@@ -7,7 +7,7 @@
 
 // station (vertex)
 struct Station {
-    int id;             // ID único (map to name in dictonary)
+    int id;             // ID (map to name in dictonary)
     std::string name;   // stsation name
 };
 
@@ -23,6 +23,14 @@ struct Road {
     RoadType type;       // Normal, Tunnel, Ferry
     int locomotive;      // numbe of locomotives for ferry
 };
+
+struct Path {
+    std::vector<Station*> stations; // sequence of stations on the path
+    std::vector<Road*> roads;       // set of roads used
+    int totalLength;                // sum of lengths (graph weights)
+    int numEdges;                   // num of roads (edges)
+};
+
 
 // graph definition
 // store properties directly on vertices and edges
@@ -97,7 +105,7 @@ int main() {
     
 
     // add roads
-    add_edge(v1, v2, Road{"yellow", 2, -1, false, RoadType::Normal, 0}, g); //par-bxl
+    add_edge(v1, v2, Road{"yellow", 2, -1, false, RoadType::Normal, 0}, g); //par-bxl   
     add_edge(v1, v2, Road{"red", 2, -1, false, RoadType::Normal, 0}, g);
     add_edge(v2, v3, Road{"black", 1, -1, false, RoadType::Normal, 0}, g); //bxl-ams
     add_edge(v3, v4, Road{"any", 2, -1, false, RoadType::Ferry, 2}, g); // ams-lon
