@@ -7,3 +7,4 @@ src/**/*.h
 .idea
 *.autosave
 tmp
+CMakeCache.txt
