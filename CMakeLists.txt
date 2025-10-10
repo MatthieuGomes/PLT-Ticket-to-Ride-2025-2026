@@ -17,8 +17,8 @@ include(GenerateDiaHeader)
 # Export executables to "bin" directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
-# Enable C++11
-set(CMAKE_CXX_STANDARD 11)
+# Enable C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Enable Debug and Release builds
@@ -78,6 +78,10 @@ endif()
 # Build dia2code
 add_subdirectory(extern/dia2code)
 
+find_package(Boost 1.74 REQUIRED COMPONENTS graph unit_test_framework)
+message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
+message(STATUS "Boost include directory: ${Boost_INCLUDE_DIRS}")
+
 # Add option to enable special build for ENSEA's machines
 set(MACHINE_ENSEA OFF CACHE BOOL
   "Set MACHINE_ENSEA to ON to build on the CentOS machine at ENSEA")
@@ -110,7 +114,7 @@ find_library(
   DOC "microhttpd library"
 )
 
-# Add source subdirectories
+# Add source subdirectories
 add_subdirectory(src/shared)
 add_subdirectory(src/client)
 #add_subdirectory(src/server)
