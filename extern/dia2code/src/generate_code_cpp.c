@@ -905,7 +905,7 @@ gen_namespace(batch *b, declaration *nsd) {
                             if (strncmp(nsnsname, "boost", 5) == 0) {
                                 print("#include <%s/%s.%s>\n", nsnsname, incfile->name, "hpp");
                             } else {
-                                print("#include \"%s/%s.%s\"\n", nsname, incfile->name, file_ext);
+                                print("#include \"%s/%s.%s\"\n", nsnsname, incfile->name, file_ext);
                             }
                         }
                     }
