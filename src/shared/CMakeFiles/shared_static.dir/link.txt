@@ -1,2 +1,0 @@
-/usr/bin/ar qc libshared_static.a CMakeFiles/shared_static.dir/state/player/player.cpp.o CMakeFiles/shared_static.dir/state/state.cpp.o "CMakeFiles/shared_static.dir/__/__/extern/jsoncpp-1.8.0/jsoncpp.cpp.o"
-/usr/bin/ranlib libshared_static.a
