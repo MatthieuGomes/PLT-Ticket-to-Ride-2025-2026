@@ -76,5 +76,11 @@ int main() {
               << "\nNumber of edges: " << path.NUMEDGES << "\n";
 
     std::cout << "\n==== END OF TEST ====\n";
+
+    //test tostring
+    std::string snapshot = map.toString();
+    
+    // check formatted state
+    std::cout << "\n[STATE SNAPSHOT]\n" << snapshot << std::endl;
     return 0;
 }

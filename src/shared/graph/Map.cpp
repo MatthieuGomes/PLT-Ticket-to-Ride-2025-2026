@@ -172,3 +172,40 @@ void Map::printMap() const {
     std::cout << "==========================\n\n";
 }
 
+//basically equal to printmap for now, but formatted for logging and calls from game
+std::string Map::toString() const { 
+    std::ostringstream out;
+    out << "===== MAP STRUCTURE =====\n";
+
+    out << "Stations (" << Stations.size() << "):\n";
+    for (const auto* s : Stations) {
+        out << "  - " << std::setw(8) << s->data->name 
+            << " (ID: " << s->data->ID << ")\n";
+    }
+
+    out << "\nRoads (" << Roads.size() << "):\n";
+    for (const auto* r : Roads) {
+        auto* d = r->data;
+        std::string owner = d->owner ? d->owner->name : "None";
+        out << "  - " << std::setw(6) << d->ID
+            << " | " << d->endpoints[0]->name << " <-> " << d->endpoints[1]->name
+            << " | Color: " << d->color
+            << " | Length: " << d->length
+            << " | Owner: " << owner
+            << (d->blocked ? " | BLOCKED" : "")
+            << "\n";
+    }
+
+    out << "\nConnections:\n";
+    for (const auto* s : Stations) {
+        out << "  " << s->data->name << " -> ";
+        auto adj = getAdjacentStations(const_cast<Station*>(s));
+        for (const auto* adjS : adj)
+            out << adjS->data->name << " ";
+        out << "\n";
+    }
+
+    out << "==========================\n";
+    return out.str();
+}
+
