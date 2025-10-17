@@ -111,7 +111,7 @@
         <dia:real val="41.771244653173952"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#graph#</dia:string>
+        <dia:string>#mapState#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>##</dia:string>
@@ -2105,7 +2105,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#printState#</dia:string>
+            <dia:string>#printMap#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
