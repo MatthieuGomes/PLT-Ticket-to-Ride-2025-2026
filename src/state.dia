@@ -82,9 +82,6 @@
     <dia:attribute name="guide_color">
       <dia:color val="#00ff00ff"/>
     </dia:attribute>
-    <dia:attribute name="guide_color">
-      <dia:color val="#00ff00ff"/>
-    </dia:attribute>
     <dia:attribute name="display">
       <dia:composite type="display">
         <dia:attribute name="antialiased">
@@ -97,16 +94,10 @@
         <dia:attribute name="snap-to-guides">
           <dia:boolean val="true"/>
         </dia:attribute>
-        <dia:attribute name="snap-to-guides">
-          <dia:boolean val="true"/>
-        </dia:attribute>
         <dia:attribute name="snap-to-object">
           <dia:boolean val="true"/>
         </dia:attribute>
         <dia:attribute name="show-grid">
-          <dia:boolean val="true"/>
-        </dia:attribute>
-        <dia:attribute name="show-guides">
           <dia:boolean val="true"/>
         </dia:attribute>
         <dia:attribute name="show-guides">
