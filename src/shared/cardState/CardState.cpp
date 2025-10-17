@@ -1,19 +1,20 @@
 #include "CardState.h"
 #include <iostream>
+#include <memory>
 
-void CardState::displayAll() const {
+void cardState::CardState::displayAll() {
     visibleDeck.displayDeck();
     wagonDeck.displayDeck();
     destinationDeck.displayDeck();
     discardedDeck.displayDeck();
 }
 
-void CardState::onPick(std::shared_ptr<Card> card, DeckPlayer& player) {
-    player.addCard(card);
+void cardState::CardState::onPick(std::shared_ptr<Card> card, DeckPlayer& player) {
+    player.addCard(card.get());
     std::cout << "Picked card #" << card->getId() << std::endl;
 }
 
-void CardState::onDiscard(std::shared_ptr<Card> card) {
-    discardedDeck.addCard(card);
+void cardState::CardState::onDiscard(std::shared_ptr<Card> card) {
+    discardedDeck.addCard(card.get());
     std::cout << "Card discarded: #" << card->getId() << std::endl;
 }

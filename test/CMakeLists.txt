@@ -1,4 +1,3 @@
-
 # Add "test" target to make
 enable_testing()
 
