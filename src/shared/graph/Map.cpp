@@ -1,6 +1,8 @@
 #include "Map.h"
+#include "Player.h"
 #include <iostream>
 #include <algorithm>
+#include <iomanip> // for std::setw
 
 using namespace boost;
 
@@ -88,7 +90,7 @@ Road* Map::getRoad(Station* u, Station* v) {
     return nullptr;
 }
 
-std::vector<Station*> Map::getAdjacentStations(Station* station) {
+std::vector<Station*> Map::getAdjacentStations(Station* station) const {
     std::vector<Station*> adj;
     auto [begin, end] = adjacent_vertices(station->vertex, gameGraph);
     for (auto it = begin; it != end; ++it)
@@ -134,3 +136,39 @@ Path Map::findShortestPath(StationData* src, StationData* dest) {
 
     return path;
 }
+
+
+void Map::printMap() const {
+    std::cout << "\n===== MAP STRUCTURE =====\n";
+
+    std::cout << "Stations (" << Stations.size() << "):\n";
+    for (const auto* s : Stations) {
+        std::cout << "  - " << std::setw(8) << s->data->name 
+                  << " (ID: " << s->data->ID << ")\n";
+    }
+
+    std::cout << "\nRoads (" << Roads.size() << "):\n";
+    for (const auto* r : Roads) {
+        auto* d = r->data;
+        std::string owner = d->owner ? d->owner->name : "None";
+        std::cout << "  - " << std::setw(6) << d->ID
+                  << " | " << d->endpoints[0]->name << " <-> " << d->endpoints[1]->name
+                  << " | Color: " << d->color
+                  << " | Length: " << d->length
+                  << " | Owner: " << owner
+                  << (d->blocked ? " | BLOCKED" : "")
+                  << "\n";
+    }
+
+    std::cout << "\nConnections:\n";
+    for (const auto* s : Stations) {
+        std::cout << "  " << s->data->name << " -> ";
+        auto adj = getAdjacentStations(const_cast<Station*>(s));
+        for (const auto* adjS : adj)
+            std::cout << adjS->data->name << " ";
+        std::cout << "\n";
+    }
+
+    std::cout << "==========================\n\n";
+}
+

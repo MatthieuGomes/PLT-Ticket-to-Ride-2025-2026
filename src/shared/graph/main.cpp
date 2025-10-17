@@ -15,7 +15,9 @@ int main() {
     Map map;
     map.generateMap();
 
-    std::cout << "\n--- Station list ---\n";
+    map.printMap();
+
+    /*std::cout << "\n--- Station list ---\n";
     for (auto* station : map.listStations()) {
         std::cout << " - " << station->data->name
                   << " (ID " << station->data->ID << ")\n";
@@ -28,7 +30,7 @@ int main() {
                   << road->data->length << " pieces) connects "
                   << road->data->endpoints[0]->name << " ↔ "
                   << road->data->endpoints[1]->name << "\n";
-    }
+    }*/
 
     // searches station
     std::cout << "\n--- Station search test ---\n";
@@ -56,6 +58,9 @@ int main() {
     if (map.claimRoad(&p1, paris->data, madrid->data)) {
         std::cout << "Alice has taken posession of the Paris <-> Madrid road\n";
     }
+
+    //check changes after claim
+    map.printMap();
 
     // shortest path rest
     std::cout << "\n--- Shortest path Paris -> Rome ---\n";
