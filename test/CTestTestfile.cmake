@@ -1,4 +1,4 @@
-# CMake generated Testfile for 
+ CMake generated Testfile for
 # Source directory: /home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/test
 # Build directory: /home/matthieu/Desktop/PLT_Ticket_to_Ride_2025-2026/test
 # 
