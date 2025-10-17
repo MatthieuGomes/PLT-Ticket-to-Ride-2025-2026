@@ -8,3 +8,5 @@ src/**/*.h
 *.autosave
 tmp
 CMakeCache.txt
+cmake_install.cmake
+CMakeFiles
