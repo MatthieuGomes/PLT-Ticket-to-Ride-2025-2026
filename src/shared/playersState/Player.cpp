@@ -55,3 +55,8 @@ void Player::moveToStation(string station) {
 }
 
 
+void Player::updateCardState(string card) {
+    cout << name << " met à jour l'état de la carte : " << card << endl;
+}
+
+
