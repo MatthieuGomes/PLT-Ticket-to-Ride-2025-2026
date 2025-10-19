@@ -22,3 +22,13 @@ void Player::drawCard(string deck) {
     wagonDeck.push_back(deck);
     cout << name << " pioche une carte : " << deck << endl;
 }
+
+void Player::playCard(string card) {
+    auto it = find(wagonDeck.begin(), wagonDeck.end(), card);
+    if (it != wagonDeck.end()) {
+        wagonDeck.erase(it);
+        cout << name << " joue la carte : " << card << endl;
+    } else {
+        cout << name << " ne possède pas la carte : " << card << endl;
+    }
+}
