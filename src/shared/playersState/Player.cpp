@@ -1,25 +1,18 @@
-#include "Player.h"
-#include <iostream>
-#include <algorithm>
 
-using namespace std;
+// ----- Setters -----
 
-namespace playersState {
+void Player::setId(int id) {
+    this->id = id;
+}
 
-  // ----- Getters -----
+void Player::setName(string name) {
+    this->name = name;
+}
 
-  int Player::getId() {
-    return id;
-  }
+void Player::setNbStations(int nbStations) {
+    this->nbStations = nbStations;
+}
 
-  string Player::getName() {
-    return name;
-  }
-
-  int Player::getNbStations() {
-    return nbStations;
-  }
-
-  int Player::getNbRoads() {
-    return nbRoads;
-  }
+void Player::setNbRoads(int nbRoads) {
+    this->nbRoads = nbRoads;
+}
