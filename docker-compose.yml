@@ -1,0 +1,29 @@
+services:
+  plt:
+    container_name: plt
+    working_dir: /app
+    build:
+      context: .
+      args:
+        USERNAME: ${username:-plt}
+        USER_UID: ${USER_UID:-1000} # $(id -u)
+        USER_GID: ${USER_GID:-1000} # $(id -g)
+        DISPLAY: ${DISPLAY}
+      dockerfile: Dockerfile
+    image: plt:latest
+    # user: $(id -u):$(id -g)
+    user: $USER_UID:$USER_GID
+    volumes:
+      - ./:/app
+      - /tmp/($WAYLAND_DISPLAY-):/tmp/($WAYLAND_DISPLAY-):rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ~/.ssh:/home/${username:-plt}/.ssh:ro
+      - ~/.gitconfig:/home/${username:-plt}/.gitconfig:ro
+      # - /dev/dri:/dev/dri:cached
+    tty: true
+    environment:
+      WAYLAND_DISPLAY: ${WAYLAND_DISPLAY:-}
+      XDG_RUNTIME_DIR: /tmp
+    env_file:
+      - .env
+    stdin_open: true

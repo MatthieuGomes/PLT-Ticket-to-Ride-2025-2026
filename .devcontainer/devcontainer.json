@@ -1,0 +1,21 @@
+{
+    "name": "PLT",
+    "privileged": false,
+    "remoteUser": "plt",
+    "service": "plt",
+    "dockerComposeFile": "../docker-compose.yml",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "jetbrains": {
+            "settings": {
+                "Docker:app:DockerSettings.dockerComposePath": "/usr/local/bin/docker-compose",
+                "Docker:app:DockerSettings.dockerPath": "/usr/bin/docker"
+            }
+        },
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cmake-tools"
+            ]
+        }
+    }
+}
