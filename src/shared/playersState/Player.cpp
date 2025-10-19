@@ -44,3 +44,8 @@ void Player::displayDeck() {
     }
 }
 
+void Player::claimRoad(string road) {
+    nbRoads++;
+    cout << name << " revendique la route : " << road << endl;
+}
+
