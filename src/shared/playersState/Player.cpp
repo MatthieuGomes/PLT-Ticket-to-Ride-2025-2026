@@ -49,3 +49,9 @@ void Player::claimRoad(string road) {
     cout << name << " revendique la route : " << road << endl;
 }
 
+void Player::moveToStation(string station) {
+    nbStations++;
+    cout << name << " se déplace vers la station : " << station << endl;
+}
+
+
