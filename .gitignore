@@ -7,6 +7,7 @@ src/**/*.h
 .idea
 *.autosave
 tmp
+.env
 CMakeCache.txt
 CMakeFiles
 Makefile
