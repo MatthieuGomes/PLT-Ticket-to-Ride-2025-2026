@@ -16,3 +16,9 @@ void Player::setNbStations(int nbStations) {
 void Player::setNbRoads(int nbRoads) {
     this->nbRoads = nbRoads;
 }
+
+
+void Player::drawCard(string deck) {
+    wagonDeck.push_back(deck);
+    cout << name << " pioche une carte : " << deck << endl;
+}
