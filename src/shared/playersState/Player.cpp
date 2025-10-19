@@ -32,3 +32,15 @@ void Player::playCard(string card) {
         cout << name << " ne possède pas la carte : " << card << endl;
     }
 }
+
+void Player::displayDeck() {
+    cout << "Main de " << name << " :" << endl;
+    if (wagonDeck.empty()) {
+        cout << "  Aucune carte." << endl;
+        return;
+    }
+    for (const auto &card : wagonDeck) {
+        cout << "  - " << card << endl;
+    }
+}
+
