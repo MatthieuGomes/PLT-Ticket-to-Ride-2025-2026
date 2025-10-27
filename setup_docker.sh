@@ -10,4 +10,5 @@ echo "Checking for display server..."
 if [ "$XDG_SESSION_TYPE" != "wayland" ]; then
     xhost +SI:localuser:$(id -un)
     echo DISPLAY=$DISPLAY >> ./.env
+    echo "xhost +SI:localuser:$(id -un)" > ~/.xsession
 fi
