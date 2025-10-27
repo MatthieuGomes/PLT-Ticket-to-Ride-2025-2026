@@ -19,6 +19,7 @@ RUN if [ -n "$DISPLAY" ]; then \
 
 RUN apt-get update && apt-get install -y \
     build-essential \
+    gdb \
     cmake \
     lcov \
     gcovr \
