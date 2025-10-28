@@ -4,15 +4,11 @@ ARG USERNAME
 ARG USER_UID
 ARG USER_GID
 ARG DISPLAY
+ARG WAYLAND_DISPLAY
 
 
 RUN groupadd --gid $USER_GID $USERNAME && \
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
-
-RUN if [ -n "$DISPLAY" ]; then \
-        export DISPLAY=$DISPLAY; \
-    fi
-
 
 # Install dependencies
 
@@ -41,8 +37,9 @@ WORKDIR /app
 COPY --exclude=build --exclude=cmake-build-debug --chown=$USERNAME:$USERNAME . /app
 
 # Set environment variables for GUI support
-RUN export GDK_BACKEND=$(if [ ! $WAYLAND_DISPLAY ]; then echo x11; else echo wayland; fi)
-RUN export QT_QPA_PLATFORM=$(if [ ! $WAYLAND_DISPLAY ]; then echo xcb; else echo wayland; fi)
+RUN [ -z "$WAYLAND_DISPLAY" ] && echo 'export DISPLAY='"$DISPLAY" >> ~/.bashrc && export DISPLAY=$DISPLAY || echo 'export WAYLAND_DISPLAY='"$WAYLAND_DISPLAY" >> /home/plt/.bashrc && export WAYLAND_DISPLAY=$WAYLAND_DISPLAY 
+RUN [ -z "$WAYLAND_DISPLAY" ] && echo 'export GDK_BACKEND=x11' >> ~/.bashrc && export GDK_BACKEND=x11 || echo "export GDK_BACKEND=wayland" >> /home/plt/.bashrc && export GDK_BACKEND=wayland
+RUN [ -z "$WAYLAND_DISPLAY" ] && echo 'export QT_QPA_PLATFORM=xcb' >> ~/.bashrc && export QT_QPA_PLATFORM=xcb || echo "export QT_QPA_PLATFORM=wayland" >> /home/plt/.bashrc && export QT_QPA_PLATFORM=wayland
 
 # Build the project
 ENV LC_ALL="C.UTF-8"
@@ -50,10 +47,7 @@ ENV LANG="C.UTF-8"
 
 RUN mkdir docker-build && cd docker-build && cmake .. && make client && cd ..
 
-RUN chmod u+x ./entrypoint.sh
-
 SHELL ["/bin/bash", "--login", "-c"]
 
 # Run the application
-ENTRYPOINT ["./entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]
