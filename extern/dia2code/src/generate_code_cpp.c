@@ -1070,7 +1070,7 @@ void gen_namespace(batch *b, declaration *nsd)
                         print("template <");
                         while (templates != NULL)
                         {
-                            print("%s %s", templates->key.type, templates->key.name);
+                            print("%s %s", templates->key.type, templates->key.name, strtok(templates->key.name,"="));
                             templates = templates->next;
                             if (templates != NULL)
                                 emit(", ");
@@ -1099,10 +1099,11 @@ void gen_namespace(batch *b, declaration *nsd)
                         print("template <");
                         while (templates != NULL)
                         {
-                            print("%s %s", templates->key.type, templates->key.name);
+                            print("%s %s", templates->key.type, strtok(templates->key.name,"="));
                             templates = templates->next;
-                            if (templates != NULL)
+                            if (templates != NULL){
                                 emit(", ");
+                            }
                         }
                         emit(">\n");
                     }
