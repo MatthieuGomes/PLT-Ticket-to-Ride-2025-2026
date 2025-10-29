@@ -368,6 +368,7 @@ gen_class(umlclassnode *node)
                     }
                     templates = templates->next;
                 }
+                emit(">");
             }
             parent = parent->next;
             if (parent != NULL)
