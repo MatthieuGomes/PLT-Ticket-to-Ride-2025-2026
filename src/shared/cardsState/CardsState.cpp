@@ -10,10 +10,11 @@ namespace cardsState {
   void CardsState::printCardsState () {
       std::cout << " Current Cards State " << std::endl;
 
-      visibleDeck.displayDeck();
-      wagonDeck.displayDeck();
-      destinationDeck.displayDeck();
-      discardedDeck.displayDeck();
+      // visibleDeck.displayDeck();
+      // wagonDeck.displayDeck();
+      // destinationDeck.displayDeck();
+      // discardedDeck.displayDeck();
 
-      std::cout << "Number of player hands: " << playerHands.size() << std::endl;
+      // std::cout << "Number of player hands: " << playerHands.size() << std::endl;
   }
+}
