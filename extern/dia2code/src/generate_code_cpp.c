@@ -1021,7 +1021,7 @@ void gen_namespace(batch *b, declaration *nsd)
                     associations = associations->next;
                 }
                 umlclassnode *dependencies = d->u.this_class->dependencies;
-                while (d->u.this_class->dependencies != NULL)
+                while (dependencies != NULL)
                 {
                     umlclass *dependendy = dependencies->key;
                     if (eq(dependendy->name, incfile->name))
