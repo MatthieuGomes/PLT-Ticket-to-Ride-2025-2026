@@ -1,0 +1,158 @@
+[
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/comment_helper.c.o -c /app/extern/dia2code/src/comment_helper.c",
+  "file": "/app/extern/dia2code/src/comment_helper.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/comment_helper.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/decls.c.o -c /app/extern/dia2code/src/decls.c",
+  "file": "/app/extern/dia2code/src/decls.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/decls.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/dia2code.c.o -c /app/extern/dia2code/src/dia2code.c",
+  "file": "/app/extern/dia2code/src/dia2code.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/dia2code.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/generate_code_cpp.c.o -c /app/extern/dia2code/src/generate_code_cpp.c",
+  "file": "/app/extern/dia2code/src/generate_code_cpp.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/generate_code_cpp.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/includes.c.o -c /app/extern/dia2code/src/includes.c",
+  "file": "/app/extern/dia2code/src/includes.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/includes.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/main.c.o -c /app/extern/dia2code/src/main.c",
+  "file": "/app/extern/dia2code/src/main.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/main.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/parse_diagram.c.o -c /app/extern/dia2code/src/parse_diagram.c",
+  "file": "/app/extern/dia2code/src/parse_diagram.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/parse_diagram.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/scan_tree.c.o -c /app/extern/dia2code/src/scan_tree.c",
+  "file": "/app/extern/dia2code/src/scan_tree.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/scan_tree.c.o"
+},
+{
+  "directory": "/app/extern/dia2code",
+  "command": "/usr/bin/gcc  -I/usr/include/libxml2    -Wall -std=c11   -pthread -g -g --coverage  -std=c99   -pthread -g -Wno-unused-variable -Wno-unused-function -Wno-pointer-sign -Wno-unused-but-set-variable -Wno-stringop-truncation -Wno-maybe-uninitialized -O3 -DNDEBUG -std=gnu99 -o CMakeFiles/dia2code.dir/src/source_parser.c.o -c /app/extern/dia2code/src/source_parser.c",
+  "file": "/app/extern/dia2code/src/source_parser.c",
+  "output": "extern/dia2code/CMakeFiles/dia2code.dir/src/source_parser.c.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/CardsState.cpp.o -c /app/src/shared/cardsState/CardsState.cpp",
+  "file": "/app/src/shared/cardsState/CardsState.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/CardsState.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/graph/build/CMakeFiles/3.31.6/CompilerIdCXX/CMakeCXXCompilerId.cpp.o -c /app/src/shared/graph/build/CMakeFiles/3.31.6/CompilerIdCXX/CMakeCXXCompilerId.cpp",
+  "file": "/app/src/shared/graph/build/CMakeFiles/3.31.6/CompilerIdCXX/CMakeCXXCompilerId.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/graph/build/CMakeFiles/3.31.6/CompilerIdCXX/CMakeCXXCompilerId.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/mapState/MapState.cpp.o -c /app/src/shared/mapState/MapState.cpp",
+  "file": "/app/src/shared/mapState/MapState.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/mapState/MapState.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/mapState/mapState.cpp.o -c /app/src/shared/mapState/mapState.cpp",
+  "file": "/app/src/shared/mapState/mapState.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/mapState/mapState.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/mapState/mapStateTest.cpp.o -c /app/src/shared/mapState/mapStateTest.cpp",
+  "file": "/app/src/shared/mapState/mapStateTest.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/mapState/mapStateTest.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/playersState/PlayersState.cpp.o -c /app/src/shared/playersState/PlayersState.cpp",
+  "file": "/app/src/shared/playersState/PlayersState.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/playersState/PlayersState.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/state/State.cpp.o -c /app/src/shared/state/State.cpp",
+  "file": "/app/src/shared/state/State.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/state/State.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/__/__/extern/jsoncpp-1.8.0/jsoncpp.cpp.o -c /app/extern/jsoncpp-1.8.0/jsoncpp.cpp",
+  "file": "/app/extern/jsoncpp-1.8.0/jsoncpp.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/__/__/extern/jsoncpp-1.8.0/jsoncpp.cpp.o"
+},
+{
+  "directory": "/app/src/client",
+  "command": "/usr/bin/g++  -I/app/src/client -I/app/extern/jsoncpp-1.8.0 -I/app/src/shared  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/client_static.dir/client/Client.cpp.o -c /app/src/client/client/Client.cpp",
+  "file": "/app/src/client/client/Client.cpp",
+  "output": "src/client/CMakeFiles/client_static.dir/client/Client.cpp.o"
+},
+{
+  "directory": "/app/src/client",
+  "command": "/usr/bin/g++  -I/app/src/client -I/app/extern/jsoncpp-1.8.0 -I/app/src/shared  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/client_static.dir/__/__/extern/jsoncpp-1.8.0/jsoncpp.cpp.o -c /app/extern/jsoncpp-1.8.0/jsoncpp.cpp",
+  "file": "/app/extern/jsoncpp-1.8.0/jsoncpp.cpp",
+  "output": "src/client/CMakeFiles/client_static.dir/__/__/extern/jsoncpp-1.8.0/jsoncpp.cpp.o"
+},
+{
+  "directory": "/app/src/client",
+  "command": "/usr/bin/g++  -I/app/src/client -I/app/extern/jsoncpp-1.8.0 -I/app/src/shared  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/client.dir/main.cpp.o -c /app/src/client/main.cpp",
+  "file": "/app/src/client/main.cpp",
+  "output": "src/client/CMakeFiles/client.dir/main.cpp.o"
+},
+{
+  "directory": "/app/test/shared",
+  "command": "/usr/bin/g++ -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN -DBOOST_TEST_MODULE=shared -DBOOST_UNIT_TEST_FRAMEWORK_DYN_LINK -DBOOST_UNIT_TEST_FRAMEWORK_NO_LIB -I/app/src/shared -I/app/extern/jsoncpp-1.8.0 -I/app/src/client  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/test_shared.dir/test_shared.cpp.o -c /app/test/shared/test_shared.cpp",
+  "file": "/app/test/shared/test_shared.cpp",
+  "output": "test/shared/CMakeFiles/test_shared.dir/test_shared.cpp.o"
+},
+{
+  "directory": "/app/test/shared/state",
+  "command": "/usr/bin/g++ -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN -DBOOST_TEST_MODULE=state -DBOOST_UNIT_TEST_FRAMEWORK_DYN_LINK -DBOOST_UNIT_TEST_FRAMEWORK_NO_LIB -I/app/src/shared -I/app/extern/jsoncpp-1.8.0 -I/app/src/client  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/test_state.dir/test_state.cpp.o -c /app/test/shared/state/test_state.cpp",
+  "file": "/app/test/shared/state/test_state.cpp",
+  "output": "test/shared/state/CMakeFiles/test_state.dir/test_state.cpp.o"
+},
+{
+  "directory": "/app/test/shared/cardsState",
+  "command": "/usr/bin/g++ -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN -DBOOST_TEST_MODULE=cards_state -DBOOST_UNIT_TEST_FRAMEWORK_DYN_LINK -DBOOST_UNIT_TEST_FRAMEWORK_NO_LIB -I/app/src/shared -I/app/extern/jsoncpp-1.8.0 -I/app/src/client  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/test_cards_state.dir/test_cards_state.cpp.o -c /app/test/shared/cardsState/test_cards_state.cpp",
+  "file": "/app/test/shared/cardsState/test_cards_state.cpp",
+  "output": "test/shared/cardsState/CMakeFiles/test_cards_state.dir/test_cards_state.cpp.o"
+},
+{
+  "directory": "/app/test/shared/playersState",
+  "command": "/usr/bin/g++ -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN -DBOOST_TEST_MODULE=players_state -DBOOST_UNIT_TEST_FRAMEWORK_DYN_LINK -DBOOST_UNIT_TEST_FRAMEWORK_NO_LIB -I/app/src/shared -I/app/extern/jsoncpp-1.8.0 -I/app/src/client  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/test_players_state.dir/test_players_state.cpp.o -c /app/test/shared/playersState/test_players_state.cpp",
+  "file": "/app/test/shared/playersState/test_players_state.cpp",
+  "output": "test/shared/playersState/CMakeFiles/test_players_state.dir/test_players_state.cpp.o"
+},
+{
+  "directory": "/app/test/shared/mapState",
+  "command": "/usr/bin/g++ -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN -DBOOST_TEST_MODULE=map_state -DBOOST_UNIT_TEST_FRAMEWORK_DYN_LINK -DBOOST_UNIT_TEST_FRAMEWORK_NO_LIB -I/app/src/shared -I/app/extern/jsoncpp-1.8.0 -I/app/src/client  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/test_map_state.dir/test_map_state.cpp.o -c /app/test/shared/mapState/test_map_state.cpp",
+  "file": "/app/test/shared/mapState/test_map_state.cpp",
+  "output": "test/shared/mapState/CMakeFiles/test_map_state.dir/test_map_state.cpp.o"
+},
+{
+  "directory": "/app/test/client",
+  "command": "/usr/bin/g++ -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN -DBOOST_TEST_MODULE=client_dummy -DBOOST_UNIT_TEST_FRAMEWORK_DYN_LINK -DBOOST_UNIT_TEST_FRAMEWORK_NO_LIB -I/app/src/shared -I/app/extern/jsoncpp-1.8.0 -I/app/src/client  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/test_client_dummy.dir/test_client_dummy.cpp.o -c /app/test/client/test_client_dummy.cpp",
+  "file": "/app/test/client/test_client_dummy.cpp",
+  "output": "test/client/CMakeFiles/test_client_dummy.dir/test_client_dummy.cpp.o"
+}
+]

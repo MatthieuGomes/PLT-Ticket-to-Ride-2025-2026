@@ -1,0 +1,66 @@
+#include <iostream>
+#include "mapState.h"
+#include "Path.h"
+
+int main() {
+    std::cout << "==== PLT mapState TEST ====\n\n";
+
+    // creates map
+    mapState::MapState map;
+    map.generateMap();
+
+    map.printMapState();
+
+    /*std::cout << "\n--- Station list ---\n";
+    for (auto* station : map.listStations()) {
+        std::cout << " - " << station->data->name
+                  << " (ID " << station->data->ID << ")\n";
+    }
+
+    std::cout << "\n--- Road list ---\n";
+    for (auto* road : map.listRoads()) {
+        std::cout << " - " << road->data->ID
+                  << " (" << road->data->color << ", "
+                  << road->data->length << " pieces) connects "
+                  << road->data->endpoints[0]->name << " ↔ "
+                  << road->data->endpoints[1]->name << "\n";
+    }*/
+
+    // searches station
+    std::cout << "\n--- Station search test ---\n";
+    auto* berlin = map.getStationByName("Berlin");
+    if (berlin) {
+        std::cout << "Station found: " << berlin->data->name << "\n";
+    } else {
+        std::cout << "Station not found!\n";
+    }
+
+    // adjacent station test
+    std::cout << "\n--- Stations adjacent to Paris ---\n";
+    auto* paris = map.getStationByName("Paris");
+    if (paris) {
+        auto adj = map.getAdjacentStations(paris);
+        for (auto* s : adj) {
+            std::cout << " - " << s->data->name << "\n";
+        }
+    }
+
+    //check changes after claim
+    map.printMapState();
+
+    // shortest path rest
+    std::cout << "\n--- Shortest path Paris -> Rome ---\n";
+    auto* rome = map.getStationByName("Rome");
+    Path path = map.findShortestPath(paris->data, rome->data);
+
+    std::cout << "Path found: ";
+    for (auto* s : path.STATIONS) {
+        std::cout << s->data->name;
+        if (s != path.STATIONS.back()) std::cout << " -> ";
+    }
+    std::cout << "\nTotal length: " << path.TOTALLENGTH
+              << "\nNumber of edges: " << path.NUMEDGES << "\n";
+
+    std::cout << "\n==== END OF TEST ====\n";
+    return 0;
+}

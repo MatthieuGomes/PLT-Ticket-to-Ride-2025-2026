@@ -1,0 +1,199 @@
+#include "MapState.h"
+#include "Path.h"
+#include <iostream>
+#include <algorithm>
+#include <iomanip>
+
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/property_map/property_map.hpp> 
+
+using namespace boost;
+
+namespace mapState {
+
+  void MapState::generateMap() {
+      // hardcoded stations
+      StationData* parisData = new StationData{"Paris", 1, nullptr};
+      StationData* berlinData = new StationData{"Berlin", 2, nullptr};
+      StationData* madridData = new StationData{"Madrid", 3, nullptr};
+      StationData* romeData   = new StationData{"Rome", 4, nullptr};
+
+      Station* paris  = new Station{add_vertex(gameGraph), parisData};
+      Station* berlin = new Station{add_vertex(gameGraph), berlinData};
+      Station* madrid = new Station{add_vertex(gameGraph), madridData};
+      Station* rome   = new Station{add_vertex(gameGraph), romeData};
+
+      std::vector<Station*> Stations = {paris, berlin, madrid, rome};
+
+      // Roads 
+      RoadData* p_b = new RoadData{"P-B", "red", 4, nullptr, false, {parisData, berlinData}};
+      RoadData* b_r = new RoadData{"B-R", "blue", 3, nullptr, false, {berlinData, romeData}};
+      RoadData* p_m = new RoadData{"P-M", "yellow", 5, nullptr, false, {parisData, madridData}};
+      RoadData* m_r = new RoadData{"M-R", "green", 6, nullptr, false, {madridData, romeData}};
+
+      Road* roadPB = new Road{add_edge(paris->vertex, berlin->vertex, gameGraph).first, p_b};
+      Road* roadBR = new Road{add_edge(berlin->vertex, rome->vertex, gameGraph).first, b_r};
+      Road* roadPM = new Road{add_edge(paris->vertex, madrid->vertex, gameGraph).first, p_m};
+      Road* roadMR = new Road{add_edge(madrid->vertex, rome->vertex, gameGraph).first, m_r};
+
+      std::vector<Road*> Roads = {roadPB, roadBR, roadPM, roadMR};
+
+      // Add to game graph
+      for (auto* s : Stations)
+          gameGraph[s->vertex] = s;
+
+      for (auto* r : Roads)
+          gameGraph[r->edge] = r;
+
+      std::cout << "Map generated with " << Stations.size() << " stations and "
+                << Roads.size() << " roads.\n";
+  }
+
+  std::vector<Station*> MapState::listStations() const {
+      return Stations;
+  }
+
+
+  std::vector<Road*> MapState::listRoads() const {
+      return Roads;
+  }
+
+  Station* MapState::getStationByName(const std::string& name) {
+      for (auto* s : Stations)
+          if (s->data->name == name)
+              return s;
+      return nullptr;
+  }
+  
+  Road* MapState::getRoad(Station* u, Station* v) {
+      for (auto* r : Roads) {
+          auto ep = r->data->endpoints;
+          if ((ep[0] == u->data && ep[1] == v->data) ||
+              (ep[0] == v->data && ep[1] == u->data))
+              return r;
+      }
+      return nullptr;
+  }
+
+  std::vector<Station*> MapState::getAdjacentStations(Station* station) const {
+      std::vector<Station*> adj;
+      auto [begin, end] = adjacent_vertices(station->vertex, gameGraph);
+      for (auto it = begin; it != end; ++it)
+          adj.push_back(gameGraph[*it]);
+      return adj;
+  }
+
+  Path MapState::findShortestPath(StationData* src, StationData* dest) {
+      Path path;
+
+      Station* srcStation = nullptr;
+      Station* destStation = nullptr;
+
+      for (auto* s : Stations) {
+          if (s->data == src) srcStation = s;
+          if (s->data == dest) destStation = s;
+      }
+      if (!srcStation || !destStation) return path;
+
+      std::vector<int> distances(num_vertices(gameGraph), std::numeric_limits<int>::max());
+      std::vector<Graph::vertex_descriptor> predecessors(num_vertices(gameGraph));
+
+      auto weightMap = make_static_property_map<Graph::edge_descriptor>(1);
+
+      dijkstra_shortest_paths(gameGraph, srcStation->vertex,
+          predecessor_map(make_iterator_property_map(predecessors.begin(), get(vertex_index, gameGraph)))
+          .distance_map(make_iterator_property_map(distances.begin(), get(vertex_index, gameGraph)))
+          .weight_map(weightMap));
+
+      // rebuild path
+      Graph::vertex_descriptor current = destStation->vertex;
+      while (current != srcStation->vertex) {
+          Station* s = gameGraph[current];
+          path.STATIONS.push_back(s);
+          if (predecessors[current] == current) break;
+          current = predecessors[current];
+      }
+      path.STATIONS.push_back(srcStation);
+      std::reverse(path.STATIONS.begin(), path.STATIONS.end());
+
+      path.NUMEDGES = (int)path.STATIONS.size() - 1;
+      path.TOTALLENGTH = path.NUMEDGES; // placeholder, adjust with weights
+
+      return path;
+  }
+
+
+  void MapState::printMapState() const {
+      std::cout << "\n===== MAP STRUCTURE =====\n";
+
+      std::cout << "Stations (" << Stations.size() << "):\n";
+      for (const auto* s : Stations) {
+          std::cout << "  - " << std::setw(8) << s->data->name 
+                    << " (ID: " << s->data->ID << ")\n";
+      }
+
+      std::cout << "\nRoads (" << Roads.size() << "):\n";
+      for (const auto* r : Roads) {
+          auto* d = r->data;
+          std::string owner = d->owner ? d->owner->name : "None";
+          std::cout << "  - " << std::setw(6) << d->ID
+                    << " | " << d->endpoints[0]->name << " <-> " << d->endpoints[1]->name
+                    << " | Color: " << d->color
+                    << " | Length: " << d->length
+                    << " | Owner: " << owner
+                    << (d->blocked ? " | BLOCKED" : "")
+                    << "\n";
+      }
+
+      std::cout << "\nConnections:\n";
+      for (const auto* s : Stations) {
+          std::cout << "  " << s->data->name << " -> ";
+          auto adj = getAdjacentStations(const_cast<Station*>(s));
+          for (const auto* adjS : adj)
+              std::cout << adjS->data->name << " ";
+          std::cout << "\n";
+      }
+
+      std::cout << "==========================\n\n";
+  }
+
+  //basically equal to printmapstate for now, but formatted for logging and calls from game
+  std::string MapState::printToString() const { 
+      std::ostringstream out;
+      out << "===== MAP STRUCTURE =====\n";
+
+      out << "Stations (" << Stations.size() << "):\n";
+      for (const auto* s : Stations) {
+          out << "  - " << std::setw(8) << s->data->name 
+              << " (ID: " << s->data->ID << ")\n";
+      }
+
+      out << "\nRoads (" << Roads.size() << "):\n";
+      for (const auto* r : Roads) {
+          auto* d = r->data;
+          std::string owner = d->owner ? d->owner->name : "None";
+          out << "  - " << std::setw(6) << d->ID
+              << " | " << d->endpoints[0]->name << " <-> " << d->endpoints[1]->name
+              << " | Color: " << d->color
+              << " | Length: " << d->length
+              << " | Owner: " << owner
+              << (d->blocked ? " | BLOCKED" : "")
+              << "\n";
+      }
+
+      out << "\nConnections:\n";
+      for (const auto* s : Stations) {
+          out << "  " << s->data->name << " -> ";
+          auto adj = getAdjacentStations(const_cast<Station*>(s));
+          for (const auto* adjS : adj)
+              out << adjS->data->name << " ";
+          out << "\n";
+      }
+
+      out << "==========================\n";
+      return out.str();
+  }
+
+};
