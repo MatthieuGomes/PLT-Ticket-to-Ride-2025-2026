@@ -17,6 +17,9 @@ namespace playersState {
             player->display();
             player->displayHand();
             player->calculateDestinationPoints();
+            player->getLongestPathLength();
+
+
         }
         cout << "-----------------------------" << endl;
     }
