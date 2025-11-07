@@ -8,16 +8,8 @@ namespace cardsState {
   }
   void PlayerCards::display() {
         std::cout << " Player's Destination Cards: " << std::endl;
-        for (const auto& card : this->destinationCards->cards) {
-            if (card) {
-                card->display();
-            }
-        }
+        destinationCards->display();
         std::cout << " Player's Wagon Cards: " << std::endl;
-        for (const auto& card : this->wagonCards->cards) {
-            if (card) {
-                card->display();
-            }
-        }
+         wagonCards->display();
   }
 }

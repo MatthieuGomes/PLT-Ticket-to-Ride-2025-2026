@@ -1,7 +1,12 @@
 #include "Deck.h"
+
+#include <iostream>
+
 #include "Card.h"
 #include "DestinationCard.h"
 #include "WagonCard.h"
+#include <boost/type_index.hpp>
+
 
 namespace cardsState
 {
@@ -45,7 +50,26 @@ namespace cardsState
     }
     template<class CardType>
     void Deck<CardType>::display() {
+        std::cout<<" This is a "<< boost::typeindex::type_id<decltype(this)>().pretty_name() <<" cards deck of "<<boost::typeindex::type_id<CardType>()<<" with " << this->countCards()<<" cards."<< std::endl;
+        for (const std::shared_ptr<CardType> &card: this->cards) {
+            if (card) {
 
+                static_cast<std::shared_ptr<CardType>>(card)->display();
+            }
+        }
+
+    }
+    template<class CardType>
+   int Deck<CardType>::countCards() {
+        int nb=0;
+        for (const std::shared_ptr<CardType> &card: this->cards) {
+            if (card) {
+                nb++;
+
+            }
+
+        }
+        return nb;
     }
     
     template class Deck<DestinationCard>;

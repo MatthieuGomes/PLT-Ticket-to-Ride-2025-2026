@@ -13,7 +13,7 @@ namespace cardsState {
     template <class CardType>
     void FaceUpCards<CardType>::display()
     {
-        std::cout << " This is a face up cards deck with " << this->cards.size() << " cards." << std::endl;
+        Deck<CardType>::display();
     }
     template class FaceUpCards<DestinationCard>;
     template class FaceUpCards<WagonCard>;

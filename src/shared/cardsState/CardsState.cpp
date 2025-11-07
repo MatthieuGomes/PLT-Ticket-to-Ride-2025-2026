@@ -19,5 +19,15 @@ namespace cardsState {
   }
   void CardsState::printCardsState () {
       std::cout << " Current Cards State " << std::endl;
+
+      gameDestinationCards->display();
+      gameWagonCards->display();
+
+        for (const auto& playerCards : playersCards) {
+            std::cout<<"player cards:"<<std::endl;
+            if (playerCards) {
+                playerCards->display();
+            }
+        }
   }
 }
