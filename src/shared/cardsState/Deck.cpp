@@ -47,4 +47,7 @@ namespace cardsState
     void Deck<CardType>::display() {
 
     }
+    
+    template class Deck<DestinationCard>;
+    template class Deck<WagonCard>;
 }

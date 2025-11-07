@@ -1,6 +1,9 @@
 #include <iostream>
 
 #include "FaceDownCards.h"
+#include "DestinationCard.h"
+#include "WagonCard.h"
+
 namespace cardsState {
     // class FaceDownCards -
     template <class CardType>
@@ -12,4 +15,7 @@ namespace cardsState {
     {
         std::cout << " This is a face down cards deck with " << this->cards.size() << " cards." << std::endl;
     }
+
+    template class FaceDownCards<DestinationCard>;
+    template class FaceDownCards<WagonCard>;
 }

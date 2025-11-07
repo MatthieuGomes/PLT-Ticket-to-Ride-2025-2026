@@ -1,4 +1,6 @@
 #include"FaceUpCards.h"
+#include "DestinationCard.h"
+#include "WagonCard.h"
 
 #include <iostream>
 
@@ -13,4 +15,6 @@ namespace cardsState {
     {
         std::cout << " This is a face up cards deck with " << this->cards.size() << " cards." << std::endl;
     }
+    template class FaceUpCards<DestinationCard>;
+    template class FaceUpCards<WagonCard>;
 }
