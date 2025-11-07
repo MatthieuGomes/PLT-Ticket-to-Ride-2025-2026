@@ -40,4 +40,10 @@ namespace cardsState
     {
         cards.clear();
     }
+    template<class CardType>
+    void Deck<CardType>::display() {
+
+    }
+
+
 }
