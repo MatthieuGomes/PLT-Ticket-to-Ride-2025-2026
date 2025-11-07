@@ -1,4 +1,7 @@
 #include "Trash.h"
+#include "DestinationCard.h"
+#include "WagonCard.h"
+
 #include <iostream>
 namespace cardsState {
     // class Trash -
@@ -10,4 +13,7 @@ namespace cardsState {
     {
         std::cout << " This is a trash cards deck with " << this->cards.size() << " cards." << std::endl;
     }
+
+    template class Trash<DestinationCard>;
+    template class Trash<WagonCard>;
 }
