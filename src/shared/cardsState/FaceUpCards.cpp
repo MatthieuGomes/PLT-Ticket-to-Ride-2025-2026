@@ -7,13 +7,8 @@
 namespace cardsState {
     // class FaceUpCards -
     template <class CardType>
-    FaceUpCards<CardType>::FaceUpCards(std::vector<CardType> *cards) : Deck<CardType>(cards)
-    {
-    }
-    template <class CardType>
-    void FaceUpCards<CardType>::display()
-    {
-        Deck<CardType>::display();
+    FaceUpCards<CardType>::FaceUpCards(std::vector<CardType> *cards) : Deck<CardType>(cards){
+        this->className = "FaceUpCards";
     }
     template class FaceUpCards<DestinationCard>;
     template class FaceUpCards<WagonCard>;

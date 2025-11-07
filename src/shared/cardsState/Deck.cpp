@@ -14,6 +14,7 @@ namespace cardsState
     template <class CardType>
     Deck<CardType>::Deck(std::vector<CardType> *cards)
     {
+        this->className = "Deck";
         if (cards)
         {
             for (const auto &card : *cards)
@@ -50,7 +51,7 @@ namespace cardsState
     }
     template<class CardType>
     void Deck<CardType>::display() {
-        std::cout<<" This is a "<< boost::typeindex::type_id<decltype(this)>().pretty_name() <<" cards deck of "<<boost::typeindex::type_id<CardType>()<<" with " << this->countCards()<<" cards."<< std::endl;
+        std::cout<<" This is a "<< this->className <<" of "<< this->getCardTypeName() <<" with " << this->countCards()<<" cards."<< std::endl;
         for (const std::shared_ptr<CardType> &card: this->cards) {
             if (card) {
 
@@ -60,18 +61,23 @@ namespace cardsState
 
     }
     template<class CardType>
-   int Deck<CardType>::countCards() {
+    int Deck<CardType>::countCards() {
         int nb=0;
         for (const std::shared_ptr<CardType> &card: this->cards) {
             if (card) {
                 nb++;
-
             }
-
         }
         return nb;
     }
     
+    template <class CardType>
+    std::string Deck<CardType>::getCardTypeName() {
+        std::string typeName_full = boost::typeindex::type_id<CardType>().pretty_name();
+        std::string typeName_short = typeName_full.substr(typeName_full.find_last_of("::") + 1);
+        return typeName_short;
+    }
+
     template class Deck<DestinationCard>;
     template class Deck<WagonCard>;
 }
