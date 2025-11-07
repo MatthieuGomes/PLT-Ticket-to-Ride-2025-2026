@@ -1,4 +1,7 @@
 #include "Deck.h"
+#include "Card.h"
+#include "DestinationCard.h"
+#include "WagonCard.h"
 
 namespace cardsState
 {
@@ -31,7 +34,7 @@ namespace cardsState
         {
             return nullptr; // or throw an exception
         }
-        CardType *removedCard = std::move(cards[position]);
+        CardType * removedCard = std::move(cards[position]).get();
         cards.erase(cards.begin() + position);
         return removedCard;
     }
@@ -44,6 +47,4 @@ namespace cardsState
     void Deck<CardType>::display() {
 
     }
-
-
 }
