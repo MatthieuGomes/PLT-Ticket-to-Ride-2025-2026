@@ -13,8 +13,8 @@ namespace cardsState {
 
   /// class CardsState - 
   CardsState::CardsState () {
-      this->gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>();
-      this->gameWagonCards = std::make_shared<SharedDeck<WagonCard>>();
+      this->gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>(nullptr,nullptr,nullptr);
+      this->gameWagonCards = std::make_shared<SharedDeck<WagonCard>>(nullptr,nullptr,nullptr);
       this->playersCards = std::vector<std::shared_ptr<PlayerCards>>{};
   }
   void CardsState::printCardsState () {
