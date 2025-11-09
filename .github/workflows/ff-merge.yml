@@ -1,0 +1,62 @@
+name: Fast-Forward Merge
+run-name: Fast-Forward Merge
+on:
+    issue_comment:
+        types: [created]
+env:
+    GH_TOKEN: ${{ github.token }}
+
+jobs:
+    ff_merge:
+        name : Try Fast-Forward Merge
+        if: ${{ github.event.issue.pull_request }} && contains(github.event.comment.body, '/ff-merge')
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Set up Git
+              run: |
+                git config --global user.name "github-ff-merger[bot]"
+                git config --global user.email "github-ff-merger[bot]@users.noreply.github.com"
+
+            - name: Check Fast-Forward Merge Possibility
+              id: ff-check
+              run: |
+                PR_NUMBER=$(echo "${{ github.event.issue.number }}")
+                TARGET_BRANCH=$(gh pr view $PR_NUMBER --json baseRefName --jq '.baseRefName')
+                SOURCE_BRANCH=$(gh pr view $PR_NUMBER --json headRefName --jq '.headRefName')
+
+                git fetch origin $TARGET_BRANCH
+                git fetch origin $SOURCE_BRANCH
+
+                if git merge-base --is-ancestor origin/$TARGET_BRANCH origin/$SOURCE_BRANCH; then
+                    echo "ff_merge_possible=true" >> $GITHUB_OUTPUT
+                else
+                    echo "ff_merge_possible=false" >> $GITHUB_OUTPUT
+                fi
+
+            - name: Post Comment if FF Merge Not Possible
+              if: steps.ff-check.outputs.ff_merge_possible == 'false'
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const issue_number = context.payload.issue.number;
+                      await github.issues.createComment({
+                          ...context.repo,
+                          issue_number,
+                          body: "Fast-Forward merge is not possible for this pull request."
+                      });
+
+            - name: Perform Fast-Forward Merge
+              if: steps.ff-check.outputs.ff_merge_possible == 'true'
+              run: |
+                    PR_NUMBER=$(echo "${{ github.event.issue.number }}")
+                    TARGET_BRANCH=$(gh pr view $PR_NUMBER --json baseRefName --jq '.baseRefName')
+                    SOURCE_BRANCH=$(gh pr view $PR_NUMBER --json headRefName --jq '.headRefName')
+
+                    git checkout $TARGET_BRANCH
+                    git merge --ff-only origin/$SOURCE_BRANCH
+                    git push origin $TARGET_BRANCH
+        
+        
