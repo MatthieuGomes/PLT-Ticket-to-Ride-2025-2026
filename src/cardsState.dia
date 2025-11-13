@@ -967,7 +967,14 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>##</dia:string>
+        <dia:string>#
+/**
+WagonCard is a concrete class derived from Card. Each Wagon card has a color,
+ defined by the ColorCard enumeration. These cards are collected by players
+ and spent to claim routes on the board.
+@property color public ColorCard This attribute uses the ColorCard enum to represent
+      the card's color 
+*/#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -1090,7 +1097,11 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#WagonCard
+/** Method - WagonCard
+Constructs a new WagonCard with a given color.
+@param color ColorCard 
+*/#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1138,7 +1149,9 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#
+/** Method - display() Displays information about the wagon card
+*/#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
