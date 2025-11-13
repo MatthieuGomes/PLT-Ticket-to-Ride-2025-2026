@@ -507,17 +507,56 @@ gen_class(umlclassnode *node)
             /* print comments on operation */
             if (strlen(umlo->key.attr.comment))
             {
-                print("/// %s\n", umlo->key.attr.comment);
-                tmpa = umlo->key.parameters;
-                while (tmpa != NULL)
+                print("/// %s\n", umlo->key.attr.name);
+                char * visibility;
+                switch (umlo->key.attr.visibility)
                 {
-                    print("/// @param %s\t\t(%s) %s\n",
-                          tmpa->key.name,
-                          kind_str(tmpa->key.kind),
-                          tmpa->key.comment);
-                    tmpa = tmpa->next;
+                case '0':
+                    visibility = "Public";
+                    break;
+                case '1':
+                    visibility = "Private";
+                    break;
+                case '2':
+                    visibility = "Protected";
+                    break;
                 }
+                print("/** %s Method - \n", visibility);
+                {
+                    char *s = umlo->key.attr.comment;
+                    char *line_start = s;
+                    char *nl;
+                    char line[SMALL_BUFFER];
+
+                    while (line_start && *line_start) {
+                        nl = strchr(line_start, '\n');
+                        size_t len;
+                        if (nl) {
+                            len = nl - line_start;
+                            if (len >= sizeof(line))
+                                len = sizeof(line) - 1;
+                            memcpy(line, line_start, len);
+                            line[len] = '\0';
+                            /* strip possible CR from Windows line endings */
+                            if (len > 0 && line[len - 1] == '\r')
+                                line[len - 1] = '\0';
+                            print(" * %s\n", line);
+                            line_start = nl + 1;
+                        } else {
+                            /* last line (no trailing newline) */
+                            strncpy(line, line_start, sizeof(line) - 1);
+                            line[sizeof(line) - 1] = '\0';
+                            len = strlen(line);
+                            if (len > 0 && line[len - 1] == '\r')
+                                line[len - 1] = '\0';
+                            print(" * %s\n", line);
+                            break;
+                        }
+                    }
+                }
+                print(" */\n");
             }
+            
             /* print operation */
             print("");
             if (umlo->key.attr.inheritance_type == '1')
