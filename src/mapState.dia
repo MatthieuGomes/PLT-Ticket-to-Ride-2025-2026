@@ -543,7 +543,7 @@
                 <dia:string>#u#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#StationData*#</dia:string>
+                <dia:string>#Station*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -560,7 +560,7 @@
                 <dia:string>#v#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#StationData*#</dia:string>
+                <dia:string>#Station*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -656,7 +656,7 @@
                 <dia:string>#src#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#StationData*#</dia:string>
+                <dia:string>#Station*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -673,7 +673,7 @@
                 <dia:string>#dest#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#StationData*#</dia:string>
+                <dia:string>#Station*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
