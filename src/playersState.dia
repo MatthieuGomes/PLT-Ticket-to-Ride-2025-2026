@@ -1517,7 +1517,7 @@ Method - display the cards in of  a player
             <dia:string>#calculateDestinationPoints
 /**
 Method - calculate player destinations points 
-@return int 
+@return int destinations points  
 */#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
@@ -1551,7 +1551,7 @@ Method - calculate player destinations points
             <dia:string>#getLongestPathLength
 /**
 Method - calculate the longet path  of a player 
-@return int 
+@return int longest path
 */#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
