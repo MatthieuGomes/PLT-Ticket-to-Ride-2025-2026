@@ -32,6 +32,12 @@ int main(int argc,char* argv[])
         } else {
             cout << "getroad berlin-rome: " << roadptr->data->ID << endl;
         }
+        mapState::Path pth = map.findShortestPath(map.getStationByName("Paris"), map.getStationByName("Rome")); 
+        for (auto s : pth.STATIONS) {
+            cout << "findshortestpath test stations:" << s->data->name << endl;
+        }
+        cout << "printtostring test:" << endl;
+        cout << map.printToString() << endl; 
         return EXIT_FAILURE;
     }
     client::Client client = client::Client();

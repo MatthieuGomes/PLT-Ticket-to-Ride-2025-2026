@@ -73,13 +73,110 @@ namespace mapState {
     }
 
     Road* MapState::getRoad(Station* u, Station* v) {
-    for (auto* r : Roads) {
-        auto ep = r->data->endpoints;
-        if ((ep[0] == u->data && ep[1] == v->data) ||
-            (ep[0] == v->data && ep[1] == u->data))
-            return r;
+      for (auto* r : Roads) {
+          auto ep = r->data->endpoints;
+          if ((ep[0] == u->data && ep[1] == v->data) ||
+              (ep[0] == v->data && ep[1] == u->data))
+              return r;
+      }
+      return nullptr;
     }
-    return nullptr;
-}
+
+    Path MapState::findShortestPath(Station* src, Station* dest) {
+        Path path;
+
+        if (!src || !dest) return path;
+
+        boost::adjacency_list<>& g = gameGraph;
+        using vertex_descriptor =
+            boost::graph_traits<boost::adjacency_list<>>::vertex_descriptor;
+        using edge_descriptor =
+            boost::graph_traits<boost::adjacency_list<>>::edge_descriptor;
+
+        std::size_t n = boost::num_vertices(g);
+
+        std::vector<int> distances(n, std::numeric_limits<int>::max());
+        std::vector<vertex_descriptor> predecessors(n);
+
+        auto weightMap =
+            boost::make_static_property_map<edge_descriptor>(1);
+
+        boost::dijkstra_shortest_paths(
+            g,
+            src->vertex,
+            boost::predecessor_map(
+                boost::make_iterator_property_map(
+                    predecessors.begin(),
+                    boost::get(boost::vertex_index, g)
+                )
+            ).distance_map(
+                boost::make_iterator_property_map(
+                    distances.begin(),
+                    boost::get(boost::vertex_index, g)
+                )
+            ).weight_map(weightMap)
+        );
+
+        auto vertexToStation =
+            [this](vertex_descriptor v) -> Station* {
+                for (Station* s : this->Stations) {
+                    if (s->vertex == v) return s;
+                }
+                return nullptr;
+            };
+
+        vertex_descriptor current = dest->vertex;
+        if (distances[current] == std::numeric_limits<int>::max())
+            return path;
+
+        while (true) {
+            Station* s = vertexToStation(current);
+            if (s) path.STATIONS.push_back(s);
+
+            if (current == src->vertex) break;
+
+            vertex_descriptor pred = predecessors[current];
+            if (pred == current) break;
+
+            current = pred;
+        }
+
+        std::reverse(path.STATIONS.begin(), path.STATIONS.end());
+        path.NUMEDGES = int(path.STATIONS.size()) - 1;
+        path.TOTALLENGTH = path.NUMEDGES;
+        return path;
+    }
+
+    std::string MapState::printToString() const { 
+      std::ostringstream out;
+      out << "===== MAP STRUCTURE =====\n";
+
+      out << "Stations (" << Stations.size() << "):\n";
+      for (const auto* s : Stations) {
+          out << "  - " << std::setw(8) << s->data->name 
+              << " (ID: " << s->data->ID << ")\n";
+      }
+
+      out << "\nRoads (" << Roads.size() << "):\n";
+      for (const auto* r : Roads) {
+          auto* d = r->data;
+          out << "  - " << std::setw(6) << d->ID
+              << " | " << d->endpoints[0]->name << " <-> " << d->endpoints[1]->name
+              << " | Color: " << d->color
+              << " | Length: " << d->length
+              << (d->isBlocked ? " | BLOCKED" : "")
+              << "\n";
+      }
+
+      out << "\nConnections:\n";
+      for (const auto* s : Stations) {
+          out << "  " << s->data->name << " -> ";
+          out << "\n";
+      }
+
+      out << "==========================\n";
+      return out.str();
+    }
+
 
 };
