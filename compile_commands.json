@@ -55,9 +55,69 @@
 },
 {
   "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/Card.cpp.o -c /app/src/shared/cardsState/Card.cpp",
+  "file": "/app/src/shared/cardsState/Card.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/Card.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
   "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/CardsState.cpp.o -c /app/src/shared/cardsState/CardsState.cpp",
   "file": "/app/src/shared/cardsState/CardsState.cpp",
   "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/CardsState.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/ColorCard.cpp.o -c /app/src/shared/cardsState/ColorCard.cpp",
+  "file": "/app/src/shared/cardsState/ColorCard.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/ColorCard.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/Deck.cpp.o -c /app/src/shared/cardsState/Deck.cpp",
+  "file": "/app/src/shared/cardsState/Deck.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/Deck.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/DestinationCard.cpp.o -c /app/src/shared/cardsState/DestinationCard.cpp",
+  "file": "/app/src/shared/cardsState/DestinationCard.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/DestinationCard.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/FaceDowncards.cpp.o -c /app/src/shared/cardsState/FaceDowncards.cpp",
+  "file": "/app/src/shared/cardsState/FaceDowncards.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/FaceDowncards.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/FaceUpCards.cpp.o -c /app/src/shared/cardsState/FaceUpCards.cpp",
+  "file": "/app/src/shared/cardsState/FaceUpCards.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/FaceUpCards.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/PlayerCards.cpp.o -c /app/src/shared/cardsState/PlayerCards.cpp",
+  "file": "/app/src/shared/cardsState/PlayerCards.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/PlayerCards.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/SharedDeck.cpp.o -c /app/src/shared/cardsState/SharedDeck.cpp",
+  "file": "/app/src/shared/cardsState/SharedDeck.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/SharedDeck.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/Trash.cpp.o -c /app/src/shared/cardsState/Trash.cpp",
+  "file": "/app/src/shared/cardsState/Trash.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/Trash.cpp.o"
+},
+{
+  "directory": "/app/src/shared",
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/cardsState/WagonCard.cpp.o -c /app/src/shared/cardsState/WagonCard.cpp",
+  "file": "/app/src/shared/cardsState/WagonCard.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/cardsState/WagonCard.cpp.o"
 },
 {
   "directory": "/app/src/shared",
@@ -73,15 +133,9 @@
 },
 {
   "directory": "/app/src/shared",
-  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/mapState/mapState.cpp.o -c /app/src/shared/mapState/mapState.cpp",
-  "file": "/app/src/shared/mapState/mapState.cpp",
-  "output": "src/shared/CMakeFiles/shared_static.dir/mapState/mapState.cpp.o"
-},
-{
-  "directory": "/app/src/shared",
-  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/mapState/mapStateTest.cpp.o -c /app/src/shared/mapState/mapStateTest.cpp",
-  "file": "/app/src/shared/mapState/mapStateTest.cpp",
-  "output": "src/shared/CMakeFiles/shared_static.dir/mapState/mapStateTest.cpp.o"
+  "command": "/usr/bin/g++  -I/app/src/shared -I/app/extern/jsoncpp-1.8.0  -Wall -std=c++11 -pthread -g -g --coverage -g -std=gnu++17 -o CMakeFiles/shared_static.dir/playersState/Player.cpp.o -c /app/src/shared/playersState/Player.cpp",
+  "file": "/app/src/shared/playersState/Player.cpp",
+  "output": "src/shared/CMakeFiles/shared_static.dir/playersState/Player.cpp.o"
 },
 {
   "directory": "/app/src/shared",

@@ -57,4 +57,12 @@ namespace mapState {
         }
     }
 
+    std::vector<Station*> MapState::listStations() const {
+      return Stations;
+    }
+
+    std::vector<Road*> MapState::listRoads() const {
+      return Roads;
+    }
+
 };

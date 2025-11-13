@@ -45,7 +45,7 @@ RUN [ -z "$WAYLAND_DISPLAY" ] && echo 'export QT_QPA_PLATFORM=xcb' >> ~/.bashrc 
 ENV LC_ALL="C.UTF-8"
 ENV LANG="C.UTF-8"
 
-RUN mkdir docker-build && cd docker-build && cmake .. && make client && cd ..
+#RUN mkdir docker-build && cd docker-build && cmake .. && make client && cd ..
 
 SHELL ["/bin/bash", "--login", "-c"]
 

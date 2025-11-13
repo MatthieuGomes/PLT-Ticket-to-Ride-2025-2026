@@ -17,6 +17,13 @@ int main(int argc,char* argv[])
     cout << "Client application started." << endl;
     if (argc<=1) {
         cout << "So far, nothing here..." << endl;
+        cout << "Testing map" << endl;
+        mapState::MapState map;
+        map.printMapState();
+        std::vector<mapState::Station*> stations = map.listStations();
+        cout << "Testing station:" << &stations[1] << endl;
+        std::vector<mapState::Road*> roads = map.listRoads();
+        cout << "Testing road:" << &roads[2] << endl;
         return EXIT_FAILURE;
     }
     client::Client client = client::Client();
@@ -28,5 +35,9 @@ int main(int argc,char* argv[])
         client.printState();
         return EXIT_SUCCESS;
     }
+
+
+
     return EXIT_SUCCESS;
+
 }
