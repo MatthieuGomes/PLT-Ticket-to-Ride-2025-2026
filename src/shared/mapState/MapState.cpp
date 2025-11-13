@@ -65,4 +65,21 @@ namespace mapState {
       return Roads;
     }
 
+    Station* MapState::getStationByName(const std::string& name) {
+      for (auto* s : Stations)
+          if (s->data->name == name)
+              return s;
+      return nullptr;
+    }
+
+    Road* MapState::getRoad(Station* u, Station* v) {
+    for (auto* r : Roads) {
+        auto ep = r->data->endpoints;
+        if ((ep[0] == u->data && ep[1] == v->data) ||
+            (ep[0] == v->data && ep[1] == u->data))
+            return r;
+    }
+    return nullptr;
+}
+
 };
