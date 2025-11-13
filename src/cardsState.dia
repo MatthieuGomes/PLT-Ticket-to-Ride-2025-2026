@@ -580,7 +580,13 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>##</dia:string>
+        <dia:string>#
+/** A DestinationCard is a concrete card type derived from Card. Each destination card
+ specifies two cities that the player must connect using claimed routes during the game.
+@property cityA private string 
+@property cityB private string 
+@property points private int 
+*/#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -749,7 +755,12 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#
+/** Method - DestinationCard Constructs a new DestinationCard.
+@param cityA string Name of the first city.
+@param cityB string Name of the second city.
+@param points int  The number of points for this destination.
+*/#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -831,7 +842,10 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#
+/** Method - getCityA string Gets the name of the first city 
+@return the cityA string
+*/#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -861,7 +875,10 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#
+/** Method - getCityB string Gets the name of the second city 
+@return the cityB string
+*/#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -891,7 +908,10 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#
+/**Method getPoints Gets the point value of the destination card
+@return the int points
+*/ #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -921,7 +941,9 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#
+/** Method display Displays detailed information about the destination card
+*/#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
