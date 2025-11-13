@@ -322,8 +322,40 @@ gen_class(umlclassnode *node)
         print("// %s\n", stype);
         is_valuetype = eq(stype, "CORBAValue");
     }
+    print("/** %s\n",name);
+    print(" * Class - \n");
+    char *s = node->key->comment;
+    char *line_start = s;
+    char *nl;
+    char line[SMALL_BUFFER];
 
-    print("/// class %s - %s\n", name, node->key->comment);
+    while (line_start && *line_start) {
+        nl = strchr(line_start, '\n');
+        size_t len;
+        if (nl) {
+            len = nl - line_start;
+            if (len >= sizeof(line))
+                len = sizeof(line) - 1;
+            memcpy(line, line_start, len);
+            line[len] = '\0';
+            /* strip possible CR from Windows line endings */
+            if (len > 0 && line[len - 1] == '\r')
+                line[len - 1] = '\0';
+            print(" * %s\n", line);
+            line_start = nl + 1;
+        } else {
+            /* last line (no trailing newline) */
+            strncpy(line, line_start, sizeof(line) - 1);
+            line[sizeof(line) - 1] = '\0';
+            len = strlen(line);
+            if (len > 0 && line[len - 1] == '\r')
+                line[len - 1] = '\0';
+            print(" * %s\n", line);
+            break;
+        }
+    }
+    
+    print(" */\n");
 
     if (node->key->templates != NULL)
     {
@@ -759,6 +791,38 @@ gen_decl(declaration *d)
     }
     else if (is_enum_stereo(stype))
     {
+        print("/** %s\n",name);
+        print(" * Enum - \n");
+        char *s = node->key->comment;
+        char *line_start = s;
+        char *nl;
+        char line[SMALL_BUFFER];
+        while (line_start && *line_start) {
+            nl = strchr(line_start, '\n');
+            size_t len;
+            if (nl) {
+                len = nl - line_start;
+                if (len >= sizeof(line))
+                    len = sizeof(line) - 1;
+                memcpy(line, line_start, len);
+                line[len] = '\0';
+                /* strip possible CR from Windows line endings */
+                if (len > 0 && line[len - 1] == '\r')
+                    line[len - 1] = '\0';
+                print(" * %s\n", line);
+                line_start = nl + 1;
+            } else {
+                /* last line (no trailing newline) */
+                strncpy(line, line_start, sizeof(line) - 1);
+                line[sizeof(line) - 1] = '\0';
+                len = strlen(line);
+                if (len > 0 && line[len - 1] == '\r')
+                    line[len - 1] = '\0';
+                print(" * %s\n", line);
+                break;
+            }
+        }
+        print(" */\n");
         print("enum %s {\n", name);
         indentlevel++;
         while (umla != NULL)
