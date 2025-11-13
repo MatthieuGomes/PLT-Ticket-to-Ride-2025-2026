@@ -318,7 +318,7 @@ constructor
           <dia:attribute name="comment">
             <dia:string>#printPLayersState 
 /**
-Method - printing the players state 
+Method - print the players state 
 */#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
