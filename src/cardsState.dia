@@ -401,7 +401,10 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>##</dia:string>
+        <dia:string>#base class representing a generic game card
+/// This class serves as the parent for all card types in the game:
+/// - Wagon cards
+/// - Destination cards#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="true"/>
@@ -500,7 +503,7 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#Virtual destructor#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -530,7 +533,8 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>##</dia:string>
+            <dia:string>#Displays information about the card
+///This pure virtual method must be implemented by all subclasses.#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="true"/>
