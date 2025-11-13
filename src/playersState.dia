@@ -156,11 +156,7 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>#
-/**
-class PlayersState
-@property players [private] std::vector&lt;Player*&gt;  vector  of players 
-*/#</dia:string>
+        <dia:string>#@property players [private] std::vector&lt;Player*&gt;  vector  of players#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -283,10 +279,7 @@ class PlayersState
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#PlayersState
-/**
-constructor
-*/#</dia:string>
+            <dia:string>#constructor#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -316,10 +309,7 @@ constructor
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#printPLayersState 
-/**
-Method - print the players state 
-*/#</dia:string>
+            <dia:string>#print the players state#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -365,18 +355,14 @@ Method - print the players state
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>#
-/**
-class Player
-@property id [private] int Player identifier
+        <dia:string>#@property id [private] int Player identifier
 @property name [private]  std::string Player name
 @property color  [private] cardsState::ColorCard  Player  color card
 @property score [private] int  Player score
 @property numTrains [private] int Player  number of trains 
 @property nbStations [private] int Player number of stations
 @property nbRoads [private] int Player number of roads 
-@property hand [private] cardsState::PlayerCards* Player hand of cards 
-*/#</dia:string>
+@property hand [private] cardsState::PlayerCards* Player hand of cards #</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -660,9 +646,7 @@ class Player
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#Player
-/**
-constructor
+            <dia:string>#constructor
 @param id int  
 @param name std::string 
 @param clor cardsState::ColorCard
@@ -670,8 +654,7 @@ constructor
 @param numTrains int
 @param nbStations int 
 @param nbRoads int
-@param hand cardsState::PlayerCards*   
-*/#</dia:string>
+@param hand cardsState::PlayerCards*#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -838,12 +821,8 @@ constructor
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#getId
-/**
-Method - getter id  
-@return int return  the id  of a   player  
-*/
-#</dia:string>
+            <dia:string>#getter id  
+@return int return  the id  of a   player  #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -873,12 +852,8 @@ Method - getter id
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#setId
-/**
-Method - 
-setter id 
-@param id int 
-*/#</dia:string>
+            <dia:string>#setter id 
+@param id int #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -926,11 +901,8 @@ setter id
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#getName
-/**
-Method - getter name
-@return std::string return the  name  of a player 
-*/#</dia:string>
+            <dia:string>#getter name
+@return std::string return the  name  of a player #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -960,11 +932,8 @@ Method - getter name
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#setName
-/**
-Method - setter name
-@param name std::string 
-*/#</dia:string>
+            <dia:string>#setter name
+@param name std::string#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1012,11 +981,8 @@ Method - setter name
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#getNumTrains
-/** 
-Method - getter numTrains
-@return int return the number of trains of a  player 
-*/ #</dia:string>
+            <dia:string>#getter numTrains
+@return int return the number of trains of a  player#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1046,11 +1012,8 @@ Method - getter numTrains
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#setNumTrains
-/**
-Method - setter numTrains
-@param numTrains int 
-*/#</dia:string>
+            <dia:string>#setter numTrains
+@param numTrains int #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1098,11 +1061,8 @@ Method - setter numTrains
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#getNbStations
-/**
-Method - getter nbStations 
-@return int return number of stations  of  a player 
-*/#</dia:string>
+            <dia:string>#getter nbStations 
+@return int return number of stations  of  a player #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1132,12 +1092,8 @@ Method - getter nbStations
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#setNbStations
-/** 
-Method - setter nbStations 
-@param nbStations int 
-*/ 
-#</dia:string>
+            <dia:string>#setter nbStations 
+@param nbStations int #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1185,11 +1141,8 @@ Method - setter nbStations
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#getNbRoads
-/**
-Method - getter nbRoads 
-@return int return number of  roads  of a player 
-*/#</dia:string>
+            <dia:string>#getter nbRoads 
+@return int return number of  roads  of a player #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1219,11 +1172,8 @@ Method - getter nbRoads
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#setNbRoads
-/**
-Method - setter nbRoads
-@param nbRoads int 
-*/#</dia:string>
+            <dia:string>#setter nbRoads
+@param nbRoads int #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1271,11 +1221,8 @@ Method - setter nbRoads
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#addToScore
-/**
-Method - calculate the  score  of a player
-@param points int 
-*/ #</dia:string>
+            <dia:string>#calculate the  score  of a player
+@param points int #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1323,12 +1270,9 @@ Method - calculate the  score  of a player
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#placeTrains
-/** 
-Method - mark the trains 
+            <dia:string>#mark the trains 
 @param num int 
-@return bool 
-*/#</dia:string>
+@return bool #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1376,11 +1320,8 @@ Method - mark the trains
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#addCardToHand
-/**
-Method - pick cards 
-@param c cardsState::WagonCard*
-*/ #</dia:string>
+            <dia:string>#pick cards 
+@param c cardsState::WagonCard*#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1428,12 +1369,8 @@ Method - pick cards
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#removeCardsFromHand
-/**
-Method - remove  cards 
-@param cards td::vector&lt;cardsState::WagonCard*&gt; vector of wagon cards  
-*/ 
-#</dia:string>
+            <dia:string>#remove  cards 
+@param cards td::vector&lt;cardsState::WagonCard*&gt; vector of wagon cards#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1481,10 +1418,7 @@ Method - remove  cards
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#displayHand
-/**
-Method - display the cards in of  a player
-*/ #</dia:string>
+            <dia:string>#display the cards in of  a player#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1514,11 +1448,8 @@ Method - display the cards in of  a player
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#calculateDestinationPoints
-/**
-Method - calculate player destinations points 
-@return int destinations points  
-*/#</dia:string>
+            <dia:string>#calculate player destinations points 
+@return int destinations points#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1548,11 +1479,8 @@ Method - calculate player destinations points
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#getLongestPathLength
-/**
-Method - calculate the longet path  of a player 
-@return int longest path
-*/#</dia:string>
+            <dia:string>#calculate the longet path  of a player 
+@return int longest path#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1582,10 +1510,7 @@ Method - calculate the longet path  of a player
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string># display
-/**
-Method - display  the informations of  a  player 
-*/ #</dia:string>
+            <dia:string>#display  the informations of  a  player #</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1846,16 +1771,16 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O6">
       <dia:attribute name="obj_pos">
-        <dia:point val="97.5798,14.2193"/>
+        <dia:point val="97.5798,14.2192"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="15.2656,-11.115;98.3298,15.0193"/>
+        <dia:rectangle val="15.2656,-11.115;98.3298,15.0192"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="97.5798,14.2193"/>
+        <dia:point val="97.5798,14.2192"/>
         <dia:point val="97.5798,5.79444"/>
         <dia:point val="15.3156,5.79444"/>
         <dia:point val="15.3156,-11.065"/>
@@ -2278,8 +2203,8 @@ Method - display  the informations of  a  player
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="97.5798,14.2088"/>
-        <dia:point val="97.5798,-0.120185"/>
-        <dia:point val="46.3124,-0.120185"/>
+        <dia:point val="97.5798,-0.120201"/>
+        <dia:point val="46.3124,-0.120201"/>
         <dia:point val="46.3124,-13.7492"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -2358,8 +2283,8 @@ Method - display  the informations of  a  player
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="97.5798,14.2088"/>
-        <dia:point val="97.5798,-1.73214"/>
-        <dia:point val="83.8345,-1.73214"/>
+        <dia:point val="97.5798,-1.73215"/>
+        <dia:point val="83.8345,-1.73215"/>
         <dia:point val="83.8345,-16.9731"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -2438,8 +2363,8 @@ Method - display  the informations of  a  player
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="97.5798,14.2088"/>
-        <dia:point val="97.5798,-1.40284"/>
-        <dia:point val="112.79,-1.40284"/>
+        <dia:point val="97.5798,-1.40285"/>
+        <dia:point val="112.79,-1.40285"/>
         <dia:point val="112.79,-16.3145"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
