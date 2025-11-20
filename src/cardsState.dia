@@ -402,9 +402,9 @@
       </dia:attribute>
       <dia:attribute name="comment">
         <dia:string>#base class representing a generic game card
-/// This class serves as the parent for all card types in the game:
-/// - Wagon cards
-/// - Destination cards#</dia:string>
+This class serves as the parent for all card types in the game:
+- Wagon cards
+- Destination cards#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="true"/>
@@ -580,13 +580,12 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>#
-/** A DestinationCard is a concrete card type derived from Card. Each destination card
+        <dia:string>#A DestinationCard is a concrete card type derived from Card. Each destination card
  specifies two cities that the player must connect using claimed routes during the game.
 @property cityA private string 
 @property cityB private string 
 @property points private int 
-*/#</dia:string>
+#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -755,12 +754,10 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#
-/** Method - DestinationCard Constructs a new DestinationCard.
+            <dia:string>#Method - DestinationCard Constructs a new DestinationCard.
 @param cityA string Name of the first city.
 @param cityB string Name of the second city.
-@param points int  The number of points for this destination.
-*/#</dia:string>
+@param points int  The number of points for this destination.#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -842,10 +839,8 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#
-/** Method - getCityA string Gets the name of the first city 
-@return the cityA string
-*/#</dia:string>
+            <dia:string>#Method - getCityA string Gets the name of the first city 
+@return the cityA string#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -875,10 +870,8 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#
-/** Method - getCityB string Gets the name of the second city 
-@return the cityB string
-*/#</dia:string>
+            <dia:string>#Method - getCityB string Gets the name of the second city 
+@return the cityB string#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -908,10 +901,8 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#
-/**Method getPoints Gets the point value of the destination card
-@return the int points
-*/ #</dia:string>
+            <dia:string>#Method getPoints Gets the point value of the destination card
+@return the int points#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -941,9 +932,7 @@
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#
-/** Method display Displays detailed information about the destination card
-*/#</dia:string>
+            <dia:string>#Method display Displays detailed information about the destination card#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -989,14 +978,12 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>#
-/**
-WagonCard is a concrete class derived from Card. Each Wagon card has a color,
+        <dia:string>#WagonCard is a concrete class derived from Card. Each Wagon card has a color,
  defined by the ColorCard enumeration. These cards are collected by players
  and spent to claim routes on the board.
 @property color public ColorCard This attribute uses the ColorCard enum to represent
       the card's color 
-*/#</dia:string>
+#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -1120,10 +1107,10 @@ WagonCard is a concrete class derived from Card. Each Wagon card has a color,
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>#WagonCard
-/** Method - WagonCard
+Method - WagonCard
 Constructs a new WagonCard with a given color.
 @param color ColorCard 
-*/#</dia:string>
+#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1171,9 +1158,7 @@ Constructs a new WagonCard with a given color.
             <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
-            <dia:string>#
-/** Method - display() Displays information about the wagon card
-*/#</dia:string>
+            <dia:string>#Method - display() Displays information about the wagon card#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -1321,7 +1306,11 @@ Constructs a new WagonCard with a given color.
         <dia:string>#Enum#</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>##</dia:string>
+        <dia:string>#ColorCard
+Enumeration representing all possible colors of Wagon cards.
+Special values:
+ - LOCOMOTIVE : Represents a wildcard card that can substitute for any color.
+ - NONE       : A fallback value for undefined or uninitialized colors.#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="false"/>
@@ -1747,7 +1736,10 @@ Constructs a new WagonCard with a given color.
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:attribute name="comment">
-        <dia:string>##</dia:string>
+        <dia:string>#
+/**Generic deck class that stores and manages a collection of cards.
+ The Deck class represents a stack of cards of a given type (CardType).
+@property cards public vector&lt;shared_ptr&lt;CardType&gt;&gt;#</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
         <dia:boolean val="true"/>
