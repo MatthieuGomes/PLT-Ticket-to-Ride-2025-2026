@@ -1,0 +1,13 @@
+test_shared 0 0
+test_state 0 0
+test_cards_state 0 0
+test_players_state 0 0
+test_map_state 0 0
+test_client_dummy 0 0
+---
+test_shared
+test_state
+test_cards_state
+test_players_state
+test_map_state
+test_client_dummy
