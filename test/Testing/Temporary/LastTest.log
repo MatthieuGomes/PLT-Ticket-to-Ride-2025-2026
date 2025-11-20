@@ -1,0 +1,99 @@
+Start testing: Nov 13 11:42 UTC
+----------------------------------------------------------
+Unable to find executable: /app/test/shared/test_shared
+1/6 Testing: test_shared
+1/6 Test: test_shared
+Command: ""
+Directory: /app
+"test_shared" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_shared" end time: Nov 13 11:42 UTC
+"test_shared" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /app/test/shared/state/test_state
+2/6 Testing: test_state
+2/6 Test: test_state
+Command: ""
+Directory: /app
+"test_state" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_state" end time: Nov 13 11:42 UTC
+"test_state" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /app/test/shared/cardsState/test_cards_state
+3/6 Testing: test_cards_state
+3/6 Test: test_cards_state
+Command: ""
+Directory: /app
+"test_cards_state" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_cards_state" end time: Nov 13 11:42 UTC
+"test_cards_state" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /app/test/shared/playersState/test_players_state
+4/6 Testing: test_players_state
+4/6 Test: test_players_state
+Command: ""
+Directory: /app
+"test_players_state" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_players_state" end time: Nov 13 11:42 UTC
+"test_players_state" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /app/test/shared/mapState/test_map_state
+5/6 Testing: test_map_state
+5/6 Test: test_map_state
+Command: ""
+Directory: /app
+"test_map_state" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_map_state" end time: Nov 13 11:42 UTC
+"test_map_state" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /app/test/client/test_client_dummy
+6/6 Testing: test_client_dummy
+6/6 Test: test_client_dummy
+Command: ""
+Directory: /app
+"test_client_dummy" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_client_dummy" end time: Nov 13 11:42 UTC
+"test_client_dummy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 13 11:42 UTC
