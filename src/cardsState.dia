@@ -582,9 +582,9 @@ This class serves as the parent for all card types in the game:
       <dia:attribute name="comment">
         <dia:string>#A DestinationCard is a concrete card type derived from Card. Each destination card
  specifies two cities that the player must connect using claimed routes during the game.
-@property cityA private string 
-@property cityB private string 
-@property points private int 
+@property cityA public string 
+@property cityB public string 
+@property points public int 
 #</dia:string>
       </dia:attribute>
       <dia:attribute name="abstract">
@@ -683,7 +683,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
-            <dia:enum val="1"/>
+            <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -706,7 +706,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
-            <dia:enum val="1"/>
+            <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -729,7 +729,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
-            <dia:enum val="1"/>
+            <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>

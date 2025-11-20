@@ -15,7 +15,12 @@ BOOST_AUTO_TEST_CASE(TestWagonCard)
 {
   {
     WagonCard card(ColorCard::RED);
-    BOOST_CHECK_EQUAL(card.getColor(), ColorCard::RED);
+    BOOST_CHECK_EQUAL(card.color, ColorCard::RED);
+
+  }
+  {
+    WagonCard card(ColorCard::BLUE);
+    BOOST_CHECK_EQUAL(card.getColor(), ColorCard::BLUE);
   }
 
   {
