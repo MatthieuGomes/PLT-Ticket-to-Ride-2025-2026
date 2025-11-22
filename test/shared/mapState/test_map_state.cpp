@@ -34,4 +34,21 @@ BOOST_AUTO_TEST_CASE(TestExemple)
   }
 }
 
+BOOST_AUTO_TEST_CASE(ConstructorInitializesGraph)
+{
+    MapState map;
+
+    auto stations = map.listStations();
+    BOOST_REQUIRE_EQUAL(stations.size(), 4);
+
+    BOOST_CHECK_EQUAL(stations[0]->data->name, "Paris");
+    BOOST_CHECK_EQUAL(stations[1]->data->name, "Berlin");
+    BOOST_CHECK_EQUAL(stations[2]->data->name, "Madrid");
+    BOOST_CHECK_EQUAL(stations[3]->data->name, "Rome");
+
+    auto roads = map.listRoads();
+    BOOST_REQUIRE_EQUAL(roads.size(), 4);
+}
+
+
 /* vim: set sw=2 sts=2 et : */
