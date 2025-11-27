@@ -13,20 +13,20 @@ namespace playersState {
       return id;
    }
     void Player::setId(int id) {
-       id= id ;
+       this->id= id ;
     }
     std::string Player::getName() {
        return name;
     }
     void Player::setName(std::string name) {
-      name= name;
+      this->name= name;
     }
     int Player::getScore() {
      return score;
      }
     void Player::setScore(int score) {
-    score= score;
-}
+        this->score= score;
+    }
     int Player::getNumTrains()
    {
        return numTrains;
@@ -34,34 +34,34 @@ namespace playersState {
 
     void Player::setNumTrains(int numTrains)
     {
-       numTrains = numTrains;
+       this->numTrains = numTrains;
     }
     int Player::getNbStations() {
        return nbStations;
     }
 
     void Player::setNbStations(int nbStations) {
-      nbStations = nbStations;
+      this->nbStations = nbStations;
     }
 
     int Player::getNbRoads() {
       return nbRoads;
     }
     void Player::setNbRoads(int nbRoads) {
-        nbRoads = nbRoads;
+        this->nbRoads = nbRoads;
     }
 
    cardsState::ColorCard   Player::getColor() {
        return color;
    }
    void Player::setColor(cardsState::ColorCard color) {
-        color= color;
+        this->color= color;
    }
    cardsState::PlayerCards* Player::getHand() {
      return hand;}
 
    void Player::setHand(cardsState::PlayerCards* hand ) {
-     hand = hand;
+     this->hand = hand;
   }
 
     void Player::addCardToHand(cardsState::WagonCard* c) {
