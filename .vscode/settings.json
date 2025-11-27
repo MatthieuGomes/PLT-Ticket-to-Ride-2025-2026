@@ -6,6 +6,6 @@
   "-DGCOV_PATH=/usr/bin/gcov",
   "-DGCOVR_PATH=/usr/bin/gcovr"
 ],
-  "cmake.generator": "Ninja",
+  "cmake.generator": "Unix Makefiles",
   "cmake.buildDirectory": "${workspaceFolder}/build"
 }
