@@ -105,7 +105,18 @@ namespace cardsState
                   << std::get<1>(args) << ", "
                   << std::get<2>(args) << std::endl;
     }
+    template <class CardType>
+  void Deck<CardType>::moveCardto (Deck<CardType>* originDeck, Deck<CardType>* destinationDeck, int cardPosition) {
+        {
+            if (!originDeck || !destinationDeck) return;
 
+            CardType* card = originDeck->removeCard(cardPosition);
+            if (card) {
+                destinationDeck->addCard(card);
+            }
+        }
+
+    }
     template class Deck<DestinationCard>;
     template class Deck<WagonCard>;
 }
