@@ -21,7 +21,7 @@ namespace cardsState
         }
     }
     template <>
-    Deck<DestinationCard>::Deck(std::initializer_list<std::tuple<std::string, std::string, int>> destinationArgs)
+    Deck<DestinationCard>::Deck(std::initializer_list<std::tuple<mapState::Station*, mapState::Station*, int>> destinationArgs)
     {
         this->className = "Deck";
         for (const auto &arg : destinationArgs)
