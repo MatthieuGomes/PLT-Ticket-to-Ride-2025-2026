@@ -2,11 +2,13 @@
 
 set -e
 
-echo USERNAME=plt > ./.env
+echo XDG_SESSION_TYPE=$XDG_SESSION_TYPE > ./.env
+echo USERNAME=plt >> ./.env
 echo USER_UID=$(id -u) >> ./.env
 echo USER_GID=$(id -g) >> ./.env
 
 echo "Setup host for docker compose with graphical support..."
+
 if [ "$XDG_SESSION_TYPE" != "wayland" ]; then
     echo -e "\tX11 server detected."
     echo -e "\tSetting environment for X11..."
