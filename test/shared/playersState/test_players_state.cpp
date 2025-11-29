@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
   BOOST_CHECK(1);
 }
 
-BOOST_AUTO_TEST_CASE(TestExemple)
+BOOST_AUTO_TEST_CASE(TestPLayersState)
 {
   {
     // ExampleA exA;

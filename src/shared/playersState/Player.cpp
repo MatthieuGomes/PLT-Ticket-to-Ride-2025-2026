@@ -7,18 +7,25 @@ namespace playersState {
    Player::Player(int id, std::string name, cardsState::ColorCard color, int score , int numTrains , int nbStations , int nbRoads , cardsState::PlayerCards* hand) : id(id), name(name), color(color) , score(score), numTrains(numTrains), nbStations(nbStations) , nbRoads(nbRoads) ,  hand(hand)
    {
    }
+
    int Player::getId()
    {
       return id;
    }
     void Player::setId(int id) {
-       id= id ;
+       this->id= id ;
     }
     std::string Player::getName() {
        return name;
     }
     void Player::setName(std::string name) {
-      name= name;
+      this->name= name;
+    }
+    int Player::getScore() {
+     return score;
+     }
+    void Player::setScore(int score) {
+        this->score= score;
     }
     int Player::getNumTrains()
    {
@@ -27,22 +34,35 @@ namespace playersState {
 
     void Player::setNumTrains(int numTrains)
     {
-       numTrains = numTrains;
+       this->numTrains = numTrains;
     }
     int Player::getNbStations() {
        return nbStations;
     }
 
     void Player::setNbStations(int nbStations) {
-      nbStations = nbStations;
+      this->nbStations = nbStations;
     }
 
     int Player::getNbRoads() {
       return nbRoads;
     }
     void Player::setNbRoads(int nbRoads) {
-        nbRoads = nbRoads;
+        this->nbRoads = nbRoads;
     }
+
+   cardsState::ColorCard   Player::getColor() {
+       return color;
+   }
+   void Player::setColor(cardsState::ColorCard color) {
+        this->color= color;
+   }
+   cardsState::PlayerCards* Player::getHand() {
+     return hand;}
+
+   void Player::setHand(cardsState::PlayerCards* hand ) {
+     this->hand = hand;
+  }
 
     void Player::addCardToHand(cardsState::WagonCard* c) {
 
@@ -58,14 +78,12 @@ namespace playersState {
        std::cout << "displayHand" << std::endl;
     }
 
-
-
-
     int Player::calculateDestinationPoints() {
        return 0;
     }
 
     int Player::getLongestPathLength() {
+     return 0;
     }
 
     void Player::display() {
