@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(TestPLayerConstructor) {
     BOOST_CHECK_EQUAL(player.name,"yosra");
     BOOST_CHECK_EQUAL(player.color,cardsState::ColorCard::RED);
     BOOST_CHECK_EQUAL(player.score,23);
-    BOOST_CHECK_EQUAL(player.numTrains,21);
+    BOOST_CHECK_EQUAL(player.nbWagons,21);
     BOOST_CHECK_EQUAL(player.nbStations,10);
     BOOST_CHECK_EQUAL(player.nbRoads,5);
     BOOST_CHECK_EQUAL(player.hand,hand);
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(TestPlayergetNumTrains){
         std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
         auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
         Player player(1, "yosra", cardsState::ColorCard::RED, 23, 21, 10, 5, hand);
-        BOOST_CHECK_EQUAL(player.getNumTrains(),21);
+        BOOST_CHECK_EQUAL(player.getNbWagons(),21);
     }
 
 }
@@ -209,7 +209,6 @@ BOOST_AUTO_TEST_CASE(TestPlayersetScore){
         std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
         auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
         Player player = Player(1, "yosra", cardsState::ColorCard::RED, 23, 21, 10, 5, hand);
-        printf("player score :", player.score);
         player.setScore(40);
         BOOST_CHECK_EQUAL(player.score,40);
     }
@@ -224,8 +223,8 @@ BOOST_AUTO_TEST_CASE(TestPlayersetNumTrains){
         std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
         auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
         Player player(1, "yosra", cardsState::ColorCard::RED, 23, 21, 10, 5, hand);
-        player.setNumTrains(20);
-        BOOST_CHECK_EQUAL(player.numTrains,20);
+        player.setNbWagons(20);
+        BOOST_CHECK_EQUAL(player.nbWagons,20);
     }
 
 }
@@ -282,10 +281,6 @@ BOOST_AUTO_TEST_CASE(TestPlayersetHand){
     }
 
 }
-
-
-
-
 
 
 
