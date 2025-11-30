@@ -374,7 +374,17 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddDestinationCard) {
 }
 
 
+BOOST_AUTO_TEST_CASE(TestPlayerDisplayHand) {
 
+    cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
+    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
+    std::vector<cardsState::DestinationCard> destCards = {dest};
+    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
+    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+    Player player(1, "Alice", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
+
+    BOOST_CHECK_NO_THROW(player.displayHand());
+}
 
 
 
