@@ -337,7 +337,26 @@ BOOST_AUTO_TEST_CASE(TestPlayerRemoveTrain)
 }
 }
 
+BOOST_AUTO_TEST_CASE(TestPlayerAddAndRemoveWagonCard) {
 
+    cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
+    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
+    std::vector<cardsState::DestinationCard> destCards = {dest};
+    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
+    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+    Player player(2, "Alexa", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
+
+    auto* card = new cardsState::WagonCard(cardsState::ColorCard::BLUE);
+    player.addWagonCard(card);
+    BOOST_CHECK_EQUAL(player.getHand()->wagonCards->cards.size(), 2);
+
+
+    std::vector<cardsState::WagonCard*> cardsToRemove = {card};
+    player.removeWagonCard(cardsToRemove);
+    BOOST_CHECK_EQUAL(player.getHand()->wagonCards->cards.size(), 1);
+
+
+}
 
 
 
