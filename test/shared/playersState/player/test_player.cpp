@@ -359,6 +359,23 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddAndRemoveWagonCard) {
 }
 
 
+BOOST_AUTO_TEST_CASE(TestPlayerAddDestinationCard) {
+
+    cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
+    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
+    std::vector<cardsState::DestinationCard> destCards = {dest};
+    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
+    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+    Player player(4, "Amina", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
+
+    auto* destCard = new cardsState::DestinationCard("Paris", "Marseille", 12);
+    player.addDestinationCard(destCard);
+    BOOST_CHECK_EQUAL(player.getHand()->destinationCards->cards.size(), 2);
+}
+
+
+
+
 
 
 
