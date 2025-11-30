@@ -301,6 +301,25 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddRoadAndStation) {
 }
 
 
+
+
+BOOST_AUTO_TEST_CASE(TestPlayerAddScore) {
+    {
+        cardsState::DestinationCard dest("Paris", "Marseille", 12);
+        cardsState::WagonCard wagon(cardsState::ColorCard::RED);
+        std::vector<cardsState::DestinationCard> destCards = {dest};
+        std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
+        auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+        Player player(1, "Alice", cardsState::ColorCard::RED, 10, 5, 1, 0, hand);
+
+        player.addScore(15);
+        BOOST_CHECK_EQUAL(player.getScore(), 25);
+    }
+}
+
+
+
+
 BOOST_AUTO_TEST_CASE(TestPlayerRemoveTrain)
 {  {
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -317,6 +336,9 @@ BOOST_AUTO_TEST_CASE(TestPlayerRemoveTrain)
     BOOST_CHECK_EQUAL(player.getNbWagons(), 0);
 }
 }
+
+
+
 
 
 
