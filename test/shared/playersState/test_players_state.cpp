@@ -13,6 +13,9 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 BOOST_AUTO_TEST_CASE(TestPLayersState)
 {
   {
+
+
+
     // ExampleA exA;
     // exA.setX(53);
     // Example ex;
