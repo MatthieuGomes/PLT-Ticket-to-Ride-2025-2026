@@ -571,16 +571,16 @@ This class serves as the parent for all card types in the game:
         <dia:point val="10.8107,29.7791"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10.7607,29.7291;28.6857,39.6291"/>
+        <dia:rectangle val="10.7607,29.7291;34.4607,38.8291"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="10.8107,29.7791"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="17.824999999999999"/>
+        <dia:real val="23.600000000000001"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="9.8000000000000007"/>
+        <dia:real val="9"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#DestinationCard#</dia:string>
@@ -683,7 +683,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>#stationA#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#mapState::Station*#</dia:string>
+            <dia:string>#std::string#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -706,7 +706,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>#stationB#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#mapState::Station*#</dia:string>
+            <dia:string>#std::string #</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -786,7 +786,7 @@ This class serves as the parent for all card types in the game:
                 <dia:string>#stationA#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::Station*#</dia:string>
+                <dia:string>#std::string#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -803,7 +803,7 @@ This class serves as the parent for all card types in the game:
                 <dia:string>#stationB#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::Station*#</dia:string>
+                <dia:string>#std::string #</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -842,7 +842,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#mapState::Station*#</dia:string>
+            <dia:string>#std::string#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -873,7 +873,7 @@ This class serves as the parent for all card types in the game:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#mapState::Station*#</dia:string>
+            <dia:string>#std::string#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -1273,7 +1273,7 @@ Constructs a new WagonCard with a given color.
         <dia:point val="15.0133,8.64867"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="14.1633,8.59867;19.7732,29.7788"/>
+        <dia:rectangle val="14.1633,8.59867;22.6607,29.7788"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -1281,8 +1281,8 @@ Constructs a new WagonCard with a given color.
       <dia:attribute name="orth_points">
         <dia:point val="15.0133,8.64867"/>
         <dia:point val="15.0133,19.5887"/>
-        <dia:point val="19.7232,19.5887"/>
-        <dia:point val="19.7232,29.7288"/>
+        <dia:point val="22.6107,19.5887"/>
+        <dia:point val="22.6107,29.7288"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3929,16 +3929,16 @@ Special values:
         <dia:point val="39.2233,17.9347"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="28.636,17.1747;39.9733,35.5191"/>
+        <dia:rectangle val="34.4111,17.1747;39.9733,35.1191"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="39.2233,17.9347"/>
-        <dia:point val="33.6046,17.9347"/>
-        <dia:point val="33.6046,34.6791"/>
-        <dia:point val="28.686,34.6791"/>
+        <dia:point val="36.4922,17.9347"/>
+        <dia:point val="36.4922,34.2791"/>
+        <dia:point val="34.4611,34.2791"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -5144,18 +5144,18 @@ Special values:
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O33">
       <dia:attribute name="obj_pos">
-        <dia:point val="10.7604,34.6791"/>
+        <dia:point val="10.7603,34.2791"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="4.58047,-9.425;10.8104,34.7291"/>
+        <dia:rectangle val="4.58047,-9.425;10.8103,34.3291"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="10.7604,34.6791"/>
-        <dia:point val="8.09545,34.6791"/>
-        <dia:point val="8.09545,-8.975"/>
+        <dia:point val="10.7603,34.2791"/>
+        <dia:point val="8.09541,34.2791"/>
+        <dia:point val="8.09541,-8.975"/>
         <dia:point val="5.03047,-8.975"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">

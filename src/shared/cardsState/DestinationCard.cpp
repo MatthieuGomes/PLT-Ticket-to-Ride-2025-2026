@@ -8,23 +8,27 @@
 
 namespace cardsState {
 
-    DestinationCard::DestinationCard(mapState::Station* stationA, mapState::Station* stationB, int points)
+    DestinationCard::DestinationCard(std::string stationA, std::string stationB, int points)
       : stationA(stationA), stationB(stationB), points(points) {}
 
-    mapState::Station* DestinationCard::getstationA() {
+    std::string DestinationCard::getstationA() {
         return stationA;
     }
 
-    mapState::Station* DestinationCard::getstationB() {
+    std::string DestinationCard::getstationB() {
         return stationB;
     }
 
     int DestinationCard::getPoints() {
         return points;
     }
-
+/*
     void DestinationCard::display() {
         std::cout << "Destination Card: " << stationA->data->name << " to " << stationB->data->name
+                  << " for " << points << " points." << std::endl;
+    }*/
+    void DestinationCard::display() {
+        std::cout << "Destination Card: " << stationA << " to " << stationB
                   << " for " << points << " points." << std::endl;
     }
 }
