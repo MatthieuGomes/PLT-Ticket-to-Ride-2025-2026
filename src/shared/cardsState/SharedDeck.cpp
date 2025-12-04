@@ -5,6 +5,8 @@
 
 #include "DestinationCard.h"
 #include "WagonCard.h"
+#include <algorithm> // std::shuffle
+#include <random>
 
 namespace cardsState {
     // class SharedDeck -
@@ -41,9 +43,43 @@ namespace cardsState {
 
         std::cout << "Card moved from face-down to face-up." << std::endl;
     }
+
+    template <  class CardType>
+    void SharedDeck <CardType>::refillMainDeck() {
+        if (faceDownCards->countCards() > 0) {
+            std::cout << "Face-down deck is not empty. No refill needed." << std::endl;
+            return;
+        }
+
+        if (trash->countCards() == 0) {
+            std::cout << "Trash is empty. Cannot refill main deck." << std::endl;
+            return;
+        }
+
+
+        std::vector<std::shared_ptr<CardType>> temp;
+
+        while (trash->countCards() > 0) {
+            temp.push_back(trash->removeCard( trash->countCards()-1 ));
+        }
+
+        // Shuffle
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(temp.begin(), temp.end(), g);
+
+        // Add them to face-down deck
+        for (auto& c : temp) {
+            faceDownCards->addCard(c);
+        }
+
+        std::cout << "Main deck refilled from trash." << std::endl;
+    }
+
+
     /*
     void trashfromcdarduptocarddown
-    void refillMaindeck
+
     void
     //turncardup
     //donner au player

@@ -16,6 +16,7 @@ namespace state
         cards.printCardsState();
         players.printPlayersState();
         map.printMapState();
+
         // Here @theo + @chahrazed + @yosra will implement the details to print their part of the state
     }
 }
