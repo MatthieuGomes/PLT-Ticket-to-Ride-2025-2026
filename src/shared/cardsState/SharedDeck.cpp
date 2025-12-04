@@ -28,6 +28,28 @@ namespace cardsState {
         this->faceDownCards->display();
     }
 
+    template <  class CardType>
+    void SharedDeck<CardType>::turnCardUp() {
+        if (faceDownCards->countCards() == 0) {
+            std::cout << "No more face-down cards." << std::endl;
+            return;
+        }
+        int lastIndex = faceDownCards->countCards() - 1;
+        auto card = faceDownCards->removeCard(lastIndex);
+
+        faceUpCards->addCard(card);
+
+        std::cout << "Card moved from face-down to face-up." << std::endl;
+    }
+    /*
+    void trashfromcdarduptocarddown
+    void refillMaindeck
+    void
+    //turncardup
+    //donner au player
+    //remove from my shareddeck
+    //ajouter au deck de player
+    */
     template class SharedDeck<DestinationCard>;
     template class SharedDeck<WagonCard>;
 }
