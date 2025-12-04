@@ -117,6 +117,7 @@ namespace cardsState
         }
 
     }
+
     template class Deck<DestinationCard>;
     template class Deck<WagonCard>;
 }
