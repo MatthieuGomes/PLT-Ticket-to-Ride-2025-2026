@@ -21,7 +21,7 @@ namespace cardsState
         }
     }
     template <>
-    Deck<DestinationCard>::Deck(std::initializer_list<std::tuple<mapState::Station*, mapState::Station*, int>> destinationArgs)
+    Deck<DestinationCard>::Deck(std::initializer_list<std::tuple<std::string, std::string, int>> destinationArgs)
     {
         this->className = "Deck";
         for (const auto &arg : destinationArgs)
@@ -106,7 +106,7 @@ namespace cardsState
                   << std::get<2>(args) << std::endl;
     }
     template <class CardType>
-  void Deck<CardType>::moveCardto (Deck<CardType>* originDeck, Deck<CardType>* destinationDeck, int cardPosition) {
+    void Deck<CardType>::moveCardTo (Deck<CardType>* originDeck, Deck<CardType>* destinationDeck, int cardPosition) {
         {
             if (!originDeck || !destinationDeck) return;
 
@@ -117,6 +117,24 @@ namespace cardsState
         }
 
     }
+    template <class CardType>
+    void Deck<CardType>::putCardBack (CardType destinationcard) {
+        auto ptr = std::make_shared<CardType>(std::move(destinationcard));
+        if (cards.size() == 1 && cards[0] == nullptr) {
+            cards[0] = ptr;
+        } else {
+            cards.insert(cards.begin(), ptr);
+        }
+
+    }
+    template <class CardType>
+    CardType* Deck<CardType>::takeLastCard() {
+        if (cards.size() > 0) {
+            return removeCard(static_cast<int>(cards.size()) - 1);
+        }
+        return nullptr;
+    }
+
 
     template class Deck<DestinationCard>;
     template class Deck<WagonCard>;
