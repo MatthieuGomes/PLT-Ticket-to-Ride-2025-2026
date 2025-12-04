@@ -23,4 +23,8 @@ namespace cardsState {
         return points;
     }
 
+    void DestinationCard::display() {
+        std::cout << "Destination Card: " << stationA->data->name << " to " << stationB->data->name
+                  << " for " << points << " points." << std::endl;
+    }
 }

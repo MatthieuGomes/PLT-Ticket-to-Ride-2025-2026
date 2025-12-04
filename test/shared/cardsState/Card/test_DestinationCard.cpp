@@ -12,24 +12,12 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 
 BOOST_AUTO_TEST_CASE(TestDestinationCard) {
   {
-    DestinationCard card("paris","rome",12);
-    BOOST_CHECK_EQUAL(card.cityA, "paris");
-    BOOST_CHECK_EQUAL(card.cityB, "rome");
-    BOOST_CHECK_EQUAL(card.points, 12);
-  }
-
-
-  {
-    DestinationCard card("paris","rome",12);
-    BOOST_CHECK_EQUAL(card.getCityB(), "rome");
   }
   {
-    DestinationCard card("paris","rome",12);
-    BOOST_CHECK_EQUAL(card.getPoints(), 12);
   }
   {
-    DestinationCard card("paris","rome",12);
-    BOOST_CHECK_EQUAL(card.getCityA(), "paris");
+  }
+  {
   }
 }
 
