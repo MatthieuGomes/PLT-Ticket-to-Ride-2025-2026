@@ -57,10 +57,11 @@ namespace cardsState {
         }
 
 
-        std::vector<std::shared_ptr<CardType>> temp;
+        using CardPtr = decltype(this->trash->removeCard(0));
+        std::vector<CardPtr> temp;
 
         while (trash->countCards() > 0) {
-            temp.push_back(trash->removeCard( trash->countCards()-1 ));
+            temp.push_back(trash->removeCard(trash->countCards() - 1));
         }
 
         // Shuffle
@@ -77,15 +78,14 @@ namespace cardsState {
     }
 
 
-    /*
-    void trashfromcdarduptocarddown
+    template <  class CardType>
+    void SharedDeck <CardType>::trashCard (std::shared_ptr<CardType> card) {
+        trash->addCard(card.get());
+        std::cout << "Card trashed." << std::endl;
+    }
 
-    void
-    //turncardup
-    //donner au player
-    //remove from my shareddeck
-    //ajouter au deck de player
-    */
+
+
     template class SharedDeck<DestinationCard>;
     template class SharedDeck<WagonCard>;
 }
