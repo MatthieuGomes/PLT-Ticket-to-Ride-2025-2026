@@ -123,7 +123,6 @@ namespace playersState {
          if (hand && hand->destinationCards)
             hand->destinationCards->addCard(d);
 
-
    }
 
    /*
@@ -168,13 +167,9 @@ namespace playersState {
             kept.push_back(cards[index]);
          }
       }
-
       cards = kept;
-
       std::cout << "You kept " << kept.size() << " destination cards.\n";
    }
-
-
     */
     int Player::calculateDestinationPoints() {
 
@@ -250,9 +245,7 @@ namespace playersState {
      return true;
    }
 
-
    template<class CardType>
-
    void Player::takeCard(cardsState::CardsState* state) {
        if constexpr (std::is_same<CardType, cardsState::WagonCard>::value) {
            if (state && state->gameWagonCards && state->gameWagonCards->faceDownCards) {
@@ -292,7 +285,7 @@ namespace playersState {
        }
    }
 
-   /*
+/*
    void Player::getCompletedDestinations(mapState::MapState* map)
    {
       if (!map) {
@@ -320,7 +313,6 @@ namespace playersState {
 
          mapState::Path path = map->findShortestPath(start, end);
 
-
          if (path.STATIONS.size() <= 1) {
             std::cout << " Not connected.\n";
             continue;
@@ -340,7 +332,6 @@ namespace playersState {
                break;
             }
 
-
             if (r->data->isBlocked) {
                ok = false;
                break;
@@ -355,14 +346,7 @@ namespace playersState {
          }
       }
    }
-
-    *
-    *
-    *
-    *
-    *
-    */
-
+*/
    int Player::getLongestPathLength(mapState::MapState* map) {
       return 0;
    }
@@ -434,3 +418,4 @@ namespace playersState {
     }
 
 }
+

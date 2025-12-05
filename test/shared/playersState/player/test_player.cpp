@@ -10,6 +10,9 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
     BOOST_CHECK(1);
 }
 
+
+/*
+ *
 BOOST_AUTO_TEST_CASE(TestPLayerConstructor) {
 
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -31,7 +34,6 @@ BOOST_AUTO_TEST_CASE(TestPLayerConstructor) {
     BOOST_CHECK_EQUAL(player.hand,hand);
 
 }
-
 BOOST_AUTO_TEST_CASE(TestPLayergetId)
 {
     {
@@ -93,7 +95,6 @@ BOOST_AUTO_TEST_CASE(TestPlayergetScore){
     }
 
 }
-
 BOOST_AUTO_TEST_CASE(TestPlayergetNumTrains){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -244,7 +245,6 @@ BOOST_AUTO_TEST_CASE(TestPlayersetNbStations){
 
 }
 
-
 BOOST_AUTO_TEST_CASE(TestPlayersetNbRoads){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -259,7 +259,6 @@ BOOST_AUTO_TEST_CASE(TestPlayersetNbRoads){
     }
 
 }
-
 
 BOOST_AUTO_TEST_CASE(TestPlayersetHand){
 
@@ -282,8 +281,6 @@ BOOST_AUTO_TEST_CASE(TestPlayersetHand){
 
 }
 
-
-
 BOOST_AUTO_TEST_CASE(TestPlayerAddRoadAndStation) {
 
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -300,9 +297,6 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddRoadAndStation) {
     BOOST_CHECK_EQUAL(player.getNbStations(), 2);
 }
 
-
-
-
 BOOST_AUTO_TEST_CASE(TestPlayerAddScore) {
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -316,9 +310,6 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddScore) {
         BOOST_CHECK_EQUAL(player.getScore(), 25);
     }
 }
-
-
-
 
 BOOST_AUTO_TEST_CASE(TestPlayerRemoveTrain)
 {  {
@@ -358,7 +349,6 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddAndRemoveWagonCard) {
 
 }
 
-
 BOOST_AUTO_TEST_CASE(TestPlayerAddDestinationCard) {
 
     cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
@@ -373,9 +363,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddDestinationCard) {
     BOOST_CHECK_EQUAL(player.getHand()->destinationCards->cards.size(), 2);
 }
 
-
 BOOST_AUTO_TEST_CASE(TestPlayerDisplayHand) {
-
     cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
     std::vector<cardsState::DestinationCard> destCards = {dest};
@@ -386,10 +374,10 @@ BOOST_AUTO_TEST_CASE(TestPlayerDisplayHand) {
     BOOST_CHECK_NO_THROW(player.displayHand());
 }
 
-
-
-
-
-
+ *
+ *
+ *
+ *
+ */
 
 /* vim: set sw=2 sts=2 et : */

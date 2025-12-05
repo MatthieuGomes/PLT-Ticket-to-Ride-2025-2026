@@ -3,7 +3,7 @@
 
 #include "../../src/shared/playersState/PlayersState.h"
 
-using namespace ::playersState;
+using namespace playersState;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
@@ -13,7 +13,6 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 BOOST_AUTO_TEST_CASE(TestPLayersState)
 {
   {
-
 
 
     // ExampleA exA;
