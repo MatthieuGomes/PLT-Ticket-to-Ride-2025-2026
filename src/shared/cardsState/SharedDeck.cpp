@@ -7,6 +7,7 @@
 #include "WagonCard.h"
 #include <algorithm> // std::shuffle
 #include <random>
+#import "PlayerCards.h"
 #include <boost/smart_ptr/make_shared_object.hpp>
 
 namespace cardsState {
@@ -76,10 +77,23 @@ namespace cardsState {
         std::shared_ptr<CardType> removedCard = std::make_shared<CardType>(*this->faceUpCards->removeCard(position));
         this->trash->addCard(removedCard.get());
     }
-
-
-
-
+    // a function that take the card wagon  passed in parameter  from the visible deck and add it in the cardsplayer
+     template <class CardType>
+      void  cardsState::SharedDeck<CardType>::drawCard(CardType* card,cardsState::PlayerCards* player) {
+          int pos = static_cast<int>(std::distance(this->faceUpCards->cards.begin(), std::find(this->faceUpCards->cards.begin(),this->faceUpCards->cards.end(), card)));
+        player->wagonCards->addCard(this->faceUpCards->removeCard(pos););
+}
+    template <class CardType>
+    void  cardsState::SharedDeck<CardType>::drawCard(int number,cardsState::PlayerCards* player) {
+            for ( int i = 0; i < number; ++i ) {
+              CardType* type =  this->faceDownCards->takeLastCard();
+                if (typeid(*type) == typeid(DestinationCard)) {
+                    player->destinationCards->addCard(type);
+                } else if (typeid(*type) == typeid(WagonCard)) {
+                    player->wagonCards->addCard(type);
+                }
+            }
+    }
 
     template class SharedDeck<DestinationCard>;
     template class SharedDeck<WagonCard>;
