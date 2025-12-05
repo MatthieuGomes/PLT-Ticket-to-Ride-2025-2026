@@ -177,14 +177,80 @@ namespace playersState {
 
     */
     int Player::calculateDestinationPoints() {
+
        return 0;
     }
 
    bool Player::canBuildRoad(mapState::MapState* map, mapState::Station* u, mapState::Station* v)
    {
+      mapState::Road* road = map->getRoad(u, v);
+      if (!road) {
+         std::cout << " No road exists between "
+                   << u->data->name << " and " << v->data->name << "\n";
+         return false;
+      }
+
+      mapState::RoadData* data = road->data;
+
+      if (data->isBlocked) {
+         std::cout << " The road is blocked.\n";
+         return false;
+      }
+
+      if (nbWagons < data->length) {
+         std::cout << " Not enough wagons. Needed: "
+                   << data->length << ", you have: " << nbWagons << "\n";
+         return false;
+      }
+
+      std::string color = data->color;
+
+      cardsState::ColorCard requiredColor;
+
+      if (data->color == "RED")       requiredColor =  cardsState::ColorCard::RED;
+      else if (data->color == "BLUE") requiredColor =  cardsState::ColorCard::BLUE;
+      else if (data->color == "GREEN") requiredColor =  cardsState::ColorCard::GREEN;
+      else if (data->color == "YELLOW") requiredColor =  cardsState::ColorCard::YELLOW;
+      else if (data->color == "BLACK") requiredColor =  cardsState::ColorCard::BLACK;
+      else if (data->color == "WHITE") requiredColor =  cardsState::ColorCard::WHITE;
+      else if (data->color == "ORANGE") requiredColor =  cardsState::ColorCard::ORANGE;
+      else if (data->color == "PINK") requiredColor =  cardsState::ColorCard::PINK;
+      else {
+         std::cout << " Unknown road color\n";
+         return false;
+      }
+
+      int needed = data->length;
+
+      int nbColor = 0;
+      int nbLoco  = 0;
+
+
+      for (auto& card : hand->wagonCards->cards) {
+         if (card != nullptr) {
+            if (card->color == requiredColor) {
+               ++nbColor;
+            }
+            else if (card->color == cardsState::ColorCard::LOCOMOTIVE) {
+               ++nbLoco;
+            }
+         }
+      }
+
+      if (nbColor + nbLoco < needed) {
+         std::cout << " Not enough cards of color " << data->color
+                   << " (have " << nbColor
+                   << " + " << nbLoco << " locos)\n";
+         return false;
+      }
+
+      std::cout << " Player can build road between "
+                << u->data->name << " and " << v->data->name << "\n";
 
      return true;
    }
+
+
    template<class CardType>
 
    void Player::takeCard(cardsState::CardsState* state) {
