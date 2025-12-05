@@ -4,11 +4,11 @@ enable_testing()
 
 # Custom "check" target that enable Boost unit test output on CTest failure.
 # Create an alias target "unittest" for "check".
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j)
 add_custom_target(unittest DEPENDS check)
 
 # Find library Boost for unit test framework
-find_package(Boost 1.74 REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost 1.74...1.999 REQUIRED COMPONENTS unit_test_framework)
 message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 message(STATUS "Boost include directory: ${Boost_INCLUDE_DIRS}")
 
@@ -73,12 +73,13 @@ function(add_custom_test name)
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-  # Add test to CTest
+  # Add test to CTest 
   add_test(NAME ${target_name}
     COMMAND $<TARGET_FILE:${target_name}>
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 
+  add_dependencies(check ${target_name})
   # Add dependency to build test target before code coverage
   if(BUILD_CODE_COVERAGE)
     add_dependencies(code-coverage ${target_name})
