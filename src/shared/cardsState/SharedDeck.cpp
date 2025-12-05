@@ -78,19 +78,23 @@ namespace cardsState {
         this->trash->addCard(removedCard.get());
     }
     // a function that take the card wagon  passed in parameter  from the visible deck and add it in the cardsplayer
-     template <class CardType>
-      void  cardsState::SharedDeck<CardType>::drawCard(CardType* card,cardsState::PlayerCards* player) {
-          int pos = static_cast<int>(std::distance(this->faceUpCards->cards.begin(), std::find(this->faceUpCards->cards.begin(),this->faceUpCards->cards.end(), card)));
-        player->wagonCards->addCard(this->faceUpCards->removeCard(pos););
-}
+    template <  class CardType>
+    void cardsState::SharedDeck<CardType>::drawCard(std::shared_ptr<CardType> card,cardsState::PlayerCards* player) {
+        int pos = static_cast<int>(std::distance(this->faceUpCards->cards.begin(), std::find(this->faceUpCards->cards.begin(), this->faceUpCards->cards.end(), card)));
+        std::shared_ptr<CardType> removedCard = std::make_shared<CardType>(*this->faceUpCards->removeCard(pos));
+        Card * removedCardPtr = removedCard.get();
+        player->wagonCards->addCard(dynamic_cast<WagonCard*>(removedCardPtr));
+
+    }
+
     template <class CardType>
     void  cardsState::SharedDeck<CardType>::drawCard(int number,cardsState::PlayerCards* player) {
             for ( int i = 0; i < number; ++i ) {
-              CardType* type =  this->faceDownCards->takeLastCard();
+              Card* type =  this->faceDownCards->takeLastCard();
                 if (typeid(*type) == typeid(DestinationCard)) {
-                    player->destinationCards->addCard(type);
+                    player->destinationCards->addCard(dynamic_cast<DestinationCard *>(type));
                 } else if (typeid(*type) == typeid(WagonCard)) {
-                    player->wagonCards->addCard(type);
+                    player->wagonCards->addCard(dynamic_cast<WagonCard *>(type));
                 }
             }
     }
