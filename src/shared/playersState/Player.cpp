@@ -372,10 +372,32 @@ namespace playersState {
     {
        std::vector<mapState::Road*> claimable;
 
+      if (!map) return claimable;
+      for (auto* road : map->Roads) {
 
+         if (!road || !road->data) continue;
+         if (road->data->isBlocked) continue;
+         if (road->data->endpoints.size() < 2) continue;
+
+         mapState::Station* u = nullptr;
+         mapState::Station* v = nullptr;
+
+
+         for (auto* s : map->Stations) {
+            if (!s || !s->data) continue;
+            if (s->data == road->data->endpoints[0]) u = s;
+            else if (s->data == road->data->endpoints[1]) v = s;
+            if (u && v) break;
+         }
+
+         if (!u || !v) continue;
+
+         if (canBuildRoad(map, u, v)) {
+            claimable.push_back(road);
+         }
+      }
        return claimable;
     }
-
 
 
    void Player::displayHand()
