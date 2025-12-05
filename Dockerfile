@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim AS plt-base
+FROM debian:stable-slim AS plt-base
 
 ARG USERNAME
 ARG USER_UID
@@ -19,12 +19,12 @@ RUN apt-get update && apt-get install -y \
     cmake \
     lcov \
     gcovr \
-    git
+    git 
 
 RUN apt-get update && apt-get install -y \
     libsfml-dev \
     libxml2-dev \
-    libboost1.74-all-dev
+    libboost-all-dev
 
 RUN apt-get update && apt-get install -y \
     dia libcanberra-gtk3-module \
