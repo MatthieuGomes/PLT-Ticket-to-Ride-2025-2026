@@ -5,8 +5,10 @@
 
 #include "mapState/MapState.h"
 
+using namespace cardsState;
+
 namespace playersState {
-   Player::Player(int id, std::string name, cardsState::ColorCard color, int score , int nbWagons , int nbStations , int nbRoads , cardsState::PlayerCards* hand) : id(id), name(name), color(color) , score(score), nbWagons(nbWagons), nbStations(nbStations) , nbRoads(nbRoads) ,  hand(hand)
+   Player::Player(int id, std::string name, ColorCard color, int score , int nbWagons , int nbStations , int nbRoads , PlayerCards* hand) : id(id), name(name), color(color) , score(score), nbWagons(nbWagons), nbStations(nbStations) , nbRoads(nbRoads) ,  hand(hand)
    {
    }
 
@@ -66,11 +68,9 @@ namespace playersState {
      this->hand = hand;
   }
 
-
    void Player::addRoad() {
       nbRoads++;
    }
-
 
    void Player::addStation() {
       nbStations++;
@@ -86,11 +86,11 @@ namespace playersState {
       score += points;
    }
 
+
    void Player::addWagonCard(cardsState::WagonCard* w) {
       if (hand && hand->wagonCards)
          hand->wagonCards->addCard(w);
    }
-
 
    void Player::removeWagonCard(std::vector<cardsState::WagonCard*> cards) {
 
@@ -101,7 +101,6 @@ namespace playersState {
       for (auto* card : cards) {
 
          auto& deckCards = hand->wagonCards->cards;
-
 
          auto it = std::find_if(
              deckCards.begin(),
@@ -127,7 +126,9 @@ namespace playersState {
 
    }
 
-   void Player::chooseDestinationCards()
+   /*
+    *
+   * void Player::chooseDestinationCards()
    {
       if (!hand || !hand->destinationCards) {
          std::cout << "No destination deck available.\n";
@@ -168,33 +169,148 @@ namespace playersState {
          }
       }
 
-
       cards = kept;
 
       std::cout << "You kept " << kept.size() << " destination cards.\n";
    }
 
+
+    */
     int Player::calculateDestinationPoints() {
        return 0;
     }
 
-
-   void Player::canBuildRoad (mapState::MapState map, std::string roadId)
+   bool Player::canBuildRoad(mapState::MapState* map, mapState::Station* u, mapState::Station* v)
    {
 
+     return true;
    }
-   void Player::getCompletedDestinations (mapState::MapState map)
+   template<class CardType>
+
+   void Player::takeCard(cardsState::CardsState* state) {
+       if constexpr (std::is_same<CardType, cardsState::WagonCard>::value) {
+           if (state && state->gameWagonCards && state->gameWagonCards->faceDownCards) {
+               auto card = state->gameWagonCards->faceDownCards->removeCard(state->gameWagonCards->faceDownCards->countCards() - 1);
+               if (card) {
+                   hand->wagonCards->cards.push_back(std::shared_ptr<cardsState::WagonCard>(card));
+               }
+           }
+       } else if constexpr (std::is_same<CardType, cardsState::DestinationCard>::value) {
+           if (state && state->gameDestinationCards && state->gameDestinationCards->faceDownCards) {
+               std::vector<std::shared_ptr<cardsState::DestinationCard>> drawnCards;
+               for (int i = 0; i < 3 && state->gameDestinationCards->faceDownCards->countCards() > 0; ++i) {
+                   auto card = state->gameDestinationCards->faceDownCards->removeCard(state->gameDestinationCards->faceDownCards->countCards() - 1);
+                   if (card) {
+                       drawnCards.push_back(std::shared_ptr<cardsState::DestinationCard>(card));
+                   }
+               }
+
+               if (!drawnCards.empty()) {
+                   auto bestCard = *std::max_element(drawnCards.begin(), drawnCards.end(), [](const auto& a, const auto& b) {
+                       return a->points < b->points;
+                   });
+
+                   hand->destinationCards->cards.push_back(bestCard);
+
+                   for (const auto& card : drawnCards) {
+                       if (card != bestCard) {
+                           state->gameDestinationCards->faceDownCards->cards.insert(
+                               state->gameDestinationCards->faceDownCards->cards.begin(), card
+                           );
+                       }
+                   }
+               }
+           }
+       } else {
+           std::cerr << "Unsupported card type." << std::endl;
+       }
+   }
+
+   /*
+   void Player::getCompletedDestinations(mapState::MapState* map)
    {
+      if (!map) {
+         std::cout << " Map is null.\n";
+         return;
+      }
+      if (!hand) {
+         std::cout << " Player has no hand.\n";
+         return;
+      }
 
+      std::cout << "Checking completed destinations for player: "
+                << this->name << "\n";
+
+      for (const auto& destCardPtr : hand->destinationCards->cards ) {
+
+         if (!destCardPtr) continue;
+         // problème destination card city a , b  doit etre station
+         mapState::Station* start = destCardPtr->start;
+         mapState::Station* end   = destCardPtr->end;
+
+         std::cout << "- Destination " << start->data->name
+                   << " → " << end->data->name << " ... ";
+
+
+         mapState::Path path = map->findShortestPath(start, end);
+
+
+         if (path.STATIONS.size() <= 1) {
+            std::cout << " Not connected.\n";
+            continue;
+         }
+
+
+         bool ok = true;
+
+         for (int i = 0; i < path.STATIONS.size() - 1; i++) {
+            auto* u = path.STATIONS[i];
+            auto* v = path.STATIONS[i + 1];
+
+
+            mapState::Road* r = map->getRoad(u, v);
+            if (!r) {
+               ok = false;
+               break;
+            }
+
+
+            if (r->data->isBlocked) {
+               ok = false;
+               break;
+            }
+         }
+
+         if (ok) {
+            std::cout << " COMPLETED\n";
+            completedDestinations.push_back(destCardPtr);
+         } else {
+            std::cout << " NOT completed\n";
+         }
+      }
    }
 
-   int Player::getLongestPathLength(mapState::MapState) {
+    *
+    *
+    *
+    *
+    *
+    */
+
+   int Player::getLongestPathLength(mapState::MapState* map) {
       return 0;
    }
-   void Player::getClaimableRoads (mapState::MapState map)
-   {
 
-   }
+
+   std::vector<mapState::Road*> Player::getClaimableRoads(mapState::MapState* map)
+    {
+       std::vector<mapState::Road*> claimable;
+
+
+       return claimable;
+    }
+
+
 
    void Player::displayHand()
    {
@@ -217,8 +333,6 @@ namespace playersState {
 
       std::cout << "====================\n";
    }
-
-
 
     void Player::display() {
        std::cout << "player name is " << name << std::endl;
