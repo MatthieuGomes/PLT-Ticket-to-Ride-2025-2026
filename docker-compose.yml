@@ -22,6 +22,7 @@ services:
       # - /dev/dri:/dev/dri:cached
     tty: true
     environment:
+      XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}
       XDG_RUNTIME_DIR: /tmp
     env_file:
       - .env
