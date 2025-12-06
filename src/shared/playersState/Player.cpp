@@ -232,6 +232,57 @@ namespace playersState {
       }
    }
 
+   void Player::drawFaceUpWagonCard(int index, cardsState::CardsState& cardsState)
+   {
+      if (!hand) {
+         std::cout << "Player has no hand to receive a wagon card.\n";
+         return;
+      }
+      if (!cardsState.gameWagonCards) {
+         std::cout << "No shared wagon deck available.\n";
+         return;
+      }
+
+      auto shared = cardsState.gameWagonCards;
+
+
+      if (!shared->faceUpCards || shared->faceUpCards->cards.empty()) {
+         if (shared->faceDownCards && !shared->faceDownCards->cards.empty()) {
+            shared->turnCardUp();
+         } else {
+            shared->refillMainDeck();
+            if (shared->faceDownCards && !shared->faceDownCards->cards.empty()) {
+               shared->turnCardUp();
+            }
+         }
+      }
+
+      if (!shared->faceUpCards || shared->faceUpCards->cards.empty()) {
+         std::cout << "No face-up wagon cards available to draw.\n";
+         return;
+      }
+
+      if (index < 0 || index >= static_cast<int>(shared->faceUpCards->cards.size())) {
+         std::cout << "Invalid face-up index: " << index << ", available: " << shared->faceUpCards->cards.size() << "\n";
+         return;
+      }
+
+      auto cardPtr = shared->faceUpCards->cards[index];
+      if (!cardPtr) {
+         std::cout << "Selected face-up card is null.\n";
+         return;
+      }
+
+      try {
+         shared->drawCard(cardPtr, this->hand);
+      } catch (const std::exception& e) {
+         std::cout << "Exception while drawing face-up wagon card: " << e.what() << "\n";
+      }
+   }
+
+
+
+
    /*
    void Player::getCompletedDestinations(mapState::MapState* map)
    {
