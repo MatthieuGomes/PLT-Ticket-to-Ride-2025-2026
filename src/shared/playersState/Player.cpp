@@ -214,21 +214,11 @@ namespace playersState {
          std::cout << "No shared wagon deck available.\n";
          return;
       }
-      auto shared = cardsState.gameWagonCards;
-      if (!shared->faceDownCards || shared->faceDownCards->cards.empty()) {
-
-         shared->refillMainDeck();
-      }
-
-      if (!shared->faceDownCards || shared->faceDownCards->cards.empty()) {
-         std::cout << "No wagon cards left in the hidden deck to draw.\n";
-         return;
-      }
 
       try {
-         shared->drawCard(1, this->hand);
+         hand->takeCard<cardsState::WagonCard>(1);
       } catch (const std::exception& e) {
-         std::cout << "Exception while drawing wagon card from hidden deck: " << e.what() << "\n";
+         std::cout << "Exception while drawing wagon card via PlayerCards" << e.what() << "\n";
       }
    }
 
@@ -274,15 +264,18 @@ namespace playersState {
       }
 
       try {
-         shared->drawCard(cardPtr, this->hand);
+
+         hand->takeCard<cardsState::WagonCard>(cardPtr.get());
       } catch (const std::exception& e) {
          std::cout << "Exception while drawing face-up wagon card: " << e.what() << "\n";
       }
    }
 
+   void Player::drawDestinationCards(int number, CardsState& cardsState)
+   {
 
 
-
+   }
    /*
    void Player::getCompletedDestinations(mapState::MapState* map)
    {
