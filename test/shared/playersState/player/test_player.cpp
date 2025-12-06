@@ -11,8 +11,6 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 
-/*
- *
 BOOST_AUTO_TEST_CASE(TestPLayerConstructor) {
 
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -280,7 +278,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetHand){
     }
 
 }
-
+/*
 BOOST_AUTO_TEST_CASE(TestPlayerAddRoadAndStation) {
 
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
