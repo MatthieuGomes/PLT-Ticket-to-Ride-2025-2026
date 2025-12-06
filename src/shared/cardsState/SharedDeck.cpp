@@ -98,7 +98,7 @@ void cardsState::SharedDeck<CardType>::drawCard(int number, PlayerCards* player)
         for (int i = 0; i < number; ++i) {
             if (this->faceDownCards->countCards() == 0) {
                 this->refillMainDeck();
-                if (this->faceDownCards->countCards() == 0) break;
+                 if (this->faceDownCards->countCards() == 0) break;
             }
             std::shared_ptr<CardType> card = this->faceDownCards->takeLastCard();
             if constexpr (std::is_same_v<CardType, WagonCard>) {
