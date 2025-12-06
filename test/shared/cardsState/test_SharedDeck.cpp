@@ -53,4 +53,21 @@ BOOST_AUTO_TEST_CASE(test_trash_card)
     BOOST_CHECK(cardToTrash != nullptr);
     BOOST_CHECK_EQUAL(cardToTrash->getColor(), ColorCard::RED);
 }
+
+BOOST_AUTO_TEST_CASE(test_refill_main_deck)
+{
+    std::vector<WagonCard> trash = { WagonCard(ColorCard::RED), WagonCard(ColorCard::BLUE) };
+    std::vector<WagonCard> fUp;
+    std::vector<WagonCard> fDown;
+
+    SharedDeck<WagonCard> deck(&trash, &fUp, &fDown);
+
+    BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
+    BOOST_CHECK_EQUAL(deck.trash->countCards(), 2);
+
+    deck.refillMainDeck();
+
+    BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
+    BOOST_CHECK_EQUAL(deck.trash->countCards(), 0);
+}
 /* vim: set sw=2 sts=2 et : */
