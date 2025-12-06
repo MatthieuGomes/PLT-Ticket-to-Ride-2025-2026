@@ -90,6 +90,7 @@ namespace cardsState {
 
         player->wagonCards->addCard(removedCard);
         std::cout << "WagonCard piochée depuis les cartes visibles !" << std::endl;
+        this->turnCardUp();
     }
     template <class CardType>
 void cardsState::SharedDeck<CardType>::drawCard(int number, PlayerCards* player)
