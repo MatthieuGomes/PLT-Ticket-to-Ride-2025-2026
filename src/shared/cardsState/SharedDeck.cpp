@@ -75,7 +75,7 @@ namespace cardsState {
     template <  class CardType>
     void cardsState::SharedDeck<CardType>::trashCard(std::shared_ptr<CardType> card) {
         int position = std::distance(this->faceUpCards->cards.begin(),std::find(this->faceUpCards->cards.begin(), this->faceUpCards->cards.end(), card));
-        std::shared_ptr<CardType> removedCard = std::make_shared<CardType>(*this->faceUpCards->removeCard(position));
+        std::shared_ptr<CardType> removedCard = this->faceUpCards->removeCard(position);
         this->trash->addCard(removedCard);
     }
     // a function that take the card wagon  passed in parameter  from the visible deck and add it in the cardsplayer
