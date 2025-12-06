@@ -47,18 +47,18 @@ namespace cardsState
     }
 
     template <class CardType>
-    void Deck<CardType>::addCard(CardType *card)
+    void Deck<CardType>::addCard( std::shared_ptr<CardType>card)
     {
         this->cards.push_back(std::shared_ptr<CardType>(card));
     }
     template <class CardType>
-    CardType *Deck<CardType>::removeCard(int position)
+      std::shared_ptr<CardType> Deck<CardType>::removeCard(int position)
     {
         if (position < 0 || position >= static_cast<int>(cards.size()))
         {
-            return nullptr; // or throw an exception
+            return nullptr;
         }
-        CardType * removedCard = std::move(cards[position]).get();
+        std::shared_ptr<CardType> removedCard = cards[position];
         cards.erase(cards.begin() + position);
         return removedCard;
     }
@@ -110,7 +110,7 @@ namespace cardsState
         {
             if (!originDeck || !destinationDeck) return;
 
-            CardType* card = originDeck->removeCard(cardPosition);
+               std::shared_ptr<CardType> card = originDeck->removeCard(cardPosition);
             if (card) {
                 destinationDeck->addCard(card);
             }
@@ -128,7 +128,7 @@ namespace cardsState
 
     }
     template <class CardType>
-    CardType* Deck<CardType>::takeLastCard() {
+    std::shared_ptr<CardType>  Deck<CardType>::takeLastCard() {
         if (cards.size() > 0) {
             return removeCard(static_cast<int>(cards.size()) - 1);
         }

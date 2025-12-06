@@ -2135,7 +2135,7 @@ Special values:
                 <dia:string>#card#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#CardType*#</dia:string>
+                <dia:string>#   std::shared_ptr&lt;CardType&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2157,7 +2157,7 @@ Special values:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#CardType*#</dia:string>
+            <dia:string>#std::shared_ptr&lt;CardType&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -2520,7 +2520,7 @@ Special values:
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#CardType*#</dia:string>
+            <dia:string>#std::shared_ptr&lt;CardType&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
