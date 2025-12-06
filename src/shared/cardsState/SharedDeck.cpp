@@ -102,3 +102,4 @@ namespace cardsState {
     template class SharedDeck<DestinationCard>;
     template class SharedDeck<WagonCard>;
 }
+
