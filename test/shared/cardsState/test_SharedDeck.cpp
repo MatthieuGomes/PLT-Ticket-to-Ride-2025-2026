@@ -102,4 +102,34 @@ BOOST_AUTO_TEST_CASE(test_drawCard_from_face_up_wagon)
     BOOST_CHECK_EQUAL(deck.faceUpCards->cards.back()->getColor(), ColorCard::YELLOW);
     BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
 }
+    BOOST_AUTO_TEST_CASE(test_drawCard_face_down_correct_behavior)
+    {
+        std::vector<WagonCard> trashV;
+        std::vector<WagonCard> faceUpV;
+        std::vector<WagonCard> faceDownV = {
+            WagonCard(ColorCard::RED),
+            WagonCard(ColorCard::BLUE)
+        };
+
+        trashV.emplace_back(ColorCard::GREEN);
+        trashV.emplace_back(ColorCard::YELLOW);
+        trashV.emplace_back(ColorCard::BLACK);
+
+        cardsState::SharedDeck<WagonCard> deck(&trashV, &faceUpV, &faceDownV);
+
+        std::vector<DestinationCard> playerDest;
+        std::vector<WagonCard> playerWagon;
+        PlayerCards player(&playerDest, &playerWagon);
+
+        BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
+        BOOST_CHECK_EQUAL(deck.trash->countCards(), 3);
+        BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 0);
+
+        deck.drawCard(10, &player);
+
+        BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 5);
+        BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
+        BOOST_CHECK_EQUAL(deck.trash->countCards(), 0);
+    }
+
 /* vim: set sw=2 sts=2 et : */
