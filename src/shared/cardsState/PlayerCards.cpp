@@ -80,3 +80,5 @@ namespace cardsState
   template void PlayerCards::takeCard<DestinationCard>(CardsState *,DestinationCard* ,int);
   template void PlayerCards::takeCard<WagonCard>(CardsState *,WagonCard* ,int);
 }
+
+
