@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <limits>
 
 #include "mapState/MapState.h"
 
@@ -214,7 +215,6 @@ namespace playersState {
          std::cout << "No shared wagon deck available.\n";
          return;
       }
-
       try {
          hand->takeCard<cardsState::WagonCard>(1);
       } catch (const std::exception& e) {
@@ -234,7 +234,6 @@ namespace playersState {
       }
 
       auto shared = cardsState.gameWagonCards;
-
 
       if (!shared->faceUpCards || shared->faceUpCards->cards.empty()) {
          if (shared->faceDownCards && !shared->faceDownCards->cards.empty()) {
@@ -264,7 +263,6 @@ namespace playersState {
       }
 
       try {
-
          hand->takeCard<cardsState::WagonCard>(cardPtr.get());
       } catch (const std::exception& e) {
          std::cout << "Exception while drawing face-up wagon card: " << e.what() << "\n";
@@ -273,8 +271,68 @@ namespace playersState {
 
    void Player::drawDestinationCards(int number, CardsState& cardsState)
    {
+      if (!hand) {
+         std::cout << "Player has no hand to receive destination cards.\n";
+         return;
+      }
+      if (!cardsState.gameDestinationCards) {
+         std::cout << "No shared destination deck available.\n";
+         return;
+      }
+
+      if (number <= 0) return;
 
 
+      try {
+         hand->takeCard<cardsState::DestinationCard>(number);
+      } catch (const std::exception& e) {
+         std::cout << "Exception while drawing destination cards: " << e.what() << "\n";
+         return;
+      }
+
+      auto &playerDeckVec = hand->destinationCards->cards;
+      std::vector<std::shared_ptr<cardsState::DestinationCard>> drawnCards;
+      drawnCards.reserve(number);
+
+      int collected = 0;
+      while (collected < number && !playerDeckVec.empty()) {
+         auto sp = playerDeckVec.back();
+         playerDeckVec.pop_back();
+         if (sp) {
+            drawnCards.push_back(sp);
+            ++collected;
+         } else {
+            std::cout << "Drawn destination card is null, skipping.\n";
+         }
+      }
+
+      if (drawnCards.empty()) {
+         std::cout << "No destination cards were drawn.\n";
+         return;
+      }
+
+      int bestIdx = 0;
+      int bestPoints = std::numeric_limits<int>::min();
+      for (int i = 0; i < static_cast<int>(drawnCards.size()); ++i) {
+         if (drawnCards[i] && drawnCards[i]->getPoints() > bestPoints) {
+            bestPoints = drawnCards[i]->getPoints();
+            bestIdx = i;
+         }
+      }
+
+      for (int i = 0; i < static_cast<int>(drawnCards.size()); ++i) {
+         auto &sp = drawnCards[i];
+         if (!sp) continue;
+         if (i == bestIdx) {
+            playerDeckVec.push_back(sp);
+         } else {
+            if (cardsState.gameDestinationCards && cardsState.gameDestinationCards->faceDownCards) {
+               cardsState.gameDestinationCards->faceDownCards->putCardBack(*sp);
+            }
+         }
+      }
+
+      std::cout << "Drew " << collected << " destination cards; kept 1 (best), returned " << (collected - 1) << " under the deck.\n";
    }
    /*
    void Player::getCompletedDestinations(mapState::MapState* map)
