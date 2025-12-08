@@ -21,23 +21,20 @@ namespace mapState
     MapState::MapState()
     {
         this->gameGraph = boost::adjacency_list<>();
-
-        Station *paris = new Station(this, 1, "paris", nullptr, false);
-
-        Station *berlin = new Station(this, 2, "berlin", nullptr, false);
-        Station *madrid = new Station(this, 3, "madrid", nullptr, false);
-        Station *rome = new Station(this, 4, "rome", nullptr, false);
+        Station *paris = new Station("paris", nullptr, false, boost::add_vertex(this->gameGraph));
+        Station *berlin = new Station("berlin", nullptr, false, boost::add_vertex(this->gameGraph));
+        Station *madrid = new Station("madrid", nullptr, false, boost::add_vertex(this->gameGraph));
+        Station *rome = new Station("rome", nullptr, false, boost::add_vertex(this->gameGraph));
         this->stations = {paris, berlin, madrid, rome};
-
+        
         // roads
-
-        Road *roadPB = new Road(this, 1, nullptr, paris, berlin, cardsState::ColorCard::RED, 2, false);
-        Road *roadBR = new Road(this, 2, nullptr, berlin, rome, cardsState::ColorCard::BLUE, 3, false);
-        Road *roadPM = new Road(this, 3, nullptr, paris, madrid, cardsState::ColorCard::YELLOW, 5, false);
-        Road *roadMR = new Road(this, 4, nullptr, madrid, rome, cardsState::ColorCard::YELLOW, 6, false);
-
+        Road *roadPB = new Road(1, nullptr, paris, berlin, cardsState::ColorCard::RED, 2, false, boost::add_edge(*paris->getVertex(), *berlin->getVertex(), this->gameGraph).first);
+        Ferry *roadBR = new Ferry(2, nullptr, berlin, rome, cardsState::ColorCard::BLUE, 3, 4, false, boost::add_edge(*berlin->getVertex(), *rome->getVertex(), this->gameGraph).first);
+        Tunnel *roadPM = new Tunnel(3, nullptr, paris, madrid, cardsState::ColorCard::YELLOW, 5, false, boost::add_edge(*paris->getVertex(), *madrid->getVertex(), this->gameGraph).first);
+        Road *roadMR = new Road(4, nullptr, madrid, rome, cardsState::ColorCard::YELLOW, 6, false, boost::add_edge(*madrid->getVertex(), *rome->getVertex(), this->gameGraph).first);
         this->roads = {roadPB, roadBR, roadPM, roadMR};
     };
+    
     void MapState::display() const
     {
         std::cout << "===== MAP STATE =====\n";
@@ -153,6 +150,27 @@ namespace mapState
         path.NUMEDGES = int(path.STATIONS.size()) - 1;
         path.TOTALLENGTH = path.NUMEDGES;
         return path;
+    }
+
+    std::vector<Station*> MapState::getAdjacentStations(Station *station) const
+    {
+        std::vector<Station*> adjacentStations;
+        auto vertex = station->vertex;
+
+        auto neighbors = boost::adjacent_vertices(vertex, this->gameGraph);
+        for(auto it = neighbors.first; it != neighbors.second; ++it) {
+            Station* neighborStation = nullptr;
+            for(Station* s : this->stations) {
+                if(s->vertex == *it) {
+                    neighborStation = s;
+                    break;
+                }
+            }
+            if(neighborStation != nullptr) {
+                adjacentStations.push_back(neighborStation);
+            }
+        }
+        return adjacentStations;
     }
 
     std::string MapState::toString() const
