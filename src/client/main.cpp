@@ -18,26 +18,6 @@ int main(int argc,char* argv[])
     if (argc<=1) {
         cout << "So far, nothing here..." << endl;
         cout << "Testing map" << endl;
-        mapState::MapState map;
-        map.printMapState();
-        std::vector<mapState::Station*> stations = map.listStations();
-        mapState::Station * b_stat = stations[1];
-        cout << "Testing station:" << b_stat->data->name << endl;
-        std::vector<mapState::Road*> roads = map.listRoads();
-        cout << "Testing road color:" << roads[2]->data->color << endl;
-        cout << "print berlin:" << map.getStationByName("Berlin")->data->name << endl;
-        mapState::Road* roadptr = map.getRoad(map.getStationByName("Berlin"), map.getStationByName("Rome"));
-        if (roadptr == nullptr) {
-            cout << "getroad search failed" << endl;
-        } else {
-            cout << "getroad berlin-rome: " << roadptr->data->ID << endl;
-        }
-        mapState::Path pth = map.findShortestPath(map.getStationByName("Paris"), map.getStationByName("Rome")); 
-        for (auto s : pth.STATIONS) {
-            cout << "findshortestpath test stations:" << s->data->name << endl;
-        }
-        cout << "printtostring test:" << endl;
-        cout << map.printToString() << endl; 
         return EXIT_FAILURE;
     }
     client::Client client = client::Client();

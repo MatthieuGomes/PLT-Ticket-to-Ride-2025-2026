@@ -5,7 +5,7 @@ using namespace std;
 namespace mapState
 {
 
-    Ferry::Ferry(MapState *mapState, int id, playersState::Player *owner, Station *stationA, Station *stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked) : Road(mapState, id, owner, stationA, stationB, color, lenght, isBlocked)
+    Ferry::Ferry(int id, playersState::Player *owner, Station *stationA, Station *stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge) : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
     {
         this->locomotives = locomotives;
     }
@@ -15,12 +15,17 @@ namespace mapState
 
     void Ferry::display()
     {
-        cout << "MapElement Type: Ferry" << endl;
-        Road::display();
+        cout << "\tFerry Details:\n";
+        Ferry::_display();
     }
     int Ferry::getLocomotives()
     {
         return this->locomotives;
+    }
+    void Ferry::_display()
+    {   
+        Road::_display();
+        cout << "\tNumber of Locomotives: " << this->locomotives << "\n";
     }
 
 }

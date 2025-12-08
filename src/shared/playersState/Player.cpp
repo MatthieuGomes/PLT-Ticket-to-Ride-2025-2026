@@ -178,69 +178,47 @@ namespace playersState {
 
    bool Player::canBuildRoad(mapState::MapState* map, mapState::Station* u, mapState::Station* v)
    {
-      mapState::Road* road = map->getRoad(u, v);
+      mapState::Road* road = map->getRoadBetweenStations(u, v);
       if (!road) {
          std::cout << " No road exists between "
-                   << u->data->name << " and " << v->data->name << "\n";
+                   << u->getName() << " and " << v->getName() << "\n";
          return false;
       }
 
-      mapState::RoadData* data = road->data;
+      
 
-      if (data->isBlocked) {
+      if (road->getBlockStatus()) {
          std::cout << " The road is blocked.\n";
          return false;
       }
-
-      if (nbWagons < data->length) {
+      if (road->getOwner() != nullptr) {
+         std::cout << " The road is already owned by another player.\n";
+         return false;
+      }
+      long unsigned int length = road->getLength();
+      if (nbWagons < length) {
          std::cout << " Not enough wagons. Needed: "
-                   << data->length << ", you have: " << nbWagons << "\n";
+                   << length << " wagons, you have: " << nbWagons << " remaining\n";
          return false;
       }
 
-      std::string color = data->color;
+      cardsState::ColorCard requiredColor = road->getColor();
 
-      cardsState::ColorCard requiredColor;
+      std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
 
-      if (data->color == "RED")       requiredColor =  cardsState::ColorCard::RED;
-      else if (data->color == "BLUE") requiredColor =  cardsState::ColorCard::BLUE;
-      else if (data->color == "GREEN") requiredColor =  cardsState::ColorCard::GREEN;
-      else if (data->color == "YELLOW") requiredColor =  cardsState::ColorCard::YELLOW;
-      else if (data->color == "BLACK") requiredColor =  cardsState::ColorCard::BLACK;
-      else if (data->color == "WHITE") requiredColor =  cardsState::ColorCard::WHITE;
-      else if (data->color == "ORANGE") requiredColor =  cardsState::ColorCard::ORANGE;
-      else if (data->color == "PINK") requiredColor =  cardsState::ColorCard::PINK;
-      else {
-         std::cout << " Unknown road color\n";
-         return false;
-      }
-
-      int needed = data->length;
-
-      int nbColor = 0;
-      int nbLoco  = 0;
-
-
-      for (auto& card : hand->wagonCards->cards) {
-         if (card != nullptr) {
-            if (card->color == requiredColor) {
-               ++nbColor;
-            }
-            else if (card->color == cardsState::ColorCard::LOCOMOTIVE) {
-               ++nbLoco;
-            }
+      for (std::shared_ptr<cardsState::WagonCard> card : hand->wagonCards->cards){
+         if (card->color == requiredColor || requiredColor == cardsState::ColorCard::LOCOMOTIVE){
+            cardsCorrectColor.push_back(card);
          }
       }
-
-      if (nbColor + nbLoco < needed) {
-         std::cout << " Not enough cards of color " << data->color
-                   << " (have " << nbColor
-                   << " + " << nbLoco << " locos)\n";
+      if (cardsCorrectColor.size() < length) {
+         std::cout << " Not enough cards of color " << requiredColor
+                   << ". Needed: " << length << ", you have: " << cardsCorrectColor.size() << "\n";
          return false;
       }
 
       std::cout << " Player can build road between "
-                << u->data->name << " and " << v->data->name << "\n";
+                << u->getName() << " and " << v->getName() << "\n";
 
      return true;
    }
@@ -357,20 +335,20 @@ namespace playersState {
        std::vector<mapState::Road*> claimable;
 
       if (!map) return claimable;
-      for (auto* road : map->Roads) {
+      for (mapState::Road* road : map->roads) {
 
-         if (!road || !road->data) continue;
-         if (road->data->isBlocked) continue;
-         if (road->data->endpoints.size() < 2) continue;
+         if (!road) continue;
+         if (road->isBlocked) continue;
+         if (road->stationA==nullptr || road->stationB==nullptr) continue;
 
          mapState::Station* u = nullptr;
          mapState::Station* v = nullptr;
 
 
-         for (auto* s : map->Stations) {
-            if (!s || !s->data) continue;
-            if (s->data == road->data->endpoints[0]) u = s;
-            else if (s->data == road->data->endpoints[1]) v = s;
+         for (auto* station : map->stations) {
+            if (!station) continue;
+            if (station == road->stationA) u = station;
+            else if (station == road->stationB) v = station;
             if (u && v) break;
          }
 
