@@ -14,7 +14,14 @@
         },
         "vscode": {
             "extensions": [
-                "ms-vscode.cmake-tools"
+                "github.vscode-pull-request-github",
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cpptools-themes",
+                "ms-vscode.hexeditor",
+                "ritwickdey.liveserver",
+                "GitHub.copilot-chat"
             ]
         }
     }
