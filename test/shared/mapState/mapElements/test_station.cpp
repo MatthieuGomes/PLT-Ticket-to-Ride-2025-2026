@@ -7,6 +7,8 @@
 
 using namespace ::mapState;
 
+using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
+
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
   BOOST_CHECK(1);
@@ -18,51 +20,93 @@ bool test_is_blocked = false;
 boost::adjacency_list<> test_graph = boost::adjacency_list<>();
 boost::adjacency_list<>::vertex_descriptor test_vertex = boost::add_vertex(test_graph);
 
-BOOST_AUTO_TEST_CASE(TestConstructor)
-{
+BOOST_AUTO_TEST_SUITE(Constructors)
 
+BOOST_AUTO_TEST_CASE(Basic)
+{
   Station station(test_station_name, &test_owner, test_is_blocked, test_vertex);
   BOOST_CHECK_EQUAL(station.owner, &test_owner);
   BOOST_CHECK_EQUAL(station.isBlocked, test_is_blocked);
   BOOST_CHECK_EQUAL(station.name, test_station_name);
   BOOST_CHECK_EQUAL(station.vertex, test_vertex);
 }
-BOOST_AUTO_TEST_SUITE(TestGettersAndSetters)
-Station station(test_station_name, &test_owner, test_is_blocked, test_vertex);
-BOOST_AUTO_TEST_SUITE(TestGetters)
 
-BOOST_AUTO_TEST_CASE(TestGetName)
+BOOST_AUTO_TEST_CASE(BatchConstructor)
+{
+  std::string test_station_name1 = "BatchStation1";
+  playersState::Player test_owner1 = playersState::Player(1, "BatchPlayer1", cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
+  bool test_is_blocked1 = false;
+  std::string test_station_name2 = "BatchStation2";
+  playersState::Player test_owner2 = playersState::Player(1, "BatchPlayer2", cardsState::ColorCard::BLUE, 0, 42, 1, 3, nullptr);
+  bool test_is_blocked2 = false;
+
+  std::vector<StationInfo> stationInfos = {
+      Station::genData(&test_owner1, test_is_blocked1, test_station_name1),
+      Station::genData(&test_owner2, test_is_blocked2, test_station_name2),
+  };
+  std::vector<Station> stations = Station::BatchConstructor(stationInfos, &test_graph);
+  BOOST_CHECK_EQUAL(stations.size(), 2);
+  BOOST_CHECK_EQUAL(stations[0].name, test_station_name1);
+  BOOST_CHECK_EQUAL(stations[0].owner, &test_owner1);
+  BOOST_CHECK_EQUAL(stations[0].isBlocked, test_is_blocked1);
+  BOOST_CHECK_EQUAL(stations[1].name, test_station_name2);
+  BOOST_CHECK_EQUAL(stations[1].owner, &test_owner2);
+  BOOST_CHECK_EQUAL(stations[1].isBlocked, test_is_blocked2);
+}
+
+BOOST_AUTO_TEST_CASE(GenData)
+{
+  StationInfo info = Station::genData(&test_owner, test_is_blocked, test_station_name);
+  BOOST_CHECK_EQUAL(std::get<0>(info), &test_owner);
+  BOOST_CHECK_EQUAL(std::get<1>(info), test_is_blocked);
+  BOOST_CHECK_EQUAL(std::get<2>(info), test_station_name);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+Station station(test_station_name, &test_owner, test_is_blocked, test_vertex);
+BOOST_AUTO_TEST_SUITE(Getters)
+
+BOOST_AUTO_TEST_CASE(GetName)
 {
   BOOST_CHECK_EQUAL(station.getName(), test_station_name);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetOwner)
+BOOST_AUTO_TEST_CASE(GetOwner)
 {
   BOOST_CHECK_EQUAL(station.getOwner(), &test_owner);
 }
+using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
+using StationPair = std::pair<Station *, Station *>;
+using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
+using RoadInfo = std::pair<StationPair, RoadDetail>;
+using TunnelDetail = RoadDetail;
+using TunnelInfo = RoadInfo;
+using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, int, bool>;
+using FerryInfo = std::pair<StationPair, FerryDetail>;
 
-BOOST_AUTO_TEST_CASE(TestGetBlockStatus)
+BOOST_AUTO_TEST_CASE(GetBlockStatus)
 {
   BOOST_CHECK_EQUAL(station.getBlockStatus(), test_is_blocked);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetVertex)
+BOOST_AUTO_TEST_CASE(GetVertex)
 {
   BOOST_CHECK_EQUAL(*station.getVertex(), test_vertex);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE(TestSetters)
+BOOST_AUTO_TEST_SUITE(Setters)
 
 playersState::Player test_set_owner = playersState::Player(2, "NewOwner", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
-BOOST_AUTO_TEST_CASE(TestSetOwner)
+BOOST_AUTO_TEST_CASE(SetOwner)
 {
   station.setOwner(&test_set_owner);
   BOOST_CHECK_EQUAL(station.owner, &test_set_owner);
 }
 bool test_set_is_blocked = true;
-BOOST_AUTO_TEST_CASE(TestSetBlockStatus)
+BOOST_AUTO_TEST_CASE(SetBlockStatus)
 {
   station.setBlockStatus(test_set_is_blocked);
   BOOST_CHECK_EQUAL(station.isBlocked, test_set_is_blocked);
