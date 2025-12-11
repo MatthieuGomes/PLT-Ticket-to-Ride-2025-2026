@@ -196,6 +196,7 @@ namespace mapState
                 return r;
             }
         }
+        return nullptr;
     }
 
     Path MapState::findShortestPath(Station *src, Station *dest)
