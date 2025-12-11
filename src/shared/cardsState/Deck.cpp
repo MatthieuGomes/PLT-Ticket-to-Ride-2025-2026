@@ -47,18 +47,18 @@ namespace cardsState
     }
 
     template <class CardType>
-    void Deck<CardType>::addCard( std::shared_ptr<CardType>card)
+    void Deck<CardType>::addCard(CardType *card)
     {
         this->cards.push_back(std::shared_ptr<CardType>(card));
     }
     template <class CardType>
-      std::shared_ptr<CardType> Deck<CardType>::removeCard(int position)
+    CardType *Deck<CardType>::removeCard(int position)
     {
         if (position < 0 || position >= static_cast<int>(cards.size()))
         {
-            return nullptr;
+            return nullptr; // or throw an exception
         }
-        std::shared_ptr<CardType> removedCard = cards[position];
+        CardType * removedCard = std::move(cards[position]).get();
         cards.erase(cards.begin() + position);
         return removedCard;
     }
@@ -76,7 +76,6 @@ namespace cardsState
                 static_cast<std::shared_ptr<CardType>>(card)->display();
             }
         }
-        this->test(std::make_tuple(1,2,"example"));
 
     }
     template<class CardType>
@@ -98,19 +97,11 @@ namespace cardsState
     }
 
     template <class CardType>
-    void Deck<CardType>::test(std::tuple<int, int, std::string> args, ...)
-    {
-        std::cout << " Deck<CardType>::test called with args: "
-                  << std::get<0>(args) << ", "
-                  << std::get<1>(args) << ", "
-                  << std::get<2>(args) << std::endl;
-    }
-    template <class CardType>
     void Deck<CardType>::moveCardTo (Deck<CardType>* originDeck, Deck<CardType>* destinationDeck, int cardPosition) {
         {
             if (!originDeck || !destinationDeck) return;
 
-               std::shared_ptr<CardType> card = originDeck->removeCard(cardPosition);
+            CardType* card = originDeck->removeCard(cardPosition);
             if (card) {
                 destinationDeck->addCard(card);
             }
@@ -128,7 +119,7 @@ namespace cardsState
 
     }
     template <class CardType>
-    std::shared_ptr<CardType>  Deck<CardType>::takeLastCard() {
+    CardType* Deck<CardType>::takeLastCard() {
         if (cards.size() > 0) {
             return removeCard(static_cast<int>(cards.size()) - 1);
         }
