@@ -8,8 +8,9 @@
 #include <algorithm> // std::shuffle
 #include <random>
 #include "PlayerCards.h"
-#include <type_traits>
 #include <boost/smart_ptr/make_shared_object.hpp>
+#include <type_traits>
+#include <algorithm> // std::find, std::find_if
 
 namespace cardsState {
     // class SharedDeck -
@@ -57,7 +58,7 @@ namespace cardsState {
             std::cout << "Trash is empty. Cannot refill main deck." << std::endl;
             return;
         }
-        std::vector< std::shared_ptr<CardType> > temp;
+        std::vector<CardType*> temp;
 
         while (trash->countCards() > 0) {
             temp.push_back(trash->removeCard(trash->countCards() - 1));
@@ -75,39 +76,40 @@ namespace cardsState {
     template <  class CardType>
     void cardsState::SharedDeck<CardType>::trashCard(std::shared_ptr<CardType> card) {
         int position = std::distance(this->faceUpCards->cards.begin(),std::find(this->faceUpCards->cards.begin(), this->faceUpCards->cards.end(), card));
-        std::shared_ptr<CardType> removedCard = this->faceUpCards->removeCard(position);
-        this->trash->addCard(removedCard);
+        std::shared_ptr<CardType> removedCard = std::make_shared<CardType>(*this->faceUpCards->removeCard(position));
+        this->trash->addCard(removedCard.get());
     }
-    // a function that take the card wagon  passed in parameter  from the visible deck and add it in the cardsplayer
 
-    template <>
-    void cardsState::SharedDeck<WagonCard>::drawCard(std::shared_ptr<WagonCard> card, PlayerCards* player)
-    {
-        int pos = std::distance(this->faceUpCards->cards.begin(), std::find(this->faceUpCards->cards.begin(),
-                            this->faceUpCards->cards.end(),
-                            card));
-        std::shared_ptr<WagonCard> removedCard = this->faceUpCards->removeCard(pos);
-
-        player->wagonCards->addCard(removedCard);
-        std::cout << "WagonCard piochée depuis les cartes visibles !" << std::endl;
-        this->turnCardUp();
-    }
-    template <class CardType>
-void cardsState::SharedDeck<CardType>::drawCard(int number, PlayerCards* player)
-    {
-        for (int i = 0; i < number; ++i) {
-            if (this->faceDownCards->countCards() == 0) {
-                this->refillMainDeck();
-                 if (this->faceDownCards->countCards() == 0) break;
-            }
-            std::shared_ptr<CardType> card = this->faceDownCards->takeLastCard();
-            if constexpr (std::is_same_v<CardType, WagonCard>) {
-                player->wagonCards->addCard(card);
-            }
-            else if constexpr (std::is_same_v<CardType, DestinationCard>) {
-                player->destinationCards->addCard(card);
+    template <  class CardType>
+    void cardsState::SharedDeck<CardType>::drawCard(PlayerCards * playerCards, CardType * card, int number) {
+        if ((card != nullptr && number > 0) || (card==nullptr && number<=0)) {
+            throw std::invalid_argument("Cannot specify both a card and a number.");
+        }
+        if (card != nullptr) {
+            auto it = std::find_if(this->faceUpCards->cards.begin(), this->faceUpCards->cards.end(),
+                                   [&](const std::shared_ptr<CardType>& sp){ return sp.get() == card; });
+            if (it == this->faceUpCards->cards.end()) return;
+            int pos = static_cast<int>(std::distance(this->faceUpCards->cards.begin(), it));
+            std::shared_ptr<CardType> removedCard = std::make_shared<CardType>(*this->faceUpCards->removeCard(pos));
+            if(typeid(CardType)==typeid(DestinationCard)){
+                playerCards->destinationCards->addCard(dynamic_cast<DestinationCard *>(removedCard.get()));
+            } else if (typeid(CardType)==typeid(WagonCard)) {
+                playerCards->wagonCards->addCard(dynamic_cast<WagonCard *>(removedCard.get()));
             }
         }
+        else if (number > 0) {
+            for( int i = 0; i < number; ++i ) {
+                Card * removedCard = this->faceDownCards->takeLastCard();
+                if (typeid(CardType)==typeid(DestinationCard)) {
+                    DestinationCard* typedRemovedCard = dynamic_cast<DestinationCard*>(removedCard);
+                    playerCards->destinationCards->addCard(typedRemovedCard);
+                } else if (typeid(CardType)==typeid(WagonCard)) {
+                    WagonCard* typedRemovedCard = dynamic_cast<WagonCard*>(removedCard);
+                    playerCards->wagonCards->addCard(typedRemovedCard);
+                }
+            }
+        }
+        
     }
 
     template class SharedDeck<DestinationCard>;

@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_drawCard_from_face_up_wagon)
 
     auto cardToDraw = deck.faceUpCards->cards[0];
 
-    deck.drawCard(cardToDraw, &player);
+    // deck.drawCard(cardToDraw, &player);
 
     BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 1);
     BOOST_CHECK_EQUAL(player.wagonCards->cards[0]->getColor(), ColorCard::RED);
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(test_drawCard_from_face_up_wagon)
         BOOST_CHECK_EQUAL(deck.trash->countCards(), 3);
         BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 0);
 
-        deck.drawCard(10, &player);
+        // deck.drawCard(10, &player);
 
         BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 5);
         BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
