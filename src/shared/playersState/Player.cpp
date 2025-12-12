@@ -3,6 +3,9 @@
 #include <iostream>
 #include <ostream>
 #include <limits>
+#include <unordered_set>
+#include <unordered_map>
+#include <functional>
 
 #include "mapState/MapState.h"
 
@@ -185,7 +188,63 @@ namespace playersState
 
    int Player::getLongestPathLength(mapState::MapState *map)
    {
-      return 0;
+      if (!map)
+         return 0;
+
+
+      std::unordered_map<mapState::Station *, std::vector<std::pair<mapState::Station *, int>>> adj;
+      for (auto *road : map->roads)
+      {
+         if (!road)
+            continue;
+         if (road->getOwner() != this)
+            continue;
+         mapState::Station *a = road->getStationA();
+         mapState::Station *b = road->getStationB();
+         if (!a || !b)
+            continue;
+         adj[a].push_back({b, road->getLength()});
+         adj[b].push_back({a, road->getLength()});
+      }
+
+      if (adj.empty())
+         return 0;
+
+
+      std::function<int(mapState::Station *, std::unordered_set<mapState::Station *> &)> dfs;
+      dfs = [&](mapState::Station *current, std::unordered_set<mapState::Station *> &visited) -> int {
+         int best = 0;
+         auto it = adj.find(current);
+         if (it == adj.end())
+            return 0;
+         for (auto &p : it->second)
+         {
+            mapState::Station *nbr = p.first;
+            int w = p.second;
+            if (visited.find(nbr) != visited.end())
+               continue;
+            visited.insert(nbr);
+            int cand = w + dfs(nbr, visited);
+            if (cand > best)
+               best = cand;
+            visited.erase(nbr);
+         }
+         return best;
+      };
+
+      int longest = 0;
+
+      for (auto &kv : adj)
+      {
+         mapState::Station *start = kv.first;
+         std::unordered_set<mapState::Station *> visited;
+         visited.insert(start);
+         int len = dfs(start, visited);
+         if (len > longest)
+            longest = len;
+      }
+
+      return longest;
    }
 
    std::vector<mapState::Road *> Player::getClaimableRoads(mapState::MapState *map)
