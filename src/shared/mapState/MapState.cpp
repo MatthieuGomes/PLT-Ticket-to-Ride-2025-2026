@@ -8,6 +8,9 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include <unordered_map>
+#include <type_traits>
+#include <memory>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -26,7 +29,7 @@
 namespace mapState
 {
     using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
-    using StationPair = std::pair<Station *, Station *>;
+    using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
     using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
     using TunnelDetail = RoadDetail;
@@ -45,19 +48,19 @@ namespace mapState
             Station::genData(nullptr, false, "rome"),
         };
 
-        std::vector<Station> stationsObject = Station::BatchConstructor(stations, &this->gameGraph);
+        std::vector<std::shared_ptr<Station>> stationsObject = Station::BatchConstructor(stations, &this->gameGraph);
         std::vector<RoadInfo> roads = {
             Road::genData(
-                &stationsObject[0],
-                &stationsObject[1],
+                stationsObject[0],
+                stationsObject[1],
                 1,
                 nullptr,
                 cardsState::ColorCard::RED,
                 2,
                 false),
             Road::genData(
-                &stationsObject[2],
-                &stationsObject[3],
+                stationsObject[2],
+                stationsObject[3],
                 4,
                 nullptr,
                 cardsState::ColorCard::GREEN,
@@ -66,8 +69,8 @@ namespace mapState
         };
         std::vector<TunnelInfo> tunnels = {
             Tunnel::genData(
-                &stationsObject[0],
-                &stationsObject[3],
+                stationsObject[0],
+                stationsObject[3],
                 3,
                 nullptr,
                 cardsState::ColorCard::BLACK,
@@ -77,8 +80,8 @@ namespace mapState
         };
         std::vector<FerryInfo> ferrys = {
             Ferry::genData(
-                &stationsObject[1],
-                &stationsObject[3],
+                stationsObject[1],
+                stationsObject[3],
                 2,
                 nullptr,
                 cardsState::ColorCard::BLUE,
@@ -107,29 +110,81 @@ namespace mapState
     {
 
         DEBUG_PRINT("MapState _MapState started ...");
-        std::vector<Station> stationObjects = Station::BatchConstructor(stationsInfos, &this->gameGraph);
+        this->stations.clear();
+        this->roads.clear();
+        this->gameGraph = boost::adjacency_list<>();
 
-        std::vector<Road> roadObjects = Road::BatchConstructor(roadsInfos, &this->gameGraph);
+        std::vector<std::shared_ptr<Station>> stationObjects = Station::BatchConstructor(stationsInfos, &this->gameGraph);
+        std::unordered_map<std::string, std::shared_ptr<Station>> stationLookup;
+        stationLookup.reserve(stationObjects.size());
 
-        std::vector<Tunnel> tunnelObjects = Tunnel::BatchConstructor(tunnelsInfos, &this->gameGraph);
-
-        std::vector<Ferry> ferryObjects = Ferry::BatchConstructor(ferrysInfos, &this->gameGraph);
-
-        for (Station station : stationObjects)
+        for (const std::shared_ptr<Station> &station : stationObjects)
         {
-            this->stations.push_back(new Station(station));
+            this->stations.push_back(station);
+            stationLookup[station->getName()] = station;
         }
-        for (Road road : roadObjects)
+
+        auto remapStation =
+            [&](const std::shared_ptr<Station> &station) -> std::shared_ptr<Station>
         {
-            this->roads.push_back(new Road(road));
+            if (!station)
+            {
+                return nullptr;
+            }
+
+            auto it = stationLookup.find(station->getName());
+            if (it == stationLookup.end())
+            {
+                DEBUG_PRINT("Unknown station: " << station->getName());
+                return nullptr;
+            }
+            return it->second;
+        };
+
+        auto remapConnections =
+            [&](const auto &infos)
+        {
+            using VectorType = typename std::decay<decltype(infos)>::type;
+            using InfoType = typename VectorType::value_type;
+            VectorType remapped;
+            remapped.reserve(infos.size());
+            for (const auto &info : infos)
+            {
+                std::shared_ptr<Station> stationA = remapStation(info.first.first);
+                std::shared_ptr<Station> stationB = remapStation(info.first.second);
+                if (!stationA || !stationB)
+                {
+                    continue;
+                }
+                InfoType newInfo = info;
+                newInfo.first.first = stationA;
+                newInfo.first.second = stationB;
+                remapped.push_back(newInfo);
+            }
+            return remapped;
+        };
+
+        std::vector<RoadInfo> normalizedRoadInfos = remapConnections(roadsInfos);
+        std::vector<TunnelInfo> normalizedTunnelInfos = remapConnections(tunnelsInfos);
+        std::vector<FerryInfo> normalizedFerryInfos = remapConnections(ferrysInfos);
+
+        std::vector<std::shared_ptr<Road>> roadObjects = Road::BatchConstructor(normalizedRoadInfos, &this->gameGraph);
+
+        std::vector<std::shared_ptr<Tunnel>> tunnelObjects = Tunnel::BatchConstructor(normalizedTunnelInfos, &this->gameGraph);
+
+        std::vector<std::shared_ptr<Ferry>> ferryObjects = Ferry::BatchConstructor(normalizedFerryInfos, &this->gameGraph);
+
+        for (const std::shared_ptr<Road> &road : roadObjects)
+        {
+            this->roads.push_back(road);
         }
-        for (Tunnel tunnel : tunnelObjects)
+        for (const std::shared_ptr<Tunnel> &tunnel : tunnelObjects)
         {
-            this->roads.push_back(new Tunnel(tunnel));
+            this->roads.push_back(tunnel);
         }
-        for (Ferry ferry : ferryObjects)
+        for (const std::shared_ptr<Ferry> &ferry : ferryObjects)
         {
-            this->roads.push_back(new Ferry(ferry));
+            this->roads.push_back(ferry);
         }
         DEBUG_PRINT("MapState _MapState finished !");
     }
@@ -154,13 +209,13 @@ namespace mapState
     {
         std::cout << "===== MAP STATE =====\n";
         std::cout << "Stations:\n";
-        for (Station *station : stations)
+        for (const std::shared_ptr<Station> &station : stations)
         {
             station->display();
             std::cout << "------------------\n";
         }
         std::cout << "Roads:\n";
-        for (Road *road : roads)
+        for (const std::shared_ptr<Road> &road : roads)
         {
             road->display();
             std::cout << "------------------\n";
@@ -168,28 +223,32 @@ namespace mapState
         std::cout << "=====================\n";
     }
 
-    std::vector<Station *> MapState::getStations() const
+    std::vector<std::shared_ptr<Station>> MapState::getStations() const
     {
         return this->stations;
     }
 
-    std::vector<Road *> MapState::getRoads() const
+    std::vector<std::shared_ptr<Road>> MapState::getRoads() const
     {
         return this->roads;
     }
 
-    Station *MapState::getStationByName(const std::string &name)
+    std::shared_ptr<Station> MapState::getStationByName(const std::string &name)
     {
 
-        for (Station *s : stations)
+        for (const std::shared_ptr<Station> &s : stations)
             if (s->name == name)
                 return s;
         return nullptr;
     }
 
-    Road *MapState::getRoadBetweenStations(Station *u, Station *v)
+    std::shared_ptr<Road> MapState::getRoadBetweenStations(std::shared_ptr<Station> u, std::shared_ptr<Station> v)
     {
-        for (Road *r : roads)
+        if (!u || !v)
+        {
+            return nullptr;
+        }
+        for (const std::shared_ptr<Road> &r : roads)
         {
             if ((r->stationA->getName() == u->name && r->stationB->getName() == v->name) || (r->stationA->getName() == v->name && r->stationB->getName() == u->name))
             {
@@ -199,7 +258,23 @@ namespace mapState
         return nullptr;
     }
 
-    Path MapState::findShortestPath(Station *src, Station *dest)
+    Road *MapState::getRoadBetweenStations(Station *u, Station *v)
+    {
+        if (!u || !v)
+        {
+            return nullptr;
+        }
+        std::shared_ptr<Station> sharedU = this->getStationByName(u->name);
+        std::shared_ptr<Station> sharedV = this->getStationByName(v->name);
+        if (!sharedU || !sharedV)
+        {
+            return nullptr;
+        }
+        std::shared_ptr<Road> sharedRoad = this->getRoadBetweenStations(sharedU, sharedV);
+        return sharedRoad.get();
+    }
+
+    Path MapState::findShortestPath(std::shared_ptr<Station> src, std::shared_ptr<Station> dest)
     {
         Path path;
 
@@ -235,9 +310,9 @@ namespace mapState
                 .weight_map(weightMap));
 
         auto vertexToStation =
-            [this](vertex_descriptor v) -> Station *
+            [this](vertex_descriptor v) -> std::shared_ptr<Station>
         {
-            for (Station *s : this->stations)
+            for (const std::shared_ptr<Station> &s : this->stations)
             {
                 if (s->vertex == v)
                     return s;
@@ -251,7 +326,7 @@ namespace mapState
 
         while (true)
         {
-            Station *s = vertexToStation(current);
+            std::shared_ptr<Station> s = vertexToStation(current);
             if (s)
                 path.STATIONS.push_back(s);
 
@@ -271,14 +346,14 @@ namespace mapState
         return path;
     }
 
-    std::vector<Station *> MapState::getAdjacentStations(Station *station)
+    std::vector<std::shared_ptr<Station>> MapState::getAdjacentStations(std::shared_ptr<Station> station)
     {
         if (!station)
         {
             return {};
         }
-        std::vector<Station *> adjacentStations;
-        for (Road *road : this->roads)
+        std::vector<std::shared_ptr<Station>> adjacentStations;
+        for (const std::shared_ptr<Road> &road : this->roads)
         {
 #ifdef DEBUG
             road->display();
@@ -302,13 +377,13 @@ namespace mapState
         std::ostringstream out;
         out << "===== MAP STATE =====\n";
         std::cout << "Stations:\n";
-        for (Station *station : stations)
+        for (const std::shared_ptr<Station> &station : stations)
         {
             station->display();
             std::cout << "------------------\n";
         }
         std::cout << "Roads:\n";
-        for (Road *road : roads)
+        for (const std::shared_ptr<Road> &road : roads)
         {
             road->display();
             std::cout << "------------------\n";

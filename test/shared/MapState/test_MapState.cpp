@@ -8,10 +8,11 @@
 #include "../../src/shared/mapState/Tunnel.h"
 #include "../../src/shared/mapState/Ferry.h"
 #include <boost/graph/adjacency_list.hpp>
+#include <memory>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
-#define DEBUG
+#define DEBUG 
 #define DEBUG_PRINT(x) std::cout << x << std::endl
 #else
 #define DEBUG_PRINT(x)
@@ -20,7 +21,7 @@
 using namespace ::mapState;
 
 using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
-using StationPair = std::pair<Station *, Station *>;
+using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
 using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 using TunnelDetail = RoadDetail;
@@ -57,8 +58,8 @@ BOOST_AUTO_TEST_CASE(Wrapper)
       Station::genData(nullptr, false, "Station1"),
       Station::genData(nullptr, false, "Station2"),
   };
-  Station *station1 = new Station("Station1", nullptr, false, boost::add_vertex(test_graph));
-  Station *station2 = new Station("Station2", nullptr, false, boost::add_vertex(test_graph));
+  auto station1 = std::make_shared<Station>("Station1", nullptr, false, boost::add_vertex(test_graph));
+  auto station2 = std::make_shared<Station>("Station2", nullptr, false, boost::add_vertex(test_graph));
   std::vector<RoadInfo> roadsInfos = {
       Road::genData(station1, station2, 1, nullptr, cardsState::ColorCard::RED, 3, false),
   };
@@ -78,8 +79,10 @@ BOOST_AUTO_TEST_CASE(Wrapper)
   }
   for (int i = 0; i < static_cast<int>(map_state.roads.size()); i++)
   {
-    BOOST_CHECK(map_state.roads[i]->stationA == station1 || map_state.roads[i]->stationA == station2);
-    BOOST_CHECK(map_state.roads[i]->stationB == station1 || map_state.roads[i]->stationB == station2);
+    const std::string &stationAName = map_state.roads[i]->stationA->getName();
+    const std::string &stationBName = map_state.roads[i]->stationB->getName();
+    BOOST_CHECK(stationAName == station1->getName() || stationAName == station2->getName());
+    BOOST_CHECK(stationBName == station1->getName() || stationBName == station2->getName());
   }
   std::cout << "Wrapper Constructor Test Finished !\n"
             << std::endl;
@@ -106,9 +109,9 @@ BOOST_AUTO_TEST_CASE(Parameterized)
       Station::genData(nullptr, false, "StationB"),
       Station::genData(nullptr, false, "StationC"),
   };
-  Station *stationA = new Station("StationA", nullptr, false, boost::add_vertex(test_graph));
-  Station *stationB = new Station("StationB", nullptr, false, boost::add_vertex(test_graph));
-  Station *stationC = new Station("StationC", nullptr, false, boost::add_vertex(test_graph));
+  auto stationA = std::make_shared<Station>("StationA", nullptr, false, boost::add_vertex(test_graph));
+  auto stationB = std::make_shared<Station>("StationB", nullptr, false, boost::add_vertex(test_graph));
+  auto stationC = std::make_shared<Station>("StationC", nullptr, false, boost::add_vertex(test_graph));
   std::vector<RoadInfo> roadsInfos = {
       Road::genData(stationA, stationB, 1, nullptr, cardsState::ColorCard::RED, 3, false),
       Road::genData(stationB, stationC, 2, nullptr, cardsState::ColorCard::BLUE, 4, true),
@@ -138,7 +141,7 @@ BOOST_AUTO_TEST_CASE(GetStations)
   test_map_state.display();
 #endif
   std::cout << "GetStations Test Started ..." << std::endl;
-  std::vector<mapState::Station *> stations = test_map_state.getStations();
+  std::vector<std::shared_ptr<mapState::Station>> stations = test_map_state.getStations();
   BOOST_CHECK_EQUAL(stations.size(), 4); // As per the default constructor in MapState
   std::cout << "GetStations Test Finished !\n"
             << std::endl;
@@ -150,7 +153,7 @@ BOOST_AUTO_TEST_CASE(GetRoads)
   test_map_state.display();
 #endif
   std::cout << "GetRoads Test Started ..." << std::endl;
-  std::vector<mapState::Road *> roads = test_map_state.getRoads();
+  std::vector<std::shared_ptr<mapState::Road>> roads = test_map_state.getRoads();
   BOOST_CHECK_EQUAL(roads.size(), 4); // As per the default constructor in MapState
   std::cout << "GetRoads Test Finished !\n"
             << std::endl;
@@ -164,7 +167,7 @@ BOOST_AUTO_TEST_CASE(GetStationByName)
     test_map_state.display();
 #endif
     std::cout << "\tDefined case started ..." << std::endl;
-    mapState::Station *station = test_map_state.getStationByName("paris");
+    std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("paris");
     BOOST_CHECK(station != nullptr);
     BOOST_CHECK_EQUAL(station->getName(), "paris");
     std::cout << "\tDefined case finished !\n"
@@ -176,7 +179,7 @@ BOOST_AUTO_TEST_CASE(GetStationByName)
     test_map_state.display();
 #endif
     std::cout << "\tUndefined case started ..." << std::endl;
-    mapState::Station *station = test_map_state.getStationByName("nonexistent");
+    std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("nonexistent");
     BOOST_CHECK(station == nullptr);
     std::cout << "\tUndefined case finished !\n"
               << std::endl;
@@ -187,9 +190,9 @@ BOOST_AUTO_TEST_CASE(GetStationByName)
 BOOST_AUTO_TEST_CASE(GetRoadBetweenStations)
 {
   mapState::MapState test_map_state = mapState::MapState();
-  mapState::Station *stationA = test_map_state.getStationByName("paris");
-  mapState::Station *stationB = test_map_state.getStationByName("berlin");
-  mapState::Road *road = test_map_state.getRoadBetweenStations(stationA, stationB);
+  std::shared_ptr<mapState::Station> stationA = test_map_state.getStationByName("paris");
+  std::shared_ptr<mapState::Station> stationB = test_map_state.getStationByName("berlin");
+  std::shared_ptr<mapState::Road> road = test_map_state.getRoadBetweenStations(stationA, stationB);
   BOOST_CHECK_NE(road, nullptr);
   BOOST_CHECK_EQUAL(road->stationA->getName(), stationA->getName());
   BOOST_CHECK_EQUAL(road->stationB->getName(), stationB->getName());
@@ -207,16 +210,16 @@ BOOST_AUTO_TEST_CASE(GetAdjacentStations)
 #ifdef DEBUG
     test_map_state.display();
 #endif
-    mapState::Station *station = test_map_state.getStationByName("paris");
-    std::vector<mapState::Station *> adjacentStations = test_map_state.getAdjacentStations(station);
+    std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("paris");
+    std::vector<std::shared_ptr<mapState::Station>> adjacentStations = test_map_state.getAdjacentStations(station);
     BOOST_CHECK_EQUAL(adjacentStations.size(), 2); // paris is connected to berlin and madrid
     std::cout << "\tDefined case finished !\n"
               << std::endl;
   }
   {
     std::cout << "\tUndefined case started ..." << std::endl;
-    mapState::Station *station = test_map_state.getStationByName("lol");
-    std::vector<mapState::Station *> adjacentStations = test_map_state.getAdjacentStations(station);
+    std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("lol");
+    std::vector<std::shared_ptr<mapState::Station>> adjacentStations = test_map_state.getAdjacentStations(station);
     // BOOST_CHECK_EQUAL(adjacentStations.size(), 0); // lol does not exist = no adjacent stations
     std::cout << "\tUndefined case finished !\n"
               << std::endl;
@@ -231,14 +234,13 @@ BOOST_AUTO_TEST_CASE(FindShortestPath)
   test_map_state.display();
 #endif
   std::cout << "FindShortestPath Test Started ..." << std::endl;
-  mapState::Station *src = test_map_state.getStationByName("paris");
-  mapState::Station *dest = test_map_state.getStationByName("rome");
+  std::shared_ptr<mapState::Station> src = test_map_state.getStationByName("paris");
+  std::shared_ptr<mapState::Station> dest = test_map_state.getStationByName("rome");
   Path shortestPath = test_map_state.findShortestPath(src, dest);
-#ifdef DEBUG
-  std::cout << "Shortest path from " << src->getName() << " to " << dest->getName() << ":\n";
-  for (Station *station : shortestPath.STATIONS)
-  {
-    std::cout << station->getName() << " ";
+  #ifdef DEBUG
+  std::cout<<"Shortest path from " << src->getName() << " to " << dest->getName() << ":\n";
+  for (const std::shared_ptr<Station> &station : shortestPath.STATIONS) {
+      std::cout << station->getName() << " ";
   }
   std::cout << "\nTotal Length: " << shortestPath.TOTALLENGTH << "\n";
   std::cout << "Number of Edges: " << shortestPath.NUMEDGES << "\n";

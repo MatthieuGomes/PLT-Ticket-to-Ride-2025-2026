@@ -5,6 +5,7 @@
 #include "../../src/shared/mapState/Station.h"
 #include "../../src/shared/playersState/Player.h"
 #include <boost/graph/adjacency_list.hpp>
+#include <memory>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -16,7 +17,7 @@
 
 using namespace ::mapState;
 
-using StationPair = std::pair<Station *, Station *>;
+using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
 using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, int, bool>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
@@ -26,8 +27,8 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 boost::adjacency_list<> test_graph = boost::adjacency_list<>();
-mapState::Station *test_stationA = new mapState::Station("StationA", new playersState::Player(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, boost::add_vertex(test_graph));
-mapState::Station *test_stationB = new mapState::Station("StationB", new playersState::Player(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, boost::add_vertex(test_graph));
+std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", new playersState::Player(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, boost::add_vertex(test_graph));
+std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", new playersState::Player(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, boost::add_vertex(test_graph));
 int test_ferry_id = 101;
 bool test_is_blocked = false;
 cardsState::ColorCard test_color = cardsState::ColorCard::GREEN;
@@ -63,9 +64,9 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
   playersState::Player stationA_owner(3, "BatchOwnerStationA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr);
   playersState::Player stationB_owner(4, "BatchOwnerStationB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
   playersState::Player stationC_owner(5, "BatchOwnerStationC", cardsState::ColorCard::GREEN, 0, 50, 4, 6, nullptr);
-  mapState::Station *batch_stationA = new mapState::Station(stationA_name, &stationA_owner, false, boost::add_vertex(test_graph));
-  mapState::Station *batch_stationB = new mapState::Station(stationB_name, &stationB_owner, false, boost::add_vertex(test_graph));
-  mapState::Station *batch_stationC = new mapState::Station(stationC_name, &stationC_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, &stationA_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, &stationB_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, &stationC_owner, false, boost::add_vertex(test_graph));
   playersState::Player batch_owner1(4, "BatchOwnerFerry1", cardsState::ColorCard::WHITE, 0, 50, 5, 7, nullptr);
   playersState::Player batch_owner2(5, "BatchOwnerFerry2", cardsState::ColorCard::BLACK, 0, 55, 6, 8, nullptr);
   playersState::Player batch_owner3(6, "BatchOwnerFerry3", cardsState::ColorCard::YELLOW, 0, 60, 7, 9, nullptr);
@@ -74,17 +75,17 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
       Ferry::genData(batch_stationB, batch_stationC, 202, &batch_owner2, cardsState::ColorCard::ORANGE, 4, 2, true),
       Ferry::genData(batch_stationA, batch_stationC, 203, &batch_owner3, cardsState::ColorCard::BLUE, 5, 3, false),
   };
-  std::vector<Ferry> ferries = Ferry::BatchConstructor(ferryInfos, &test_graph);
+  std::vector<std::shared_ptr<Ferry>> ferries = Ferry::BatchConstructor(ferryInfos, &test_graph);
   BOOST_CHECK_EQUAL(ferries.size(), 3);
   for(int i = 0; i < static_cast<int>(ferries.size()); i++) {
-    BOOST_CHECK_EQUAL(ferries[i].id, std::get<0>(std::get<1>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].owner, std::get<1>(std::get<1>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].stationA, std::get<0>(std::get<0>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].stationB, std::get<1>(std::get<0>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].color, std::get<2>(std::get<1>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].length, std::get<3>(std::get<1>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].locomotives, std::get<4>(std::get<1>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i].isBlocked, std::get<5>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->id, std::get<0>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->owner, std::get<1>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->stationA, std::get<0>(std::get<0>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->stationB, std::get<1>(std::get<0>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->color, std::get<2>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->length, std::get<3>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->locomotives, std::get<4>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->isBlocked, std::get<5>(std::get<1>(ferryInfos[i])));
   }
   std::cout << "BatchConstructor Test Finished !\n"<< std::endl;
 } 

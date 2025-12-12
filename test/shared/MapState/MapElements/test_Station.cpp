@@ -4,6 +4,7 @@
 #include "../../src/shared/mapState/Station.h"
 #include "../../src/shared/playersState/Player.h"
 #include <boost/graph/adjacency_list.hpp>
+#include <memory>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -55,14 +56,14 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
       Station::genData(&test_owner1, test_is_blocked1, test_station_name1),
       Station::genData(&test_owner2, test_is_blocked2, test_station_name2),
   };
-  std::vector<Station> stations = Station::BatchConstructor(stationInfos, &test_graph);
+  std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationInfos, &test_graph);
   BOOST_CHECK_EQUAL(stations.size(), 2);
-  BOOST_CHECK_EQUAL(stations[0].name, test_station_name1);
-  BOOST_CHECK_EQUAL(stations[0].owner, &test_owner1);
-  BOOST_CHECK_EQUAL(stations[0].isBlocked, test_is_blocked1);
-  BOOST_CHECK_EQUAL(stations[1].name, test_station_name2);
-  BOOST_CHECK_EQUAL(stations[1].owner, &test_owner2);
-  BOOST_CHECK_EQUAL(stations[1].isBlocked, test_is_blocked2);
+  BOOST_CHECK_EQUAL(stations[0]->name, test_station_name1);
+  BOOST_CHECK_EQUAL(stations[0]->owner, &test_owner1);
+  BOOST_CHECK_EQUAL(stations[0]->isBlocked, test_is_blocked1);
+  BOOST_CHECK_EQUAL(stations[1]->name, test_station_name2);
+  BOOST_CHECK_EQUAL(stations[1]->owner, &test_owner2);
+  BOOST_CHECK_EQUAL(stations[1]->isBlocked, test_is_blocked2);
   std::cout << "BatchConstructor Test Finished !\n"<< std::endl;
 }
 

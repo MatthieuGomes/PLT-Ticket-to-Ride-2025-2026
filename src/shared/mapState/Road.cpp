@@ -14,11 +14,11 @@ using namespace std;
 
 namespace mapState
 {
-    using StationPair = std::pair<Station *, Station *>;
+    using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
     using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
 
-    Road::Road(int id, playersState::Player *owner, Station *stationA, Station *stationB, cardsState::ColorCard color, int length, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge)
+    Road::Road(int id, playersState::Player *owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge)
     {
         DEBUG_PRINT("Road creation started ...");
         this->id = id;
@@ -58,11 +58,11 @@ namespace mapState
         this->isBlocked = isBlocked;
     }
 
-    Station *Road::getStationA()
+    std::shared_ptr<Station> Road::getStationA()
     {
         return this->stationA;
     }
-    Station *Road::getStationB()
+    std::shared_ptr<Station> Road::getStationB()
     {
         return this->stationB;
     }
@@ -96,27 +96,26 @@ namespace mapState
     {
         return this->stationB->getVertex();
     }
-    std::vector<Road> Road::BatchConstructor(std::vector<RoadInfo> roadsInfos, boost::adjacency_list<> *gameGraph)
+    std::vector<std::shared_ptr<Road>> Road::BatchConstructor(std::vector<RoadInfo> roadsInfos, boost::adjacency_list<> *gameGraph)
     {
-        
-        std::vector<Road> roads;
+        std::vector<std::shared_ptr<Road>> roads;
         for (RoadInfo info : roadsInfos)
         {
             StationPair pair = info.first;
             RoadDetail detail = info.second;
-            Station *stationA = pair.first;
-            Station *stationB = pair.second;
+            std::shared_ptr<Station> stationA = pair.first;
+            std::shared_ptr<Station> stationB = pair.second;
             int id = std::get<0>(detail);
             playersState::Player *owner = std::get<1>(detail);
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
             bool isBlocked = std::get<4>(detail);
             boost::adjacency_list<>::edge_descriptor edge = boost::add_edge(*(stationA->getVertex()), *(stationB->getVertex()), *gameGraph).first;
-            roads.push_back(Road(id, owner, stationA, stationB, color, length, isBlocked, edge));
+            roads.push_back(std::make_shared<Road>(id, owner, stationA, stationB, color, length, isBlocked, edge));
         }
         return roads;
     }
-    RoadInfo Road::genData(Station *stationA, Station *stationB, int id, playersState::Player *owner, cardsState::ColorCard color, int length, int isBlocked)
+    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, playersState::Player *owner, cardsState::ColorCard color, int length, int isBlocked)
     {
         StationPair pair = std::pair(stationA, stationB);
         RoadDetail detail = std::tuple(id, owner, color, length, isBlocked);

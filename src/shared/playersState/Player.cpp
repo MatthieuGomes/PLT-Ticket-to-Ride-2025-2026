@@ -113,7 +113,19 @@ namespace playersState
    }
    bool Player::canBuildRoad(mapState::MapState *map, mapState::Station *u, mapState::Station *v)
    {
-      mapState::Road *road = map->getRoadBetweenStations(u, v);
+      if (!map || !u || !v)
+      {
+         return false;
+      }
+
+      std::shared_ptr<mapState::Station> sharedU = map->getStationByName(u->getName());
+      std::shared_ptr<mapState::Station> sharedV = map->getStationByName(v->getName());
+      if (!sharedU || !sharedV)
+      {
+         return false;
+      }
+
+      std::shared_ptr<mapState::Road> road = map->getRoadBetweenStations(sharedU, sharedV);
       if (!road)
       {
          std::cout << " No road exists between "
@@ -174,7 +186,7 @@ namespace playersState
 
       if (!map)
          return claimable;
-      for (auto *road : map->roads)
+      for (const std::shared_ptr<mapState::Road> &road : map->roads)
       {
 
          if (!road)
@@ -185,14 +197,14 @@ namespace playersState
          mapState::Station *u = nullptr;
          mapState::Station *v = nullptr;
 
-         for (auto *s : map->stations)
+         for (const std::shared_ptr<mapState::Station> &s : map->stations)
          {
             if (!s)
                continue;
             if (s == road->stationA)
-               u = s;
+               u = s.get();
             else if (s == road->stationB)
-               v = s;
+               v = s.get();
             if (u && v)
                break;
          }
@@ -202,7 +214,7 @@ namespace playersState
 
          if (canBuildRoad(map, u, v))
          {
-            claimable.push_back(road);
+            claimable.push_back(road.get());
          }
       }
       return claimable;

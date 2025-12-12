@@ -12,10 +12,10 @@ using namespace std;
 
 namespace mapState
 {
-    using StationPair = std::pair<Station*,Station*>;
+    using StationPair = std::pair<std::shared_ptr<Station>,std::shared_ptr<Station>>;
     using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int,int, bool>;
     using FerryInfo = std::pair<StationPair,FerryDetail>;
-    Ferry::Ferry(int id, playersState::Player *owner, Station *stationA, Station *stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge) : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
+    Ferry::Ferry(int id, playersState::Player *owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge) : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
     {
         DEBUG_PRINT("Parent constructor finished :");
         
@@ -42,14 +42,14 @@ namespace mapState
         Road::_display();
         cout << "\tNumber of Locomotives: " << this->locomotives << "\n";
     }
-    std::vector<Ferry> Ferry::BatchConstructor(std::vector<FerryInfo> tunnelsInfos, boost::adjacency_list<> * gameGraph){
+    std::vector<std::shared_ptr<Ferry>> Ferry::BatchConstructor(std::vector<FerryInfo> tunnelsInfos, boost::adjacency_list<> * gameGraph){
         DEBUG_PRINT("Ferry BatchConstructor started ...");
-        std::vector<Ferry> tunnels;
+        std::vector<std::shared_ptr<Ferry>> tunnels;
         for(FerryInfo info : tunnelsInfos){
             StationPair pair = info.first;
             FerryDetail detail = info.second;
-            Station * stationA = pair.first;
-            Station * stationB = pair.second;
+            std::shared_ptr<Station> stationA = pair.first;
+            std::shared_ptr<Station> stationB = pair.second;
             int id  = std::get<0>(detail);
             playersState::Player * owner = std::get<1>(detail);
             cardsState::ColorCard color = std::get<2>(detail);
@@ -57,13 +57,13 @@ namespace mapState
             int locomotives = std::get<4>(detail);
             bool isBlocked = std::get<5>(detail);
             boost::adjacency_list<>::edge_descriptor edge = boost::add_edge(*(stationA->getVertex()), *(stationB->getVertex()), *gameGraph).first;
-            tunnels.push_back(Ferry(id,owner,stationA,stationB,color,length,locomotives,isBlocked,edge));
+            tunnels.push_back(std::make_shared<Ferry>(id,owner,stationA,stationB,color,length,locomotives,isBlocked,edge));
         }
         DEBUG_PRINT("Ferry BatchConstructor finished !");
         return tunnels;
     }
 
-    FerryInfo Ferry::genData (Station * stationA, Station * stationB, int id, playersState::Player * owner, cardsState::ColorCard color,int locomotives, int length, bool isBlocked){
+    FerryInfo Ferry::genData (std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, playersState::Player * owner, cardsState::ColorCard color,int locomotives, int length, bool isBlocked){
         StationPair pair = std::pair(stationA,stationB);
         FerryDetail detail = std::tuple(id,owner,color,locomotives,length,isBlocked);
         return std::pair(pair,detail);
