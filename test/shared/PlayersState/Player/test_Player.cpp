@@ -11,7 +11,9 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 
-BOOST_AUTO_TEST_CASE(TestPLayerConstructor) {
+BOOST_AUTO_TEST_SUITE(Constructors)
+
+BOOST_AUTO_TEST_CASE(Constructor) {
 
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -32,7 +34,14 @@ BOOST_AUTO_TEST_CASE(TestPLayerConstructor) {
     BOOST_CHECK_EQUAL(player.hand,hand);
 
 }
-BOOST_AUTO_TEST_CASE(TestPLayergetId)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+
+BOOST_AUTO_TEST_SUITE(Getters)
+
+BOOST_AUTO_TEST_CASE(getId)
 {
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -48,7 +57,7 @@ BOOST_AUTO_TEST_CASE(TestPLayergetId)
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestPLayergetName)
+BOOST_AUTO_TEST_CASE(getName)
 {
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -67,7 +76,7 @@ BOOST_AUTO_TEST_CASE(TestPLayergetName)
 }
 
 
-BOOST_AUTO_TEST_CASE(TestPlayergetColor){
+BOOST_AUTO_TEST_CASE(getColor){
 
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -81,7 +90,7 @@ BOOST_AUTO_TEST_CASE(TestPlayergetColor){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayergetScore){
+BOOST_AUTO_TEST_CASE(getScore){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -93,7 +102,7 @@ BOOST_AUTO_TEST_CASE(TestPlayergetScore){
     }
 
 }
-BOOST_AUTO_TEST_CASE(TestPlayergetNumTrains){
+BOOST_AUTO_TEST_CASE(getNumTrains){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -106,7 +115,7 @@ BOOST_AUTO_TEST_CASE(TestPlayergetNumTrains){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayergetNbStations){
+BOOST_AUTO_TEST_CASE(getNbStations){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -119,7 +128,7 @@ BOOST_AUTO_TEST_CASE(TestPlayergetNbStations){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayergetNbRoads){
+BOOST_AUTO_TEST_CASE(getNbRoads){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -133,7 +142,7 @@ BOOST_AUTO_TEST_CASE(TestPlayergetNbRoads){
 }
 
 
-BOOST_AUTO_TEST_CASE(TestPlayergetHand){
+BOOST_AUTO_TEST_CASE(getHand){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -146,7 +155,10 @@ BOOST_AUTO_TEST_CASE(TestPlayergetHand){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPLayersetId)
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(Setters)
+
+BOOST_AUTO_TEST_CASE(setId)
 {
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -165,7 +177,7 @@ BOOST_AUTO_TEST_CASE(TestPLayersetId)
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestPLayersetName)
+BOOST_AUTO_TEST_CASE(setName)
 {
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -185,7 +197,7 @@ BOOST_AUTO_TEST_CASE(TestPLayersetName)
 }
 
 
-BOOST_AUTO_TEST_CASE(TestPlayersetColor){
+BOOST_AUTO_TEST_CASE(setColor){
 
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
@@ -200,7 +212,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetColor){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayersetScore){
+BOOST_AUTO_TEST_CASE(setScore){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -214,7 +226,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetScore){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayersetNumTrains){
+BOOST_AUTO_TEST_CASE(setNumTrains){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -228,7 +240,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetNumTrains){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayersetNbStations){
+BOOST_AUTO_TEST_CASE(setNbStations){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -243,7 +255,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetNbStations){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayersetNbRoads){
+BOOST_AUTO_TEST_CASE(setNbRoads){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -258,7 +270,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetNbRoads){
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayersetHand){
+BOOST_AUTO_TEST_CASE(setHand){
 
     {   cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -279,7 +291,7 @@ BOOST_AUTO_TEST_CASE(TestPlayersetHand){
 
 }
 /*
-BOOST_AUTO_TEST_CASE(TestPlayerAddRoadAndStation) {
+BOOST_AUTO_TEST_CASE(AddRoadAndStation) {
 
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -295,7 +307,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddRoadAndStation) {
     BOOST_CHECK_EQUAL(player.getNbStations(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayerAddScore) {
+BOOST_AUTO_TEST_CASE(AddScore) {
     {
         cardsState::DestinationCard dest("Paris", "Marseille", 12);
         cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -309,7 +321,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddScore) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayerRemoveTrain)
+BOOST_AUTO_TEST_CASE(RemoveTrain)
 {  {
     cardsState::DestinationCard dest("Paris", "Marseille", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -326,7 +338,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerRemoveTrain)
 }
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayerAddAndRemoveWagonCard) {
+BOOST_AUTO_TEST_CASE(AddAndRemoveWagonCard) {
 
     cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -347,7 +359,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddAndRemoveWagonCard) {
 
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayerAddDestinationCard) {
+BOOST_AUTO_TEST_CASE(AddDestinationCard) {
 
     cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -361,7 +373,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerAddDestinationCard) {
     BOOST_CHECK_EQUAL(player.getHand()->destinationCards->cards.size(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestPlayerDisplayHand) {
+BOOST_AUTO_TEST_CASE(DisplayHand) {
     cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
     std::vector<cardsState::DestinationCard> destCards = {dest};
@@ -377,5 +389,9 @@ BOOST_AUTO_TEST_CASE(TestPlayerDisplayHand) {
  *
  *
  */
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()
 
 /* vim: set sw=2 sts=2 et : */
