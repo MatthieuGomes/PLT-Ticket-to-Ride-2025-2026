@@ -5,6 +5,7 @@
 #include "../../src/shared/mapState/Station.h"
 #include "../../src/shared/playersState/Player.h"
 #include <boost/graph/adjacency_list.hpp>
+#include <memory>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -16,7 +17,7 @@
 
 using namespace ::mapState;
 
-using StationPair = std::pair<Station *, Station *>;
+using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
 using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 
@@ -26,8 +27,8 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 boost::adjacency_list<> test_graph = boost::adjacency_list<>();
-mapState::Station *test_stationA = new mapState::Station("StationA", new playersState::Player(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, boost::add_vertex(test_graph));
-mapState::Station *test_stationB = new mapState::Station("StationB", new playersState::Player(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, boost::add_vertex(test_graph));
+std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", new playersState::Player(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, boost::add_vertex(test_graph));
+std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", new playersState::Player(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, boost::add_vertex(test_graph));
 int test_road_id = 101;
 bool test_is_blocked = false;
 cardsState::ColorCard test_color = cardsState::ColorCard::GREEN;
@@ -61,9 +62,9 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
   playersState::Player stationA_owner(3, "BatchOwnerStationA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr);
   playersState::Player stationB_owner(4, "BatchOwnerStationB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
   playersState::Player stationC_owner(5, "BatchOwnerStationC", cardsState::ColorCard::GREEN, 0, 50, 4, 6, nullptr);
-  mapState::Station *batch_stationA = new mapState::Station(stationA_name, &stationA_owner, false, boost::add_vertex(test_graph));
-  mapState::Station *batch_stationB = new mapState::Station(stationB_name, &stationB_owner, false, boost::add_vertex(test_graph));
-  mapState::Station *batch_stationC = new mapState::Station(stationC_name, &stationC_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, &stationA_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, &stationB_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, &stationC_owner, false, boost::add_vertex(test_graph));
   playersState::Player batch_owner1(4, "BatchOwnerRoad1", cardsState::ColorCard::WHITE, 0, 50, 5, 7, nullptr);
   playersState::Player batch_owner2(5, "BatchOwnerRoad2", cardsState::ColorCard::BLACK, 0, 55, 6, 8, nullptr);
   playersState::Player batch_owner3(6, "BatchOwnerRoad3", cardsState::ColorCard::YELLOW, 0, 60, 7, 9, nullptr);
@@ -93,16 +94,16 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
           4,
           false),
   };
-  std::vector<mapState::Road> roads = mapState::Road::BatchConstructor(roadInfos, &test_graph);
+  std::vector<std::shared_ptr<mapState::Road>> roads = mapState::Road::BatchConstructor(roadInfos, &test_graph);
   BOOST_CHECK_EQUAL(roads.size(), 3);
   for(int i = 0; i < 3; i++) {
-    BOOST_CHECK_EQUAL(roads[i].id, std::get<0>(std::get<1>(roadInfos[i])));
-    BOOST_CHECK_EQUAL(roads[i].owner, std::get<1>(std::get<1>(roadInfos[i])));
-    BOOST_CHECK_EQUAL(roads[i].stationA, std::get<0>(std::get<0>(roadInfos[i])));
-    BOOST_CHECK_EQUAL(roads[i].stationB, std::get<1>(std::get<0>(roadInfos[i])));
-    BOOST_CHECK_EQUAL(roads[i].color, std::get<2>(std::get<1>(roadInfos[i])));
-    BOOST_CHECK_EQUAL(roads[i].length, std::get<3>(std::get<1>(roadInfos[i])));
-    BOOST_CHECK_EQUAL(roads[i].isBlocked, std::get<4>(std::get<1>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->id, std::get<0>(std::get<1>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->owner, std::get<1>(std::get<1>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->stationA, std::get<0>(std::get<0>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->stationB, std::get<1>(std::get<0>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->color, std::get<2>(std::get<1>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->length, std::get<3>(std::get<1>(roadInfos[i])));
+    BOOST_CHECK_EQUAL(roads[i]->isBlocked, std::get<4>(std::get<1>(roadInfos[i])));
   }
   std::cout << "BatchConstructor Test Finished !\n"<< std::endl;
 }
@@ -137,14 +138,14 @@ BOOST_AUTO_TEST_CASE(GetId)
 BOOST_AUTO_TEST_CASE(GetStationA)
 {
   std::cout << "GetStationA Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL((*test_road_getters_and_setters.getStationA()).name, test_stationA->name);
+  BOOST_CHECK_EQUAL(test_road_getters_and_setters.getStationA()->name, test_stationA->name);
   std::cout << "GetStationA Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetStationB)
 {
   std::cout << "GetStationB Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL((*test_road_getters_and_setters.getStationB()).name, test_stationB->name);
+  BOOST_CHECK_EQUAL(test_road_getters_and_setters.getStationB()->name, test_stationB->name);
   std::cout << "GetStationB Test Finished !\n"<< std::endl;
 }
 

@@ -84,16 +84,16 @@ namespace mapState
         }
         cout << "\tBlocked : " << (this->isBlocked ? "Yes" : "No") << "\n";
     }
-    std::vector<Station> Station::BatchConstructor(std::vector<StationInfo> stationInfos, boost::adjacency_list<> *gameGraph)
+    std::vector<std::shared_ptr<Station>> Station::BatchConstructor(std::vector<StationInfo> stationInfos, boost::adjacency_list<> *gameGraph)
     {
         DEBUG_PRINT("Station BatchConstructor started ...");
-        std::vector<Station> stations;
+        std::vector<std::shared_ptr<Station>> stations;
         for (std::tuple<playersState::Player *, bool, std::string> info : stationInfos)
         {
             playersState::Player *owner = std::get<0>(info);
             bool isBlocked = std::get<1>(info);
             std::string name = std::get<2>(info);
-            stations.push_back(Station(name, owner, isBlocked, boost::add_vertex(*gameGraph)));
+            stations.push_back(std::make_shared<Station>(name, owner, isBlocked, boost::add_vertex(*gameGraph)));
         }
         DEBUG_PRINT("Station BatchConstructor finished !");
         return stations;
