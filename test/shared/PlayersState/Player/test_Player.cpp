@@ -345,6 +345,9 @@ BOOST_AUTO_TEST_CASE(setHand)
                   << std::endl;
     }
 }
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Functions)
 BOOST_AUTO_TEST_CASE(addRoad)
 {
     cardsState::DestinationCard dest("Paris", "Bruxelle", 12);
@@ -441,6 +444,134 @@ BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
     delete d1;
     delete d2;
     delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(canBuildRoad_success)
+{
+
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+
+    playersState::Player player(1, "p1", cardsState::ColorCard::RED, 0, 2, 0, 0, hand);
+
+    BOOST_CHECK(player.canBuildRoad(&map, paris, berlin));
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(canBuildRoad_notEnoughWagons)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+
+    playersState::Player player(1, "p2", cardsState::ColorCard::RED, 0, 1, 0, 0, hand);
+
+    BOOST_CHECK_MESSAGE(!player.canBuildRoad(&map, paris, berlin), "Should be false: not enough wagons");
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(canBuildRoad_notEnoughCards)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+
+    playersState::Player player(1, "p3", cardsState::ColorCard::RED, 0, 2, 0, 0, hand);
+
+    BOOST_CHECK_MESSAGE(!player.canBuildRoad(&map, paris, berlin), "Should be false: not enough wagon cards of required color");
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(canBuildRoad_blocked)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+    mapState::Road* road = map.getRoadBetweenStations(paris, berlin);
+    BOOST_REQUIRE(road);
+
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+    playersState::Player player(1, "p4", cardsState::ColorCard::RED, 0,  2, 0, 0, hand);
+
+
+    road->setBlockStatus(true);
+    BOOST_CHECK_MESSAGE(!player.canBuildRoad(&map, paris, berlin), "Should be false: road is blocked");
+
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(canBuildRoad_alreadyOwned)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+    mapState::Road* road = map.getRoadBetweenStations(paris, berlin);
+    BOOST_REQUIRE(road);
+
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+    playersState::Player player(1, "p5", cardsState::ColorCard::RED, 0,  2, 0, 0, hand);
+
+
+    std::vector<cardsState::DestinationCard> destVec2;
+    std::vector<cardsState::WagonCard> wagonVec2;
+    auto* hand2 = new cardsState::PlayerCards(&destVec2, &wagonVec2);
+    playersState::Player owner(2, "owner", cardsState::ColorCard::GREEN, 0, 10, 0, 0, hand2);
+
+    road->setOwner(&owner);
+    BOOST_CHECK_MESSAGE(!player.canBuildRoad(&map, paris, berlin), "Should be false: route already owned");
+
+    delete hand;
+    delete hand2;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
