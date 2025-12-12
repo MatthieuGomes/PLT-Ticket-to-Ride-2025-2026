@@ -79,7 +79,7 @@ endif()
 # Build dia2code
 add_subdirectory(extern/dia2code)
 
-find_package(Boost 1.74 REQUIRED COMPONENTS graph unit_test_framework)
+find_package(Boost 1.74...1.999 REQUIRED COMPONENTS graph unit_test_framework)
 message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 message(STATUS "Boost include directory: ${Boost_INCLUDE_DIRS}")
 
