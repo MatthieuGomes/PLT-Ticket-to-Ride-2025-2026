@@ -35,7 +35,27 @@ ColorCard test_colors[] = {ColorCard::RED, ColorCard::BLUE};
         }
     }
 
+BOOST_AUTO_TEST_CASE(BatchDestinationDeck) {
+    Deck<DestinationCard> deck({
+            {"Paris", "Lyon", 5},
+            {"Berlin", "Munich", 7}
+        });
 
+    BOOST_CHECK_EQUAL(deck.countCards(), 2);
+
+
+    BOOST_REQUIRE(deck.cards[0]);
+    BOOST_REQUIRE(deck.cards[1]);
+
+    BOOST_CHECK_EQUAL(deck.cards[0]->stationA, "Paris");
+    BOOST_CHECK_EQUAL(deck.cards[0]->stationB, "Lyon");
+    BOOST_CHECK_EQUAL(deck.cards[0]->points, 5);
+
+    BOOST_CHECK_EQUAL(deck.cards[1]->stationA, "Berlin");
+    BOOST_CHECK_EQUAL(deck.cards[1]->stationB, "Munich");
+    BOOST_CHECK_EQUAL(deck.cards[1]->points, 7);
+
+}
 
 BOOST_AUTO_TEST_CASE(Default)
 {
