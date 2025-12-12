@@ -1,4 +1,3 @@
-
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/cardsState/CardsState.h"
@@ -46,6 +45,20 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
 
 BOOST_AUTO_TEST_SUITE(Getters)
+BOOST_AUTO_TEST_CASE(getCards) {
+    ColorCard cardArgs[] = {ColorCard::RED, ColorCard::BLUE};
+    WagonCard card1(cardArgs[0]);
+    WagonCard card2(cardArgs[1]);
+    auto *cardsVec = new std::vector<WagonCard>{card1, card2};
+    Deck<WagonCard> deck(cardsVec);
+    auto returnedCards = deck.getCards();
+
+    BOOST_CHECK_EQUAL(returnedCards.size(), 2);
+
+    BOOST_CHECK_EQUAL(returnedCards[0]->color, cardArgs[0]);
+    BOOST_CHECK_EQUAL(returnedCards[1]->color, cardArgs[1]);
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

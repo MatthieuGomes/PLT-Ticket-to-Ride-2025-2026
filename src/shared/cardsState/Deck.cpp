@@ -11,6 +11,11 @@
 namespace cardsState
 {
     // class Deck -
+    template  <class CardType>
+      std::vector<std::shared_ptr<CardType>> Deck<CardType>::getCards() {
+        return cards;
+    }
+
     template <>
     Deck<WagonCard>::Deck(std::initializer_list<ColorCard> wagonArgs)
     {
