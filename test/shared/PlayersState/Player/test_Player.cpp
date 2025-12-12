@@ -416,6 +416,33 @@ BOOST_AUTO_TEST_CASE(removeTrain)
     BOOST_CHECK_EQUAL(player.getNbWagons(), 7);
 }
 
+BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
+{
+    using namespace cardsState;
+
+    DestinationCard* d1 = new DestinationCard("A", "B", 10);
+    DestinationCard* d2 = new DestinationCard("C", "D", 8);
+
+    std::vector<DestinationCard> destCardsVec;
+    std::vector<WagonCard> wagonCardsVec;
+    auto* hand = new PlayerCards(&destCardsVec, &wagonCardsVec);
+
+    playersState::Player player(1, "tester", ColorCard::BLUE, 5, 10, 2, 3, hand);
+    BOOST_CHECK_EQUAL(player.getScore(), 5);
+
+    player.completedDestinations.clear();
+    player.completedDestinations.push_back(d1);
+    player.completedDestinations.push_back(d2);
+
+    int gained = player.calculateDestinationPoints();
+    BOOST_CHECK_EQUAL(gained, 18);
+    BOOST_CHECK_EQUAL(player.getScore(), 23);
+
+    delete d1;
+    delete d2;
+    delete hand;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
