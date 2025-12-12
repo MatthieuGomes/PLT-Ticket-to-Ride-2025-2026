@@ -361,6 +361,27 @@ BOOST_AUTO_TEST_CASE(addRoad)
     BOOST_CHECK_EQUAL(player.getNbRoads(), 4);
 }
 
+BOOST_AUTO_TEST_CASE(addStation)
+{
+    cardsState::DestinationCard dest("Paris", "Bruxelle", 12);
+    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
+
+    std::vector<cardsState::DestinationCard> destCards = { dest };
+    std::vector<cardsState::WagonCard> wagonCardsVec = { wagon };
+    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+
+
+    Player player(1, "yosra", cardsState::ColorCard::RED, 0, 10, 2, 3, hand);
+
+
+    BOOST_CHECK_EQUAL(player.getNbStations(), 2);
+
+
+    player.addStation();
+    BOOST_CHECK_EQUAL(player.getNbStations(), 3);
+
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
