@@ -108,9 +108,9 @@ namespace playersState
 
    int Player::calculateDestinationPoints()
    {
-
       return 0;
    }
+
    bool Player::canBuildRoad(mapState::MapState *map, mapState::Station *u, mapState::Station *v)
    {
       if (!map || !u || !v)
