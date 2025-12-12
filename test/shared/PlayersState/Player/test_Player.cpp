@@ -383,6 +383,25 @@ BOOST_AUTO_TEST_CASE(addStation)
 
 }
 
+BOOST_AUTO_TEST_CASE(addScore)
+{
+    cardsState::DestinationCard dest("Paris", "Marseille", 12);
+    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
+
+    std::vector<cardsState::DestinationCard> destCards = { dest };
+    std::vector<cardsState::WagonCard> wagonCardsVec = { wagon };
+    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+
+    Player player(1, "yosra", cardsState::ColorCard::RED, 0 , 10, 2, 3, hand);
+
+    BOOST_CHECK_EQUAL(player.getScore(), 0);
+
+    player.addScore(10);
+    BOOST_CHECK_EQUAL(player.getScore(), 10);
+}
+
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
