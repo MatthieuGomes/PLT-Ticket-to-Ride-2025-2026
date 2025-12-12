@@ -22,6 +22,21 @@ BOOST_AUTO_TEST_SUITE(Constructors)
 ColorCard test_colors[] = {ColorCard::RED, ColorCard::BLUE};
 
 
+    BOOST_AUTO_TEST_CASE(BatchWagonDeck) {
+        ColorCard cardArgs[] = {ColorCard::RED, ColorCard::BLUE, ColorCard::GREEN};
+        Deck<WagonCard> deck({ ColorCard::RED, ColorCard::BLUE, ColorCard::GREEN });
+
+        BOOST_CHECK_EQUAL(deck.countCards(), 3);
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            BOOST_REQUIRE(deck.cards[i]);
+            BOOST_CHECK_EQUAL(deck.cards[i]->color, cardArgs[i]);
+        }
+    }
+
+
+
 BOOST_AUTO_TEST_CASE(Default)
 {
     {
