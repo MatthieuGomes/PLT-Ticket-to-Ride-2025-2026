@@ -189,6 +189,7 @@ BOOST_AUTO_TEST_CASE(getHand)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(Setters)
 
 BOOST_AUTO_TEST_CASE(setId)
@@ -347,7 +348,6 @@ BOOST_AUTO_TEST_CASE(setHand)
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(Functions)
 BOOST_AUTO_TEST_CASE(addRoad)
 {
     cardsState::DestinationCard dest("Paris", "Bruxelle", 12);
@@ -574,9 +574,121 @@ BOOST_AUTO_TEST_CASE(canBuildRoad_alreadyOwned)
     delete hand2;
 }
 
-BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE_END()
+#include <algorithm>
+
+BOOST_AUTO_TEST_CASE(getClaimableRoads_success)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+    playersState::Player player(1, "p_ok", cardsState::ColorCard::RED, 0,  2, 0, 0, hand);
+
+    auto claimable = player.getClaimableRoads(&map);
+    mapState::Road* road = map.getRoadBetweenStations(paris, berlin);
+    BOOST_REQUIRE(road);
+
+    BOOST_CHECK(std::find(claimable.begin(), claimable.end(), road) != claimable.end());
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(getClaimableRoads_insufficient_wagons)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+    playersState::Player player(1, "p_no_wagons", cardsState::ColorCard::RED, 0, 1, 0, 0, hand);
+
+    auto claimable = player.getClaimableRoads(&map);
+    mapState::Road* road = map.getRoadBetweenStations(paris, berlin);
+    BOOST_REQUIRE(road);
+
+    BOOST_CHECK(std::find(claimable.begin(), claimable.end(), road) == claimable.end());
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(getClaimableRoads_insufficient_cards)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+    playersState::Player player(1, "p_no_cards", cardsState::ColorCard::RED, 0, 2, 0, 0, hand);
+
+    auto claimable = player.getClaimableRoads(&map);
+    mapState::Road* road = map.getRoadBetweenStations(paris, berlin);
+    BOOST_REQUIRE(road);
+    BOOST_CHECK(std::find(claimable.begin(), claimable.end(), road) == claimable.end());
+
+    delete hand;
+}
+
+BOOST_AUTO_TEST_CASE(getClaimableRoads_blocked_and_owned)
+{
+    mapState::MapState map;
+    mapState::Station* paris = map.getStationByName("paris");
+    mapState::Station* berlin = map.getStationByName("berlin");
+    BOOST_REQUIRE(paris);
+    BOOST_REQUIRE(berlin);
+
+    mapState::Road* road = map.getRoadBetweenStations(paris, berlin);
+    BOOST_REQUIRE(road);
+
+    std::vector<cardsState::DestinationCard> destVec;
+    std::vector<cardsState::WagonCard> wagonVec = {
+        cardsState::WagonCard(cardsState::ColorCard::RED),
+        cardsState::WagonCard(cardsState::ColorCard::RED)
+    };
+    auto* hand = new cardsState::PlayerCards(&destVec, &wagonVec);
+    playersState::Player player(1, "p_test", cardsState::ColorCard::RED, 0, 2, 0, 0, hand);
+
+    road->setBlockStatus(true);
+    auto claimable_blocked = player.getClaimableRoads(&map);
+    BOOST_CHECK(std::find(claimable_blocked.begin(), claimable_blocked.end(), road) == claimable_blocked.end());
+    road->setBlockStatus(false);
+
+    std::vector<cardsState::DestinationCard> destVec2;
+    std::vector<cardsState::WagonCard> wagonVec2;
+    auto* hand2 = new cardsState::PlayerCards(&destVec2, &wagonVec2);
+    playersState::Player owner(2, "owner", cardsState::ColorCard::GREEN, 0, 10, 0, 0, hand2);
+    road->setOwner(&owner);
+
+    auto claimable_owned = player.getClaimableRoads(&map);
+    BOOST_CHECK(std::find(claimable_owned.begin(), claimable_owned.end(), road) == claimable_owned.end());
+
+
+    road->setOwner(nullptr);
+    delete hand;
+    delete hand2;
+}
+}
 
 BOOST_AUTO_TEST_SUITE(Operations)
 
