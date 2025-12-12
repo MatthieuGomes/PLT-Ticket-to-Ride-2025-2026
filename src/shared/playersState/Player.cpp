@@ -108,7 +108,15 @@ namespace playersState
 
    int Player::calculateDestinationPoints()
    {
-      return 0;
+      int total = 0;
+      for (auto *dest : completedDestinations)
+      {
+         if (!dest)
+            continue;
+         total += dest->getPoints();
+      }
+      addScore(total);
+      return total;
    }
 
    bool Player::canBuildRoad(mapState::MapState *map, mapState::Station *u, mapState::Station *v)
