@@ -1,4 +1,3 @@
-
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/playersState/Player.h"
@@ -346,105 +345,22 @@ BOOST_AUTO_TEST_CASE(setHand)
                   << std::endl;
     }
 }
-/*
-BOOST_AUTO_TEST_CASE(AddRoadAndStation) {
-
-    cardsState::DestinationCard dest("Paris", "Marseille", 12);
+BOOST_AUTO_TEST_CASE(addRoad)
+{
+    cardsState::DestinationCard dest("Paris", "Bruxelle", 12);
     cardsState::WagonCard wagon(cardsState::ColorCard::RED);
-    std::vector<cardsState::DestinationCard> destCards = {dest};
-    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
-    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
-    Player player(1, "Alice", cardsState::ColorCard::RED, 0, 10, 1, 0, hand);
 
+    std::vector<cardsState::DestinationCard> destCards = { dest };
+    std::vector<cardsState::WagonCard> wagonCardsVec = { wagon };
+    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
+
+    Player player(1, "yosra", cardsState::ColorCard::RED, 0 , 10, 2, 3, hand);
+
+    BOOST_CHECK_EQUAL(player.getNbRoads(), 3);
     player.addRoad();
-    BOOST_CHECK_EQUAL(player.getNbRoads(), 1);
-
-    player.addStation();
-    BOOST_CHECK_EQUAL(player.getNbStations(), 2);
+    BOOST_CHECK_EQUAL(player.getNbRoads(), 4);
 }
 
-BOOST_AUTO_TEST_CASE(AddScore) {
-    {
-        cardsState::DestinationCard dest("Paris", "Marseille", 12);
-        cardsState::WagonCard wagon(cardsState::ColorCard::RED);
-        std::vector<cardsState::DestinationCard> destCards = {dest};
-        std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
-        auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
-        Player player(1, "Alice", cardsState::ColorCard::RED, 10, 5, 1, 0, hand);
-
-        player.addScore(15);
-        BOOST_CHECK_EQUAL(player.getScore(), 25);
-    }
-}
-
-BOOST_AUTO_TEST_CASE(RemoveTrain)
-{  {
-    cardsState::DestinationCard dest("Paris", "Marseille", 12);
-    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
-    std::vector<cardsState::DestinationCard> destCards = {dest};
-    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
-    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
-    Player player(1, "Alice", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
-
-    player.removeTrain(2);
-    BOOST_CHECK_EQUAL(player.getNbWagons(), 3);
-
-    player.removeTrain(10);
-    BOOST_CHECK_EQUAL(player.getNbWagons(), 0);
-}
-}
-
-BOOST_AUTO_TEST_CASE(AddAndRemoveWagonCard) {
-
-    cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
-    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
-    std::vector<cardsState::DestinationCard> destCards = {dest};
-    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
-    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
-    Player player(2, "Alexa", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
-
-    auto* card = new cardsState::WagonCard(cardsState::ColorCard::BLUE);
-    player.addWagonCard(card);
-    BOOST_CHECK_EQUAL(player.getHand()->wagonCards->cards.size(), 2);
-
-
-    std::vector<cardsState::WagonCard*> cardsToRemove = {card};
-    player.removeWagonCard(cardsToRemove);
-    BOOST_CHECK_EQUAL(player.getHand()->wagonCards->cards.size(), 1);
-
-
-}
-
-BOOST_AUTO_TEST_CASE(AddDestinationCard) {
-
-    cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
-    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
-    std::vector<cardsState::DestinationCard> destCards = {dest};
-    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
-    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
-    Player player(4, "Amina", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
-
-    auto* destCard = new cardsState::DestinationCard("Paris", "Marseille", 12);
-    player.addDestinationCard(destCard);
-    BOOST_CHECK_EQUAL(player.getHand()->destinationCards->cards.size(), 2);
-}
-
-BOOST_AUTO_TEST_CASE(DisplayHand) {
-    cardsState::DestinationCard dest("Strasbourg", "Lyon", 12);
-    cardsState::WagonCard wagon(cardsState::ColorCard::RED);
-    std::vector<cardsState::DestinationCard> destCards = {dest};
-    std::vector<cardsState::WagonCard> wagonCardsVec = {wagon};
-    auto* hand = new cardsState::PlayerCards(&destCards, &wagonCardsVec);
-    Player player(1, "Alice", cardsState::ColorCard::RED, 0, 5, 1, 0, hand);
-
-    BOOST_CHECK_NO_THROW(player.displayHand());
-}
-
- *
- *
- *
- *
- */
 
 BOOST_AUTO_TEST_SUITE_END()
 
