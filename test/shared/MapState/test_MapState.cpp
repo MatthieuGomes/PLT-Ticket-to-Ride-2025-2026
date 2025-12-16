@@ -20,13 +20,13 @@
 
 using namespace ::mapState;
 
-using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
+using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
 using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
+using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 using TunnelDetail = RoadDetail;
 using TunnelInfo = RoadInfo;
-using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, int, bool>;
+using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int, bool>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
@@ -194,8 +194,8 @@ BOOST_AUTO_TEST_CASE(GetRoadBetweenStations)
   std::shared_ptr<mapState::Station> stationB = test_map_state.getStationByName("berlin");
   std::shared_ptr<mapState::Road> road = test_map_state.getRoadBetweenStations(stationA, stationB);
   BOOST_CHECK_NE(road, nullptr);
-  BOOST_CHECK_EQUAL(road->stationA->getName(), stationA->getName());
-  BOOST_CHECK_EQUAL(road->stationB->getName(), stationB->getName());
+  BOOST_CHECK_EQUAL(road->stationA->name, stationA->name);
+  BOOST_CHECK_EQUAL(road->stationB->name, stationB->name);
 }
 
 BOOST_AUTO_TEST_CASE(GetAdjacentStations)

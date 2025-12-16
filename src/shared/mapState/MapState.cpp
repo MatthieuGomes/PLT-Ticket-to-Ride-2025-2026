@@ -28,13 +28,13 @@
 
 namespace mapState
 {
-    using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
+    using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-    using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
+    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
     using TunnelDetail = RoadDetail;
     using TunnelInfo = RoadInfo;
-    using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, int, bool>;
+    using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int, bool>;
     using FerryInfo = std::pair<StationPair, FerryDetail>;
 
     MapState::MapState()
@@ -256,23 +256,7 @@ namespace mapState
             }
         }
         return nullptr;
-    }
-
-    Road *MapState::getRoadBetweenStations(Station *u, Station *v)
-    {
-        if (!u || !v)
-        {
-            return nullptr;
-        }
-        std::shared_ptr<Station> sharedU = this->getStationByName(u->name);
-        std::shared_ptr<Station> sharedV = this->getStationByName(v->name);
-        if (!sharedU || !sharedV)
-        {
-            return nullptr;
-        }
-        std::shared_ptr<Road> sharedRoad = this->getRoadBetweenStations(sharedU, sharedV);
-        return sharedRoad.get();
-    }
+    }   
 
     Path MapState::findShortestPath(std::shared_ptr<Station> src, std::shared_ptr<Station> dest)
     {
