@@ -5,6 +5,14 @@
 #include "../../src/shared/playersState/Player.h"
 #include <boost/graph/adjacency_list.hpp>
 
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 using namespace ::mapState;
 
 using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
@@ -24,15 +32,18 @@ BOOST_AUTO_TEST_SUITE(Constructors)
 
 BOOST_AUTO_TEST_CASE(Basic)
 {
+  std::cout << "Default Constructor Test Started ..." << std::endl;
   Station station(test_station_name, &test_owner, test_is_blocked, test_vertex);
   BOOST_CHECK_EQUAL(station.owner, &test_owner);
   BOOST_CHECK_EQUAL(station.isBlocked, test_is_blocked);
   BOOST_CHECK_EQUAL(station.name, test_station_name);
   BOOST_CHECK_EQUAL(station.vertex, test_vertex);
+  std::cout << "Default Constructor Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(BatchConstructor)
 {
+  std::cout << "BatchConstructor Test Started ..." << std::endl;
   std::string test_station_name1 = "BatchStation1";
   playersState::Player test_owner1 = playersState::Player(1, "BatchPlayer1", cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
   bool test_is_blocked1 = false;
@@ -52,14 +63,17 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
   BOOST_CHECK_EQUAL(stations[1].name, test_station_name2);
   BOOST_CHECK_EQUAL(stations[1].owner, &test_owner2);
   BOOST_CHECK_EQUAL(stations[1].isBlocked, test_is_blocked2);
+  std::cout << "BatchConstructor Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GenData)
 {
+  std::cout << "GenData Test Started ..." << std::endl;
   StationInfo info = Station::genData(&test_owner, test_is_blocked, test_station_name);
   BOOST_CHECK_EQUAL(std::get<0>(info), &test_owner);
   BOOST_CHECK_EQUAL(std::get<1>(info), test_is_blocked);
   BOOST_CHECK_EQUAL(std::get<2>(info), test_station_name);
+  std::cout << "GenData Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -70,12 +84,16 @@ BOOST_AUTO_TEST_SUITE(Getters)
 
 BOOST_AUTO_TEST_CASE(GetName)
 {
+  std::cout << "GetName Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(station.getName(), test_station_name);
+  std::cout << "GetName Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetOwner)
 {
+  std::cout << "GetOwner Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(station.getOwner(), &test_owner);
+  std::cout << "GetOwner Test Finished !\n"<< std::endl;
 }
 using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
 using StationPair = std::pair<Station *, Station *>;
@@ -88,12 +106,16 @@ using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 BOOST_AUTO_TEST_CASE(GetBlockStatus)
 {
+  std::cout << "GetBlockStatus Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(station.getBlockStatus(), test_is_blocked);
+  std::cout << "GetBlockStatus Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetVertex)
 {
+  std::cout << "GetVertex Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(*station.getVertex(), test_vertex);
+  std::cout << "GetVertex Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -102,15 +124,31 @@ BOOST_AUTO_TEST_SUITE(Setters)
 playersState::Player test_set_owner = playersState::Player(2, "NewOwner", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
 BOOST_AUTO_TEST_CASE(SetOwner)
 {
+  std::cout << "SetOwner Test Started ..." << std::endl;
   station.setOwner(&test_set_owner);
   BOOST_CHECK_EQUAL(station.owner, &test_set_owner);
+  std::cout << "SetOwner Test Finished !\n"<< std::endl;
 }
 bool test_set_is_blocked = true;
 BOOST_AUTO_TEST_CASE(SetBlockStatus)
 {
+  std::cout << "SetBlockStatus Test Started ..." << std::endl;
   station.setBlockStatus(test_set_is_blocked);
   BOOST_CHECK_EQUAL(station.isBlocked, test_set_is_blocked);
+  std::cout << "SetBlockStatus Test Finished !\n"<< std::endl;
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Operations)
+
+BOOST_AUTO_TEST_SUITE(Internal)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Interactions)
 
 BOOST_AUTO_TEST_SUITE_END()
 

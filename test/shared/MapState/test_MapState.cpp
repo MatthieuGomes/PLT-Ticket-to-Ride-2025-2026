@@ -234,14 +234,15 @@ BOOST_AUTO_TEST_CASE(FindShortestPath)
   mapState::Station *src = test_map_state.getStationByName("paris");
   mapState::Station *dest = test_map_state.getStationByName("rome");
   Path shortestPath = test_map_state.findShortestPath(src, dest);
-  #ifdef DEBUG
-  std::cout<<"Shortest path from " << src->getName() << " to " << dest->getName() << ":\n";
-  for (Station* station : shortestPath.STATIONS) {
-      std::cout << station->getName() << " ";
+#ifdef DEBUG
+  std::cout << "Shortest path from " << src->getName() << " to " << dest->getName() << ":\n";
+  for (Station *station : shortestPath.STATIONS)
+  {
+    std::cout << station->getName() << " ";
   }
   std::cout << "\nTotal Length: " << shortestPath.TOTALLENGTH << "\n";
   std::cout << "Number of Edges: " << shortestPath.NUMEDGES << "\n";
-  #endif      
+#endif
   BOOST_CHECK(!shortestPath.STATIONS.empty());
   BOOST_CHECK_EQUAL(shortestPath.STATIONS.front(), src);
   BOOST_CHECK_EQUAL(shortestPath.STATIONS.back(), dest);
@@ -249,8 +250,23 @@ BOOST_AUTO_TEST_CASE(FindShortestPath)
             << std::endl;
 }
 BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(Setters)
+
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Operations)
+
+BOOST_AUTO_TEST_SUITE(Internal)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Interactions)
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE_END()
 
 /* vim: set sw=2 sts=2 et : */
