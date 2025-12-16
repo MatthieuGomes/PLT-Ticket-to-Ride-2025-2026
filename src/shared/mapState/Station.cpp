@@ -15,16 +15,16 @@ using namespace std;
 struct StationData
 {
     int id;
-    playersState::Player *owner;
+    std::shared_ptr<playersState::Player> owner;
     std::string name;
 };
 
 namespace mapState
 {
 
-    using StationInfo = std::tuple<playersState::Player *, bool, std::string>;
+    using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
 
-    Station::Station(std::string name, playersState::Player *owner, bool isBlocked, boost::adjacency_list<>::vertex_descriptor vertex)
+    Station::Station(std::string name, std::shared_ptr<playersState::Player> owner, bool isBlocked, boost::adjacency_list<>::vertex_descriptor vertex)
     {
         DEBUG_PRINT("Station creation started ...");
         this->owner = owner;
@@ -37,11 +37,11 @@ namespace mapState
     {
         return this->name;
     }
-    playersState::Player *Station::getOwner()
+    std::shared_ptr<playersState::Player> Station::getOwner()
     {
         return this->owner;
     }
-    void Station::setOwner(playersState::Player *owner)
+    void Station::setOwner(std::shared_ptr<playersState::Player> owner)
     {
         this->owner = owner;
     }
@@ -88,9 +88,9 @@ namespace mapState
     {
         DEBUG_PRINT("Station BatchConstructor started ...");
         std::vector<std::shared_ptr<Station>> stations;
-        for (std::tuple<playersState::Player *, bool, std::string> info : stationInfos)
+        for (StationInfo info : stationInfos)
         {
-            playersState::Player *owner = std::get<0>(info);
+            std::shared_ptr<playersState::Player> owner = std::get<0>(info);
             bool isBlocked = std::get<1>(info);
             std::string name = std::get<2>(info);
             stations.push_back(std::make_shared<Station>(name, owner, isBlocked, boost::add_vertex(*gameGraph)));
@@ -99,7 +99,7 @@ namespace mapState
         return stations;
     }
 
-    StationInfo Station::genData(playersState::Player *owner, bool isBlocked, std::string name)
+    StationInfo Station::genData(std::shared_ptr<playersState::Player> owner, bool isBlocked, std::string name)
     { 
         return std::tuple(owner, isBlocked, name);
     } 

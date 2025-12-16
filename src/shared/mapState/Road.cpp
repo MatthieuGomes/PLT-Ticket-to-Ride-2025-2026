@@ -15,10 +15,10 @@ using namespace std;
 namespace mapState
 {
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-    using RoadDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, bool>;
+    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
 
-    Road::Road(int id, playersState::Player *owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge)
+    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge)
     {
         DEBUG_PRINT("Road creation started ...");
         this->id = id;
@@ -36,11 +36,11 @@ namespace mapState
     {
         return this->id;
     }
-    playersState::Player *Road::getOwner()
+    std::shared_ptr<playersState::Player> Road::getOwner()
     {
         return this->owner;
     }
-    void Road::setOwner(playersState::Player *owner)
+    void Road::setOwner(std::shared_ptr<playersState::Player> owner)
     {
         this->owner = owner;
     }
@@ -106,7 +106,7 @@ namespace mapState
             std::shared_ptr<Station> stationA = pair.first;
             std::shared_ptr<Station> stationB = pair.second;
             int id = std::get<0>(detail);
-            playersState::Player *owner = std::get<1>(detail);
+            std::shared_ptr<playersState::Player> owner = std::get<1>(detail);
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
             bool isBlocked = std::get<4>(detail);
@@ -115,7 +115,7 @@ namespace mapState
         }
         return roads;
     }
-    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, playersState::Player *owner, cardsState::ColorCard color, int length, int isBlocked)
+    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length, int isBlocked)
     {
         StationPair pair = std::pair(stationA, stationB);
         RoadDetail detail = std::tuple(id, owner, color, length, isBlocked);

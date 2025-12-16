@@ -18,7 +18,7 @@
 using namespace ::mapState;
 
 using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, int, bool>;
+using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int, bool>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
@@ -27,13 +27,13 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 boost::adjacency_list<> test_graph = boost::adjacency_list<>();
-std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", new playersState::Player(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, boost::add_vertex(test_graph));
-std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", new playersState::Player(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, boost::add_vertex(test_graph));
+std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", std::make_shared<playersState::Player>(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, boost::add_vertex(test_graph));
+std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", std::make_shared<playersState::Player>(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, boost::add_vertex(test_graph));
 int test_ferry_id = 101;
 bool test_is_blocked = false;
 cardsState::ColorCard test_color = cardsState::ColorCard::GREEN;
 int test_length = 5;
-playersState::Player test_owner(3, "TestOwner", cardsState::ColorCard::YELLOW, 0, 40, 4, 6, nullptr);
+std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>(3, "TestOwner", cardsState::ColorCard::YELLOW, 0, 40, 4, 6, nullptr);
 boost::adjacency_list<>::edge_descriptor test_edge = boost::add_edge(*(test_stationA->getVertex()), *(test_stationB->getVertex()), test_graph).first;
 int test_locomotives = 2;
 
@@ -42,9 +42,9 @@ BOOST_AUTO_TEST_SUITE(Constructors)
 BOOST_AUTO_TEST_CASE(Default)
 {
   std::cout << "Default Constructor Test Started ..." << std::endl;
-  mapState::Ferry test_ferry = mapState::Ferry(test_ferry_id, &test_owner, test_stationA, test_stationB, test_color, test_length, test_locomotives, test_is_blocked, test_edge);
+  mapState::Ferry test_ferry = mapState::Ferry(test_ferry_id, test_owner, test_stationA, test_stationB, test_color, test_length, test_locomotives, test_is_blocked, test_edge);
   BOOST_CHECK_EQUAL(test_ferry.id, test_ferry_id);
-  BOOST_CHECK_EQUAL(test_ferry.owner, &test_owner);
+  BOOST_CHECK_EQUAL(test_ferry.owner->name, test_owner->name);
   BOOST_CHECK_EQUAL(test_ferry.stationA, test_stationA);
   BOOST_CHECK_EQUAL(test_ferry.stationB, test_stationB);
   BOOST_CHECK_EQUAL(test_ferry.color, test_color);
@@ -61,25 +61,25 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
   std::string stationA_name = "BatchStationA";
   std::string stationB_name = "BatchStationB";
   std::string stationC_name = "BatchStationC";
-  playersState::Player stationA_owner(3, "BatchOwnerStationA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr);
-  playersState::Player stationB_owner(4, "BatchOwnerStationB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
-  playersState::Player stationC_owner(5, "BatchOwnerStationC", cardsState::ColorCard::GREEN, 0, 50, 4, 6, nullptr);
-  std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, &stationA_owner, false, boost::add_vertex(test_graph));
-  std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, &stationB_owner, false, boost::add_vertex(test_graph));
-  std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, &stationC_owner, false, boost::add_vertex(test_graph));
-  playersState::Player batch_owner1(4, "BatchOwnerFerry1", cardsState::ColorCard::WHITE, 0, 50, 5, 7, nullptr);
-  playersState::Player batch_owner2(5, "BatchOwnerFerry2", cardsState::ColorCard::BLACK, 0, 55, 6, 8, nullptr);
-  playersState::Player batch_owner3(6, "BatchOwnerFerry3", cardsState::ColorCard::YELLOW, 0, 60, 7, 9, nullptr);
+  std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>  (3, "BatchOwnerStationA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr);
+  std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>(4, "BatchOwnerStationB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
+  std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>(5, "BatchOwnerStationC", cardsState::ColorCard::GREEN, 0, 50, 4, 6, nullptr);
+  std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, stationA_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, stationB_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, stationC_owner, false, boost::add_vertex(test_graph));
+  std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>(4, "BatchOwnerFerry1", cardsState::ColorCard::WHITE, 0, 50, 5, 7, nullptr);
+  std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>(5, "BatchOwnerFerry2", cardsState::ColorCard::BLACK, 0, 55, 6, 8, nullptr);
+  std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>(6, "BatchOwnerFerry3", cardsState::ColorCard::YELLOW, 0, 60, 7, 9, nullptr);
   std::vector<FerryInfo> ferryInfos = {
-      Ferry::genData(batch_stationA, batch_stationB, 201, &batch_owner1, cardsState::ColorCard::PINK, 3, 1, false),
-      Ferry::genData(batch_stationB, batch_stationC, 202, &batch_owner2, cardsState::ColorCard::ORANGE, 4, 2, true),
-      Ferry::genData(batch_stationA, batch_stationC, 203, &batch_owner3, cardsState::ColorCard::BLUE, 5, 3, false),
+      Ferry::genData(batch_stationA, batch_stationB, 201, batch_owner1, cardsState::ColorCard::PINK, 3, 1, false),
+      Ferry::genData(batch_stationB, batch_stationC, 202, batch_owner2, cardsState::ColorCard::ORANGE, 4, 2, true),
+      Ferry::genData(batch_stationA, batch_stationC, 203, batch_owner3, cardsState::ColorCard::BLUE, 5, 3, false),
   };
   std::vector<std::shared_ptr<Ferry>> ferries = Ferry::BatchConstructor(ferryInfos, &test_graph);
   BOOST_CHECK_EQUAL(ferries.size(), 3);
   for(int i = 0; i < static_cast<int>(ferries.size()); i++) {
     BOOST_CHECK_EQUAL(ferries[i]->id, std::get<0>(std::get<1>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i]->owner, std::get<1>(std::get<1>(ferryInfos[i])));
+    BOOST_CHECK_EQUAL(ferries[i]->owner->name, std::get<1>(std::get<1>(ferryInfos[i]))->name);
     BOOST_CHECK_EQUAL(ferries[i]->stationA, std::get<0>(std::get<0>(ferryInfos[i])));
     BOOST_CHECK_EQUAL(ferries[i]->stationB, std::get<1>(std::get<0>(ferryInfos[i])));
     BOOST_CHECK_EQUAL(ferries[i]->color, std::get<2>(std::get<1>(ferryInfos[i])));
@@ -93,11 +93,11 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
 BOOST_AUTO_TEST_CASE(GenData)
 {
   std::cout << "GenData Test Started ..." << std::endl;
-  FerryInfo info = Ferry::genData(test_stationA, test_stationB, test_ferry_id, &test_owner, test_color, test_length, test_locomotives, test_is_blocked);
+  FerryInfo info = Ferry::genData(test_stationA, test_stationB, test_ferry_id, test_owner, test_color, test_length, test_locomotives, test_is_blocked);
   BOOST_CHECK_EQUAL(info.first.first, test_stationA);
   BOOST_CHECK_EQUAL(info.first.second, test_stationB);
   BOOST_CHECK_EQUAL(std::get<0>(info.second), test_ferry_id);
-  BOOST_CHECK_EQUAL(std::get<1>(info.second), &test_owner);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second)->name, test_owner->name);
   BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
   BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
   BOOST_CHECK_EQUAL(std::get<4>(info.second), test_locomotives);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(GenData)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
-mapState::Ferry test_ferry_getters_and_setters = mapState::Ferry(test_ferry_id, &test_owner, test_stationA, test_stationB, test_color, test_length, test_locomotives, test_is_blocked, test_edge);
+mapState::Ferry test_ferry_getters_and_setters = mapState::Ferry(test_ferry_id, test_owner, test_stationA, test_stationB, test_color, test_length, test_locomotives, test_is_blocked, test_edge);
 BOOST_AUTO_TEST_SUITE(Getters)
 
 BOOST_AUTO_TEST_CASE(GetId)
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(GetColor)
 BOOST_AUTO_TEST_CASE(GetOwner)
 {
   std::cout << "GetOwner Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getOwner(), &test_owner);
+  BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getOwner()->name, test_owner->name);
   std::cout << "GetOwner Test Finished !\n"<< std::endl;
 }
 
@@ -190,12 +190,12 @@ BOOST_AUTO_TEST_CASE(GetLocomotives)
 
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(Setters)
-playersState::Player test_set_owner = playersState::Player(4, "NewOwner", cardsState::ColorCard::BLACK, 0, 50, 5, 7, nullptr);
+std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>(4, "NewOwner", cardsState::ColorCard::BLACK, 0, 50, 5, 7, nullptr);
 BOOST_AUTO_TEST_CASE(SetOwner)
 {
   std::cout << "SetOwner Test Started ..." << std::endl;
-  test_ferry_getters_and_setters.setOwner(&test_set_owner);
-  BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.owner, &test_set_owner);
+  test_ferry_getters_and_setters.setOwner(test_set_owner);
+  BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.owner->name, test_set_owner->name);
   std::cout << "SetOwner Test Finished !\n"<< std::endl;
 }
 bool new_block_status = true;

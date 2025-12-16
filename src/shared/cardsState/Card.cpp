@@ -1,7 +1,7 @@
 #include "Card.h"
 
 #include <iostream>
-#include <ostream>
+
 
 namespace cardsState {
 

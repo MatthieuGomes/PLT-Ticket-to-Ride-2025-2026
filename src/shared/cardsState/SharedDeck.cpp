@@ -1,7 +1,6 @@
 #include "SharedDeck.h"
 
 #include <iostream>
-#include <ostream>
 
 #include "DestinationCard.h"
 #include "WagonCard.h"
