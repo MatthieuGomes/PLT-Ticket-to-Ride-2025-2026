@@ -6,6 +6,14 @@
 #include "../../src/shared/playersState/Player.h"
 #include <boost/graph/adjacency_list.hpp>
 
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 using namespace ::mapState;
 
 using StationPair = std::pair<Station *, Station *>;
@@ -30,8 +38,9 @@ int test_locomotives = 2;
 
 BOOST_AUTO_TEST_SUITE(Constructors)
 
-BOOST_AUTO_TEST_CASE(Constructor)
+BOOST_AUTO_TEST_CASE(Default)
 {
+  std::cout << "Default Constructor Test Started ..." << std::endl;
   mapState::Ferry test_ferry = mapState::Ferry(test_ferry_id, &test_owner, test_stationA, test_stationB, test_color, test_length, test_locomotives, test_is_blocked, test_edge);
   BOOST_CHECK_EQUAL(test_ferry.id, test_ferry_id);
   BOOST_CHECK_EQUAL(test_ferry.owner, &test_owner);
@@ -42,10 +51,12 @@ BOOST_AUTO_TEST_CASE(Constructor)
   BOOST_CHECK_EQUAL(test_ferry.isBlocked, test_is_blocked);
   BOOST_CHECK_EQUAL(test_ferry.edge, test_edge);
   BOOST_CHECK_EQUAL(test_ferry.locomotives, test_locomotives);
+  std::cout << "Default Constructor Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(BatchConstructor)
 {
+  std::cout << "BatchConstructor Test Started ..." << std::endl;
   std::string stationA_name = "BatchStationA";
   std::string stationB_name = "BatchStationB";
   std::string stationC_name = "BatchStationC";
@@ -75,10 +86,12 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
     BOOST_CHECK_EQUAL(ferries[i].locomotives, std::get<4>(std::get<1>(ferryInfos[i])));
     BOOST_CHECK_EQUAL(ferries[i].isBlocked, std::get<5>(std::get<1>(ferryInfos[i])));
   }
+  std::cout << "BatchConstructor Test Finished !\n"<< std::endl;
 } 
 
 BOOST_AUTO_TEST_CASE(GenData)
 {
+  std::cout << "GenData Test Started ..." << std::endl;
   FerryInfo info = Ferry::genData(test_stationA, test_stationB, test_ferry_id, &test_owner, test_color, test_length, test_locomotives, test_is_blocked);
   BOOST_CHECK_EQUAL(info.first.first, test_stationA);
   BOOST_CHECK_EQUAL(info.first.second, test_stationB);
@@ -88,6 +101,7 @@ BOOST_AUTO_TEST_CASE(GenData)
   BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
   BOOST_CHECK_EQUAL(std::get<4>(info.second), test_locomotives);
   BOOST_CHECK_EQUAL(std::get<5>(info.second), test_is_blocked); 
+  std::cout << "GenData Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -98,57 +112,79 @@ BOOST_AUTO_TEST_SUITE(Getters)
 
 BOOST_AUTO_TEST_CASE(GetId)
 {
+  std::cout << "GetId Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getId(), test_ferry_id);
+  std::cout << "GetId Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetStationA)
 {
+  std::cout << "GetStationA Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getStationA(), test_stationA);
+  std::cout << "GetStationA Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetStationB)
 {
+  std::cout << "GetStationB Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getStationB(), test_stationB);
+  std::cout << "GetStationB Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetLength)
 {
+  std::cout << "GetLength Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getLength(), test_length);
+  std::cout << "GetLength Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetEdge)
 {
+  std::cout << "GetEdge Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(*test_ferry_getters_and_setters.getEdge(), test_edge);
+  std::cout << "GetEdge Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetColor)
 {
+  std::cout << "GetColor Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getColor(), test_color);
+  std::cout << "GetColor Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetOwner)
 {
+  std::cout << "GetOwner Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getOwner(), &test_owner);
+  std::cout << "GetOwner Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetBlockStatus)
 {
+  std::cout << "GetBlockStatus Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getBlockStatus(), test_is_blocked);
+  std::cout << "GetBlockStatus Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetVertexA)
 {
+  std::cout << "GetVertexA Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getVertexA(), &(test_stationA->vertex));
+  std::cout << "GetVertexA Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetVertexB)
 {
+  std::cout << "GetVertexB Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getVertexB(), &(test_stationB->vertex));
+  std::cout << "GetVertexB Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(GetLocomotives)
 {
+  std::cout << "GetLocomotives Test Started ..." << std::endl;
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getLocomotives(), test_locomotives);
+  std::cout << "GetLocomotives Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -156,18 +192,33 @@ BOOST_AUTO_TEST_SUITE(Setters)
 playersState::Player test_set_owner = playersState::Player(4, "NewOwner", cardsState::ColorCard::BLACK, 0, 50, 5, 7, nullptr);
 BOOST_AUTO_TEST_CASE(SetOwner)
 {
+  std::cout << "SetOwner Test Started ..." << std::endl;
   test_ferry_getters_and_setters.setOwner(&test_set_owner);
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.owner, &test_set_owner);
+  std::cout << "SetOwner Test Finished !\n"<< std::endl;
 }
 bool new_block_status = true;
 BOOST_AUTO_TEST_CASE(SetBlockStatus)
 {
+  std::cout << "SetBlockStatus Test Started ..." << std::endl;
   test_ferry_getters_and_setters.setBlockStatus(new_block_status);
   BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.isBlocked, new_block_status);
+  std::cout << "SetBlockStatus Test Finished !\n"<< std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(Operations)
+
+BOOST_AUTO_TEST_SUITE(Internal)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Interactions)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()
 /* vim: set sw=2 sts=2 et : */

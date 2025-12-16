@@ -2,12 +2,19 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/cardsState/CardsState.h"
-#
 
 #include "../../src/shared/cardsState/SharedDeck.h"
 #include "../../src/shared/cardsState/WagonCard.h"
 #include "../../src/shared/cardsState/DestinationCard.h"
 #include "../../src/shared/cardsState/PlayerCards.h"
+
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
 
 using namespace ::cardsState;
 
@@ -32,12 +39,16 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_CASE(test_turn_card_up)
-{
+BOOST_AUTO_TEST_SUITE(Operations)
 
+BOOST_AUTO_TEST_SUITE(Internal)
+
+BOOST_AUTO_TEST_CASE(TurnCardUp)
+{
+    std::cout << "TurnCardUp Test Started ..." << std::endl;
     std::vector<WagonCard> trashV;
     std::vector<WagonCard> faceUpV;
-    std::vector faceDownV = { WagonCard(ColorCard::RED) };
+    std::vector faceDownV = {WagonCard(ColorCard::RED)};
 
     SharedDeck<WagonCard> deck(&trashV, &faceUpV, &faceDownV);
 
@@ -48,9 +59,11 @@ BOOST_AUTO_TEST_CASE(test_turn_card_up)
 
     BOOST_CHECK_EQUAL(deck.faceUpCards->countCards(), 1);
     BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
+    std::cout << "TurnCardUp Test Finished !\n" << std::endl;
 }
-BOOST_AUTO_TEST_CASE(test_trash_card)
+BOOST_AUTO_TEST_CASE(TrashCard)
 {
+    std::cout << "TrashCard Test Started ..." << std::endl;
     std::vector<WagonCard> trashV;
     std::vector<WagonCard> faceUpV;
     std::vector<WagonCard> faceDownV;
@@ -68,11 +81,12 @@ BOOST_AUTO_TEST_CASE(test_trash_card)
     BOOST_CHECK_EQUAL(deck.trash->cards[0]->getColor(), ColorCard::RED);
     BOOST_CHECK(cardToTrash != nullptr);
     BOOST_CHECK_EQUAL(cardToTrash->getColor(), ColorCard::RED);
+    std::cout << "TrashCard Test Finished !\n" << std::endl;
 }
-
-BOOST_AUTO_TEST_CASE(test_refill_main_deck)
+BOOST_AUTO_TEST_CASE(RefillMainDeck)
 {
-    std::vector<WagonCard> trash = { WagonCard(ColorCard::RED), WagonCard(ColorCard::BLUE) };
+    std::cout << "RefillMainDeck Test Started ..." << std::endl;
+    std::vector<WagonCard> trash = {WagonCard(ColorCard::RED), WagonCard(ColorCard::BLUE)};
     std::vector<WagonCard> fUp;
     std::vector<WagonCard> fDown;
 
@@ -85,9 +99,17 @@ BOOST_AUTO_TEST_CASE(test_refill_main_deck)
 
     BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
     BOOST_CHECK_EQUAL(deck.trash->countCards(), 0);
+    std::cout << "RefillMainDeck Test Finished !\n" << std::endl;
 }
-BOOST_AUTO_TEST_CASE(test_drawCard_from_face_up_wagon)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Interactions)
+
+BOOST_AUTO_TEST_CASE(DrawCardFromFaceUpWagon)
 {
+    
+    std::cout << "DrawCardFromFaceUpWagon Test Started ..." << std::endl;
     std::vector<WagonCard> trashV;
     std::vector<WagonCard> faceUpV;
     std::vector<WagonCard> faceDownV;
@@ -117,35 +139,42 @@ BOOST_AUTO_TEST_CASE(test_drawCard_from_face_up_wagon)
     BOOST_CHECK_EQUAL(deck.faceUpCards->countCards(), 2);
     BOOST_CHECK_EQUAL(deck.faceUpCards->cards.back()->getColor(), ColorCard::YELLOW);
     BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
+    std::cout << "DrawCardFromFaceUpWagon Test Finished !\n" << std::endl;
 }
-    BOOST_AUTO_TEST_CASE(test_drawCard_face_down_correct_behavior)
-    {
-        std::vector<WagonCard> trashV;
-        std::vector<WagonCard> faceUpV;
-        std::vector<WagonCard> faceDownV = {
-            WagonCard(ColorCard::RED),
-            WagonCard(ColorCard::BLUE)
-        };
+BOOST_AUTO_TEST_CASE(DrawCardFaceDownCorrectBehavior)
+{
+    std::cout << "DrawCardFaceDownCorrectBehavior Test Started ..." << std::endl;
+    std::vector<WagonCard> trashV;
+    std::vector<WagonCard> faceUpV;
+    std::vector<WagonCard> faceDownV = {
+        WagonCard(ColorCard::RED),
+        WagonCard(ColorCard::BLUE)};
 
-        trashV.emplace_back(ColorCard::GREEN);
-        trashV.emplace_back(ColorCard::YELLOW);
-        trashV.emplace_back(ColorCard::BLACK);
+    trashV.emplace_back(ColorCard::GREEN);
+    trashV.emplace_back(ColorCard::YELLOW);
+    trashV.emplace_back(ColorCard::BLACK);
 
-        cardsState::SharedDeck<WagonCard> deck(&trashV, &faceUpV, &faceDownV);
+    cardsState::SharedDeck<WagonCard> deck(&trashV, &faceUpV, &faceDownV);
 
-        std::vector<DestinationCard> playerDest;
-        std::vector<WagonCard> playerWagon;
-        PlayerCards player(&playerDest, &playerWagon);
+    std::vector<DestinationCard> playerDest;
+    std::vector<WagonCard> playerWagon;
+    PlayerCards player(&playerDest, &playerWagon);
 
-        BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
-        BOOST_CHECK_EQUAL(deck.trash->countCards(), 3);
-        BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 0);
+    BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
+    BOOST_CHECK_EQUAL(deck.trash->countCards(), 3);
+    BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 0);
 
-        // deck.drawCard(10, &player);
+    // deck.drawCard(10, &player);
 
-        BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 5);
-        BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
-        BOOST_CHECK_EQUAL(deck.trash->countCards(), 0);
-    }
+    BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 5);
+    BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
+    BOOST_CHECK_EQUAL(deck.trash->countCards(), 0);
+    std::cout << "DrawCardFaceDownCorrectBehavior Test Finished !\n" << std::endl;
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()
+
 
 /* vim: set sw=2 sts=2 et : */
