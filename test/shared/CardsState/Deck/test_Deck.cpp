@@ -13,36 +13,38 @@
 
 using namespace ::cardsState;
 
+using DestinationCardInfos = std::tuple<std::string, std::string, int>;
+using WagonCardInfos = cardsState::ColorCard;
+
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
     BOOST_CHECK(1);
 }
 
 BOOST_AUTO_TEST_SUITE(Constructors)
-ColorCard test_colors[] = {ColorCard::RED, ColorCard::BLUE};
+std::vector<WagonCardInfos> test_colors = {ColorCard::RED, ColorCard::BLUE};
 
+BOOST_AUTO_TEST_CASE(BatchWagonDeck)
+{
+    std::vector<WagonCardInfos> cardArgs = {ColorCard::RED, ColorCard::BLUE, ColorCard::GREEN};
+    Deck<WagonCard> deck(
+        cardArgs);
 
-    BOOST_AUTO_TEST_CASE(BatchWagonDeck) {
-        ColorCard cardArgs[] = {ColorCard::RED, ColorCard::BLUE, ColorCard::GREEN};
-        Deck<WagonCard> deck({ ColorCard::RED, ColorCard::BLUE, ColorCard::GREEN });
+    BOOST_CHECK_EQUAL(deck.countCards(), 3);
 
-        BOOST_CHECK_EQUAL(deck.countCards(), 3);
-
-        for (size_t i = 0; i < 3; i++)
-        {
-            BOOST_REQUIRE(deck.cards[i]);
-            BOOST_CHECK_EQUAL(deck.cards[i]->color, cardArgs[i]);
-        }
+    for (size_t i = 0; i < 3; i++)
+    {
+        BOOST_REQUIRE(deck.cards[i]);
+        BOOST_CHECK_EQUAL(deck.cards[i]->color, cardArgs[i]);
     }
+}
 
-BOOST_AUTO_TEST_CASE(BatchDestinationDeck) {
-    Deck<DestinationCard> deck({
-            {"Paris", "Lyon", 5},
-            {"Berlin", "Munich", 7}
-        });
-
+BOOST_AUTO_TEST_CASE(BatchDestinationDeck)
+{
+    std::vector<DestinationCardInfos> cardArgs = {DestinationCardInfos("Paris", "Lyon", 5), DestinationCardInfos("Berlin", "Munich", 7)};
+    Deck<DestinationCard> deck(
+        cardArgs);
     BOOST_CHECK_EQUAL(deck.countCards(), 2);
-
 
     BOOST_REQUIRE(deck.cards[0]);
     BOOST_REQUIRE(deck.cards[1]);
@@ -54,24 +56,24 @@ BOOST_AUTO_TEST_CASE(BatchDestinationDeck) {
     BOOST_CHECK_EQUAL(deck.cards[1]->stationA, "Berlin");
     BOOST_CHECK_EQUAL(deck.cards[1]->stationB, "Munich");
     BOOST_CHECK_EQUAL(deck.cards[1]->points, 7);
-
 }
 
 BOOST_AUTO_TEST_CASE(Default)
 {
     {
         std::cout << "Deck Default Constructor<WagonCard> Test Started ..." << std::endl;
-        ColorCard cardArgs[] = {ColorCard::RED, ColorCard::BLUE};
+        std::vector<WagonCardInfos> cardArgs = {ColorCard::RED, ColorCard::BLUE};
         WagonCard card1(test_colors[0]);
         WagonCard card2(test_colors[1]);
-        std::vector<WagonCard> *cardsVec = new std::vector<WagonCard>{card1, card2};
+        std::vector<std::shared_ptr<WagonCard>> cardsVec = std::vector<std::shared_ptr<WagonCard>>{std::make_shared<WagonCard>(card1), std::make_shared<WagonCard>(card2)};
         Deck<WagonCard> deck(cardsVec);
         BOOST_CHECK_EQUAL(deck.countCards(), sizeof(test_colors) / sizeof(ColorCard));
         for (unsigned int i = 0; i < static_cast<int>(sizeof(test_colors)) / sizeof(ColorCard); i++)
         {
             BOOST_CHECK_EQUAL(deck.cards[i]->color, test_colors[i]);
         }
-        std::cout << "Deck Default Constructor<WagonCard> Test Finished !\n" << std::endl;
+        std::cout << "Deck Default Constructor<WagonCard> Test Finished !\n"
+                  << std::endl;
     }
 }
 
@@ -80,11 +82,12 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
 
 BOOST_AUTO_TEST_SUITE(Getters)
-BOOST_AUTO_TEST_CASE(getCards) {
+BOOST_AUTO_TEST_CASE(getCards)
+{
     ColorCard cardArgs[] = {ColorCard::RED, ColorCard::BLUE};
     WagonCard card1(cardArgs[0]);
     WagonCard card2(cardArgs[1]);
-    auto *cardsVec = new std::vector<WagonCard>{card1, card2};
+    std::vector<std::shared_ptr<WagonCard>> cardsVec = std::vector<std::shared_ptr<WagonCard>>{std::make_shared<WagonCard>(card1), std::make_shared<WagonCard>(card2)};
     Deck<WagonCard> deck(cardsVec);
     auto returnedCards = deck.getCards();
 
@@ -92,7 +95,6 @@ BOOST_AUTO_TEST_CASE(getCards) {
 
     BOOST_CHECK_EQUAL(returnedCards[0]->color, cardArgs[0]);
     BOOST_CHECK_EQUAL(returnedCards[1]->color, cardArgs[1]);
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()
