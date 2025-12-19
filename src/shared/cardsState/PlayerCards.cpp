@@ -4,7 +4,7 @@
 #include "CardsState.h"
 namespace cardsState
 {
-  PlayerCards::PlayerCards(std::vector<DestinationCard> *destinationCards, std::vector<WagonCard> *wagonCards)
+  PlayerCards::PlayerCards(std::vector<std::shared_ptr<DestinationCard>> destinationCards, std::vector<std::shared_ptr<WagonCard>> wagonCards)
   {
     this->destinationCards = std::make_shared<Deck<DestinationCard>>(destinationCards);
     this->wagonCards = std::make_shared<Deck<WagonCard>>(wagonCards);
@@ -18,7 +18,7 @@ namespace cardsState
   }
 
   template <>
-  void PlayerCards::_takeCard<DestinationCard>(SharedDeck<DestinationCard> *sharedDeck, DestinationCard *card, int number)
+  void PlayerCards::_takeCard<DestinationCard>(std::shared_ptr<SharedDeck<DestinationCard>> sharedDeck, std::shared_ptr<DestinationCard> card, int number)
   {
     if ((card != nullptr && number > 0)|| (card==nullptr && number<=0))
     {
@@ -31,16 +31,16 @@ namespace cardsState
     }
     if (card != nullptr)
     {
-      sharedDeck->drawCard(this, card, 0);
+      sharedDeck->drawCard(std::make_shared<PlayerCards>(*this), card, 0);
     }
     else if (number > 0)
     {
-      sharedDeck->drawCard(this, nullptr, number);
+      sharedDeck->drawCard(std::make_shared<PlayerCards>(*this), nullptr, number);
     }
   }
 
   template <>
-  void PlayerCards::_takeCard<WagonCard>(SharedDeck<WagonCard> *sharedDeck, WagonCard *card, int number)
+  void PlayerCards::_takeCard<WagonCard>(std::shared_ptr<SharedDeck<WagonCard>> sharedDeck, std::shared_ptr<WagonCard> card, int number)
   {
     if ((card != nullptr && number > 0)|| (card==nullptr && number<=0))
     {
@@ -53,32 +53,32 @@ namespace cardsState
     }
     if (card != nullptr)
     {
-      sharedDeck->drawCard(this, card, 0);
+      sharedDeck->drawCard(std::make_shared<PlayerCards>(*this), card, 0);
     }
     else if (number > 0)
     {
-      sharedDeck->drawCard(this, nullptr, number);
+      sharedDeck->drawCard(std::make_shared<PlayerCards>(*this), nullptr, number);
     }
   }
 
   template <>
-  void PlayerCards::takeCard(CardsState * cardsState, DestinationCard *card, int number)
+  void PlayerCards::takeCard(std::shared_ptr<cardsState::CardsState> cardsState, std::shared_ptr<DestinationCard> card, int number)
   {
-    SharedDeck<DestinationCard> *sharedDeck= cardsState->gameDestinationCards.get();
+    std::shared_ptr<SharedDeck<DestinationCard>> sharedDeck= cardsState->gameDestinationCards;
 
     this->_takeCard<DestinationCard>(sharedDeck, card, number);
   }
 
   template <>
-  void PlayerCards::takeCard(CardsState * cardsState, WagonCard *card, int number)
+  void PlayerCards::takeCard(std::shared_ptr<cardsState::CardsState> cardsState, std::shared_ptr<WagonCard> card, int number)
   {
-    SharedDeck<WagonCard> *sharedDeck= cardsState->gameWagonCards.get();
+    std::shared_ptr<SharedDeck<WagonCard>> sharedDeck= cardsState->gameWagonCards;
 
     this->_takeCard<WagonCard>(sharedDeck, card, number);
   }
 
-  template void PlayerCards::takeCard<DestinationCard>(CardsState *,DestinationCard* ,int);
-  template void PlayerCards::takeCard<WagonCard>(CardsState *,WagonCard* ,int);
+  template void PlayerCards::takeCard<DestinationCard>(std::shared_ptr<cardsState::CardsState>, std::shared_ptr<DestinationCard>, int);
+  template void PlayerCards::takeCard<WagonCard>(std::shared_ptr<cardsState::CardsState>, std::shared_ptr<WagonCard>, int);
 }
 
 

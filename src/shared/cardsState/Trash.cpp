@@ -6,7 +6,7 @@
 namespace cardsState {
     // class Trash -
     template <class CardType>
-    Trash<CardType>::Trash(std::vector<CardType> *cards) : Deck<CardType>(cards){
+    Trash<CardType>::Trash(std::vector<CardType> cards) : Deck<CardType>(cards){
         this->className = "Trash";
     }
 

@@ -8,6 +8,9 @@
 #include <boost/type_index.hpp>
 
 
+using DestinationCardInfos = std::tuple<std::string, std::string, int>;
+using WagonCardInfos = cardsState::ColorCard;
+
 namespace cardsState
 {
     // class Deck -
@@ -17,53 +20,71 @@ namespace cardsState
     }
 
     template <>
-    Deck<WagonCard>::Deck(std::initializer_list<ColorCard> wagonArgs)
+    Deck<WagonCard>::Deck(std::vector<ColorCard> wagonCardsInfos)
     {
         this->className = "Deck";
-        for (const auto &arg : wagonArgs)
+        for (WagonCardInfos wagonInfo : wagonCardsInfos)
         {
-            this->cards.push_back(std::make_shared<WagonCard>(arg));
+            this->cards.push_back(std::make_shared<WagonCard>(wagonInfo));
         }
     }
     template <>
-    Deck<DestinationCard>::Deck(std::initializer_list<std::tuple<std::string, std::string, int>> destinationArgs)
+    Deck<DestinationCard>::Deck(std::vector<DestinationCardInfos> destinationCardsInfos)
     {
         this->className = "Deck";
-        for (const auto &arg : destinationArgs)
+        for (DestinationCardInfos destinationInfo : destinationCardsInfos)
         {
-            this->cards.push_back(std::make_shared<DestinationCard>(std::get<0>(arg), std::get<1>(arg), std::get<2>(arg)));
+            this->cards.push_back(std::make_shared<DestinationCard>(std::get<0>(destinationInfo), std::get<1>(destinationInfo), std::get<2>(destinationInfo)));
         }
     }
     template <class CardType>
-    Deck<CardType>::Deck(std::vector<CardType> *cards)
+    Deck<CardType>::Deck(std::vector<CardType> cards)
     {
         this->className = "Deck";
-        if (cards)
+        if (!cards.empty())
         {
-            for (const auto &card : *cards)
+            for (CardType card : cards)
             {
                 this->cards.push_back(std::make_shared<CardType>(card));
             }
         }
         else
         {
-            this->cards = {nullptr};
+            this->cards = {};
         }
     }
 
     template <class CardType>
-    void Deck<CardType>::addCard(CardType *card)
+    Deck<CardType>::Deck(std::vector<std::shared_ptr<CardType>> cards)
     {
-        this->cards.push_back(std::shared_ptr<CardType>(card));
+        this->className = "Deck";
+        if (!cards.empty())
+        {
+            for (std::shared_ptr<CardType> card : cards)
+            {
+                this->cards.push_back(std::move(card));
+            }
+        }
+        else
+        {
+            this->cards = {};
+        }
+    }
+
+    template <class CardType>
+    void Deck<CardType>::addCard(std::shared_ptr<CardType> card)
+    {
+        
+        this->cards.push_back(std::move(card));
     }
     template <class CardType>
-    CardType *Deck<CardType>::removeCard(int position)
+    std::shared_ptr<CardType> Deck<CardType>::removeCard(int position)
     {
         if (position < 0 || position >= static_cast<int>(cards.size()))
         {
             return nullptr; // or throw an exception
         }
-        CardType * removedCard = std::move(cards[position]).get();
+        std::shared_ptr<CardType> removedCard = std::move(cards[position]);
         cards.erase(cards.begin() + position);
         return removedCard;
     }
@@ -86,7 +107,7 @@ namespace cardsState
     template<class CardType>
     int Deck<CardType>::countCards() {
         int nb=0;
-        for (const std::shared_ptr<CardType> &card: this->cards) {
+        for (std::shared_ptr<CardType> card: this->cards) {
             if (card) {
                 nb++;
             }
@@ -102,11 +123,11 @@ namespace cardsState
     }
 
     template <class CardType>
-    void Deck<CardType>::moveCardTo (Deck<CardType>* originDeck, Deck<CardType>* destinationDeck, int cardPosition) {
+    void Deck<CardType>::moveCardTo (std::shared_ptr<Deck<CardType>> originDeck, std::shared_ptr<Deck<CardType>> destinationDeck, int cardPosition) {
         {
             if (!originDeck || !destinationDeck) return;
 
-            CardType* card = originDeck->removeCard(cardPosition);
+            std::shared_ptr<CardType> card = originDeck->removeCard(cardPosition);
             if (card) {
                 destinationDeck->addCard(card);
             }
@@ -124,7 +145,7 @@ namespace cardsState
 
     }
     template <class CardType>
-    CardType* Deck<CardType>::takeLastCard() {
+    std::shared_ptr<CardType> Deck<CardType>::takeLastCard() {
         if (cards.size() > 0) {
             return removeCard(static_cast<int>(cards.size()) - 1);
         }
