@@ -2,6 +2,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include "Station.h"
 #include <iostream>
+#include <stdexcept>
 #define DEBUG_MODE false
 #if DEBUG_MODE == true 
     #define DEBUG
@@ -18,7 +19,7 @@ namespace mapState
     using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
 
-    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge)
+    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
     {
         DEBUG_PRINT("Road creation started ...");
         this->id = id;
@@ -84,20 +85,24 @@ namespace mapState
         cout << "\tIs Blocked: " << (this->isBlocked ? "Yes" : "No") << "\n";
     }
 
-    boost::adjacency_list<>::edge_descriptor *Road::getEdge()
+    std::shared_ptr<boost::adjacency_list<>::edge_descriptor> Road::getEdge()
     {
-        return &(this->edge);
+        return this->edge;
     }
-    boost::adjacency_list<>::vertex_descriptor *Road::getVertexA()
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> Road::getVertexA()
     {
         return this->stationA->getVertex();
     }
-    boost::adjacency_list<>::vertex_descriptor *Road::getVertexB()
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> Road::getVertexB()
     {
         return this->stationB->getVertex();
     }
-    std::vector<std::shared_ptr<Road>> Road::BatchConstructor(std::vector<RoadInfo> roadsInfos, boost::adjacency_list<> *gameGraph)
+    std::vector<std::shared_ptr<Road>> Road::BatchConstructor(std::vector<RoadInfo> roadsInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
+        if (!gameGraph)
+        {
+            throw std::invalid_argument("Road::BatchConstructor requires a graph");
+        }
         std::vector<std::shared_ptr<Road>> roads;
         for (RoadInfo info : roadsInfos)
         {
@@ -110,8 +115,10 @@ namespace mapState
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
             bool isBlocked = std::get<4>(detail);
-            boost::adjacency_list<>::edge_descriptor edge = boost::add_edge(*(stationA->getVertex()), *(stationB->getVertex()), *gameGraph).first;
-            roads.push_back(std::make_shared<Road>(id, owner, stationA, stationB, color, length, isBlocked, edge));
+            std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
+                std::make_shared<boost::adjacency_list<>::edge_descriptor>(
+                    boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
+            roads.push_back(std::make_shared<Road>(id, owner, stationA, stationB, color, length, isBlocked, edgeDescriptor));
         }
         return roads;
     }

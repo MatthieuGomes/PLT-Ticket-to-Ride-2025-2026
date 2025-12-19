@@ -40,7 +40,7 @@ namespace mapState
     MapState::MapState()
     {
         DEBUG_PRINT("default MapState creation started...");
-        this->gameGraph = boost::adjacency_list<>();
+        this->gameGraph = std::make_shared<boost::adjacency_list<>>();
         std::vector<StationInfo> stations = {
             Station::genData(nullptr, false, "paris"),
             Station::genData(nullptr, false, "berlin"),
@@ -48,7 +48,7 @@ namespace mapState
             Station::genData(nullptr, false, "rome"),
         };
 
-        std::vector<std::shared_ptr<Station>> stationsObject = Station::BatchConstructor(stations, &this->gameGraph);
+        std::vector<std::shared_ptr<Station>> stationsObject = Station::BatchConstructor(stations, this->gameGraph);
         std::vector<RoadInfo> roads = {
             Road::genData(
                 stationsObject[0],
@@ -89,32 +89,35 @@ namespace mapState
                 4,
                 false),
         };
-        this->_MapState(stations, roads, tunnels, ferrys);
+        this->_MapState(this->gameGraph, stations, roads, tunnels, ferrys);
 #ifdef DEBUG
         this->display();
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
-    MapState::MapState(std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
+    MapState::MapState(std::shared_ptr<boost::adjacency_list<>> gameGraph, std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
     {
         DEBUG_PRINT("Parameterized MapState creation started...");
-        this->gameGraph = boost::adjacency_list<>();
-        this->_MapState(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
+        this->_MapState(gameGraph, stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
 #ifdef DEBUG
         this->display();
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
 
-    void MapState::_MapState(std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
+    void MapState::_MapState(std::shared_ptr<boost::adjacency_list<>> gameGraph, std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
     {
 
         DEBUG_PRINT("MapState _MapState started ...");
         this->stations.clear();
         this->roads.clear();
-        this->gameGraph = boost::adjacency_list<>();
+        if (!gameGraph)
+        {
+            gameGraph = std::make_shared<boost::adjacency_list<>>();
+        }
+        this->gameGraph = gameGraph;
 
-        std::vector<std::shared_ptr<Station>> stationObjects = Station::BatchConstructor(stationsInfos, &this->gameGraph);
+        std::vector<std::shared_ptr<Station>> stationObjects = Station::BatchConstructor(stationsInfos, this->gameGraph);
         std::unordered_map<std::string, std::shared_ptr<Station>> stationLookup;
         stationLookup.reserve(stationObjects.size());
 
@@ -168,11 +171,11 @@ namespace mapState
         std::vector<TunnelInfo> normalizedTunnelInfos = remapConnections(tunnelsInfos);
         std::vector<FerryInfo> normalizedFerryInfos = remapConnections(ferrysInfos);
 
-        std::vector<std::shared_ptr<Road>> roadObjects = Road::BatchConstructor(normalizedRoadInfos, &this->gameGraph);
+        std::vector<std::shared_ptr<Road>> roadObjects = Road::BatchConstructor(normalizedRoadInfos, this->gameGraph);
 
-        std::vector<std::shared_ptr<Tunnel>> tunnelObjects = Tunnel::BatchConstructor(normalizedTunnelInfos, &this->gameGraph);
+        std::vector<std::shared_ptr<Tunnel>> tunnelObjects = Tunnel::BatchConstructor(normalizedTunnelInfos, this->gameGraph);
 
-        std::vector<std::shared_ptr<Ferry>> ferryObjects = Ferry::BatchConstructor(normalizedFerryInfos, &this->gameGraph);
+        std::vector<std::shared_ptr<Ferry>> ferryObjects = Ferry::BatchConstructor(normalizedFerryInfos, this->gameGraph);
 
         for (const std::shared_ptr<Road> &road : roadObjects)
         {
@@ -195,7 +198,7 @@ namespace mapState
         MapState mapState = MapState();
         mapState.stations.clear();
         mapState.roads.clear();
-        mapState.gameGraph = boost::adjacency_list<>();
+        mapState.gameGraph = std::make_shared<boost::adjacency_list<>>();
         DEBUG_PRINT("Empty MapState creation finished !");
         return mapState;
     }
@@ -262,10 +265,10 @@ namespace mapState
     {
         Path path;
 
-        if (!src || !dest)
+        if (!src || !dest || !this->gameGraph)
             return path;
 
-        boost::adjacency_list<> &g = gameGraph;
+        boost::adjacency_list<> &g = *this->gameGraph;
         using vertex_descriptor =
             boost::graph_traits<boost::adjacency_list<>>::vertex_descriptor;
         using edge_descriptor =
@@ -282,7 +285,7 @@ namespace mapState
 
         boost::dijkstra_shortest_paths(
             g,
-            src->vertex,
+            *(src->vertex.get()),
             boost::predecessor_map(
                 boost::make_iterator_property_map(
                     predecessors.begin(),
@@ -298,13 +301,13 @@ namespace mapState
         {
             for (const std::shared_ptr<Station> &s : this->stations)
             {
-                if (s->vertex == v)
+                if (*(s->vertex.get()) == v)
                     return s;
             }
             return nullptr;
         };
 
-        vertex_descriptor current = dest->vertex;
+        vertex_descriptor current = *(dest->vertex.get());
         if (distances[current] == std::numeric_limits<int>::max())
             return path;
 
@@ -314,7 +317,7 @@ namespace mapState
             if (s)
                 path.STATIONS.push_back(s);
 
-            if (current == src->vertex)
+            if (current == *(src->vertex.get()))
                 break;
 
             vertex_descriptor pred = predecessors[current];

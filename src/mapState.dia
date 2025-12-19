@@ -147,7 +147,7 @@
         <dia:point val="13,-17"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="12.95,-17.05;51.28,20.05"/>
+        <dia:rectangle val="12.95,-17.05;51.28,21.65"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="13,-17"/>
@@ -156,7 +156,7 @@
         <dia:real val="38.230000000000004"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="37.000000000000014"/>
+        <dia:real val="38.600000000000009"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#MapState#</dia:string>
@@ -254,7 +254,7 @@
             <dia:string>#gameGraph#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -381,6 +381,23 @@
           <dia:attribute name="parameters">
             <dia:composite type="umlparameter">
               <dia:attribute name="name">
+                <dia:string>#gameGraph#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
                 <dia:string>#stationsInfos#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
@@ -478,6 +495,23 @@
             <dia:boolean val="false"/>
           </dia:attribute>
           <dia:attribute name="parameters">
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#gameGraph#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
             <dia:composite type="umlparameter">
               <dia:attribute name="name">
                 <dia:string>#stationsInfos#</dia:string>
@@ -1606,13 +1640,13 @@
         <dia:point val="12,29"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="11.95,28.95;52.59,62.85"/>
+        <dia:rectangle val="11.95,28.95;58.365,62.85"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="12,29"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="40.539999999999999"/>
+        <dia:real val="46.314999999999998"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="33.800000000000011"/>
@@ -1736,7 +1770,7 @@
             <dia:string>#edge#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;::edge_descriptor#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::edge_descriptor&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -2047,7 +2081,7 @@
                 <dia:string>#edge#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt;::edge_descriptor#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::edge_descriptor&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2309,7 +2343,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;::edge_descriptor *#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::edge_descriptor&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -2399,7 +2433,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;::vertex_descriptor *#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::vertex_descriptor&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -2429,7 +2463,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;::vertex_descriptor *#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::vertex_descriptor&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -2598,7 +2632,7 @@
                 <dia:string>#gameGraph#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt; *#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2773,13 +2807,13 @@
         <dia:point val="54,37"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="53.95,36.95;97.67,54.85"/>
+        <dia:rectangle val="53.95,36.95;103.445,54.85"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="54,37"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="43.619999999999997"/>
+        <dia:real val="49.394999999999996"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="17.800000000000004"/>
@@ -2949,7 +2983,7 @@
             <dia:string>#vertex#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;::vertex_descriptor#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::vertex_descriptor&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -3054,7 +3088,7 @@
                 <dia:string>#vertex#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt;::vertex_descriptor#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::vertex_descriptor&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -3166,7 +3200,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#boost::adjacency_list&lt;&gt;::vertex_descriptor *#</dia:string>
+            <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::vertex_descriptor&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -3425,7 +3459,7 @@
                 <dia:string>#gameGraph#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt; *#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -3529,19 +3563,19 @@
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O10">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.115,20"/>
+        <dia:point val="32.115,21.6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.365,19.25;32.865,29.8"/>
+        <dia:rectangle val="31.365,20.85;35.3575,29.8"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="32.115,20"/>
+        <dia:point val="32.115,21.6"/>
         <dia:point val="32.115,22"/>
-        <dia:point val="32.27,22"/>
-        <dia:point val="32.27,29"/>
+        <dia:point val="35.1575,22"/>
+        <dia:point val="35.1575,29"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3610,19 +3644,19 @@
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O11">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.115,20"/>
+        <dia:point val="32.115,21.6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.365,19.25;76.01,37.755"/>
+        <dia:rectangle val="31.365,20.85;78.8975,37.755"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="32.115,20"/>
+        <dia:point val="32.115,21.6"/>
         <dia:point val="32.115,24"/>
-        <dia:point val="75.81,24"/>
-        <dia:point val="75.81,36.955"/>
+        <dia:point val="78.6975,24"/>
+        <dia:point val="78.6975,36.955"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3852,7 +3886,7 @@
         <dia:point val="103.95,14.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="50.78,14.05;104,18.35"/>
+        <dia:rectangle val="50.78,14.05;104,19.95"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -3860,8 +3894,8 @@
       <dia:attribute name="orth_points">
         <dia:point val="103.95,14.1"/>
         <dia:point val="77.7898,14.1"/>
-        <dia:point val="77.7898,17.9"/>
-        <dia:point val="51.23,17.9"/>
+        <dia:point val="77.7898,19.5"/>
+        <dia:point val="51.23,19.5"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -3902,16 +3936,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O15">
       <dia:attribute name="obj_pos">
-        <dia:point val="52.5819,45.9"/>
+        <dia:point val="58.3635,45.9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="52.5319,-0.75;107.45,45.95"/>
+        <dia:rectangle val="58.3135,-0.75;107.45,45.95"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="52.5819,45.9"/>
+        <dia:point val="58.3635,45.9"/>
         <dia:point val="101,45.9"/>
         <dia:point val="101,-0.3"/>
         <dia:point val="107,-0.3"/>
@@ -3955,16 +3989,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O16">
       <dia:attribute name="obj_pos">
-        <dia:point val="97.6702,45.9"/>
+        <dia:point val="78.6975,45.9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="97.6202,-0.75;107.45,45.95"/>
+        <dia:rectangle val="78.6475,-0.75;107.45,45.95"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="97.6702,45.9"/>
+        <dia:point val="78.6975,45.9"/>
         <dia:point val="101,45.9"/>
         <dia:point val="101,-0.3"/>
         <dia:point val="107,-0.3"/>
@@ -4169,13 +4203,13 @@
         <dia:point val="-33,33"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-33.05,32.95;8.36,51.85"/>
+        <dia:rectangle val="-33.05,32.95;14.135,51.85"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-33,33"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="41.310000000000002"/>
+        <dia:real val="47.085000000000001"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="18.800000000000008"/>
@@ -4425,7 +4459,7 @@
                 <dia:string>#edge#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt;::edge_descriptor#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::edge_descriptor&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -4580,7 +4614,7 @@
                 <dia:string>#gameGraph#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt; *#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -4755,13 +4789,13 @@
         <dia:point val="-34,-6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-34.05,-6.05;8.515,15.05"/>
+        <dia:rectangle val="-34.05,-6.05;14.29,15.05"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-34,-6"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="42.464999999999996"/>
+        <dia:real val="48.239999999999995"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="21.000000000000007"/>
@@ -5052,7 +5086,7 @@
                 <dia:string>#edge#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt;::edge_descriptor#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;::edge_descriptor&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -5237,7 +5271,7 @@
                 <dia:string>#gameGraph#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#boost::adjacency_list&lt;&gt; *#</dia:string>
+                <dia:string>#std::shared_ptr&lt;boost::adjacency_list&lt;&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -5426,19 +5460,19 @@
     </dia:object>
     <dia:object type="UML - Generalization" version="1" id="O21">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.27,28.9504"/>
+        <dia:point val="38.5812,28.9504"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-12.8175,14.95;33.12,29.0004"/>
+        <dia:rectangle val="-9.93,14.95;40.2483,29.1677"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="32.27,28.9504"/>
-        <dia:point val="32.27,24"/>
-        <dia:point val="-12.7675,24"/>
-        <dia:point val="-12.7675,15"/>
+        <dia:point val="38.5812,28.9504"/>
+        <dia:point val="40.1872,20.9996"/>
+        <dia:point val="-9.88,20.9996"/>
+        <dia:point val="-9.88,15"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -5477,21 +5511,23 @@
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O22">
       <dia:attribute name="obj_pos">
-        <dia:point val="53.9497,45.9"/>
+        <dia:point val="78.6975,54.8503"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="52.5403,45.14;53.9997,46.74"/>
+        <dia:rectangle val="58.3154,45.14;78.8975,56.4503"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="53.9497,45.9"/>
-        <dia:point val="53.27,45.9"/>
-        <dia:point val="53.27,45.9"/>
-        <dia:point val="52.5903,45.9"/>
+        <dia:point val="78.6975,54.8503"/>
+        <dia:point val="78.6975,55.9003"/>
+        <dia:point val="68.5564,55.9003"/>
+        <dia:point val="68.5564,45.9"/>
+        <dia:point val="58.3654,45.9"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
+        <dia:enum val="1"/>
         <dia:enum val="0"/>
         <dia:enum val="1"/>
         <dia:enum val="0"/>
@@ -5558,17 +5594,17 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O23">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.27,29"/>
+        <dia:point val="35.1575,29"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="32.22,22.24;109.664,30.4305"/>
+        <dia:rectangle val="35.1075,22.24;109.664,30.4305"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="32.27,29"/>
-        <dia:point val="32.27,23"/>
+        <dia:point val="35.1575,29"/>
+        <dia:point val="35.1575,23"/>
         <dia:point val="109.214,23"/>
         <dia:point val="109.214,29.9805"/>
       </dia:attribute>
@@ -5611,16 +5647,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O24">
       <dia:attribute name="obj_pos">
-        <dia:point val="97.62,44.7"/>
+        <dia:point val="103.395,44.7"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="97.57,44.14;107.4,45.74"/>
+        <dia:rectangle val="100.95,44.14;107.4,45.74"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="97.62,44.7"/>
+        <dia:point val="103.395,44.7"/>
         <dia:point val="101,44.7"/>
         <dia:point val="101,45.1"/>
         <dia:point val="106.95,45.1"/>
@@ -5664,16 +5700,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O25">
       <dia:attribute name="obj_pos">
-        <dia:point val="52.54,37.5"/>
+        <dia:point val="58.315,37.5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="52.49,37.45;107.4,45.55"/>
+        <dia:rectangle val="58.265,37.45;107.4,45.55"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="52.54,37.5"/>
+        <dia:point val="58.315,37.5"/>
         <dia:point val="101,37.5"/>
         <dia:point val="101,45.1"/>
         <dia:point val="106.95,45.1"/>
@@ -5717,19 +5753,19 @@
     </dia:object>
     <dia:object type="UML - Generalization" version="1" id="O26">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.27,29"/>
+        <dia:point val="35.1575,29"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-12.395,23.95;33.12,33.05"/>
+        <dia:rectangle val="-9.5075,23.24;36.0075,33.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="32.27,29"/>
-        <dia:point val="32.27,24"/>
-        <dia:point val="-12.345,24"/>
-        <dia:point val="-12.345,33"/>
+        <dia:point val="35.1575,29"/>
+        <dia:point val="35.1575,24"/>
+        <dia:point val="-9.4575,24"/>
+        <dia:point val="-9.4575,33"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
