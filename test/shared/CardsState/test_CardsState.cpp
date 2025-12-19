@@ -19,6 +19,14 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 BOOST_AUTO_TEST_SUITE(Constructors)
+BOOST_AUTO_TEST_CASE(DefaultConstructor)
+{
+  CardsState state;
+
+  BOOST_CHECK(state.gameDestinationCards);
+  BOOST_CHECK(state.gameWagonCards);
+  BOOST_CHECK(state.playersCards.empty());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -37,6 +45,12 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(Operations)
 
 BOOST_AUTO_TEST_SUITE(Internal)
+BOOST_AUTO_TEST_CASE(PrintCardsState)
+{
+  CardsState state;
+
+  BOOST_CHECK_NO_THROW(state.printCardsState());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
