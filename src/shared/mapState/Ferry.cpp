@@ -1,5 +1,6 @@
 #include "Ferry.h"
 #include <iostream>
+#include <stdexcept>
 #define DEBUG_MODE false
 #if DEBUG_MODE == true 
     #define DEBUG
@@ -15,7 +16,7 @@ namespace mapState
     using StationPair = std::pair<std::shared_ptr<Station>,std::shared_ptr<Station>>;
     using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int,int, bool>;
     using FerryInfo = std::pair<StationPair,FerryDetail>;
-    Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge) : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
+    Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge) : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
     {
         DEBUG_PRINT("Parent constructor finished :");
         
@@ -42,8 +43,12 @@ namespace mapState
         Road::_display();
         cout << "\tNumber of Locomotives: " << this->locomotives << "\n";
     }
-    std::vector<std::shared_ptr<Ferry>> Ferry::BatchConstructor(std::vector<FerryInfo> tunnelsInfos, boost::adjacency_list<> * gameGraph){
+    std::vector<std::shared_ptr<Ferry>> Ferry::BatchConstructor(std::vector<FerryInfo> tunnelsInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph){
         DEBUG_PRINT("Ferry BatchConstructor started ...");
+        if (!gameGraph)
+        {
+            throw std::invalid_argument("Ferry::BatchConstructor requires a graph");
+        }
         std::vector<std::shared_ptr<Ferry>> tunnels;
         for(FerryInfo info : tunnelsInfos){
             StationPair pair = info.first;
@@ -56,8 +61,10 @@ namespace mapState
             int length = std::get<3>(detail);
             int locomotives = std::get<4>(detail);
             bool isBlocked = std::get<5>(detail);
-            boost::adjacency_list<>::edge_descriptor edge = boost::add_edge(*(stationA->getVertex()), *(stationB->getVertex()), *gameGraph).first;
-            tunnels.push_back(std::make_shared<Ferry>(id,owner,stationA,stationB,color,length,locomotives,isBlocked,edge));
+            std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
+                std::make_shared<boost::adjacency_list<>::edge_descriptor>(
+                    boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
+            tunnels.push_back(std::make_shared<Ferry>(id,owner,stationA,stationB,color,length,locomotives,isBlocked,edgeDescriptor));
         }
         DEBUG_PRINT("Ferry BatchConstructor finished !");
         return tunnels;

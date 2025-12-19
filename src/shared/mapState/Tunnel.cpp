@@ -1,5 +1,6 @@
 #include "Tunnel.h"
 #include <iostream>
+#include <stdexcept>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true 
@@ -17,7 +18,7 @@ namespace mapState
     using TunnelDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
     using TunnelInfo = std::pair<StationPair, TunnelDetail>;
 
-    Tunnel::Tunnel(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, bool isBlocked, boost::adjacency_list<>::edge_descriptor edge)
+    Tunnel::Tunnel(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
         : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
     {
         DEBUG_PRINT("Parent constructor finished : Tunnel "<< this->id <<" created !");
@@ -38,9 +39,13 @@ namespace mapState
     {
         Road::_display();
     }
-    std::vector<std::shared_ptr<Tunnel>> Tunnel::BatchConstructor(std::vector<TunnelInfo> tunnelsInfos, boost::adjacency_list<> *gameGraph)
+    std::vector<std::shared_ptr<Tunnel>> Tunnel::BatchConstructor(std::vector<TunnelInfo> tunnelsInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
         DEBUG_PRINT("Tunnel BatchConstructor started ...");
+        if (!gameGraph)
+        {
+            throw std::invalid_argument("Tunnel::BatchConstructor requires a graph");
+        }
         std::vector<std::shared_ptr<Tunnel>> tunnels;
         for (TunnelInfo info : tunnelsInfos)
         {
@@ -53,8 +58,10 @@ namespace mapState
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
             bool isBlocked = std::get<4>(detail);
-            boost::adjacency_list<>::edge_descriptor edge = boost::add_edge(*(stationA->getVertex()), *(stationB->getVertex()), *gameGraph).first;
-            tunnels.push_back(std::make_shared<Tunnel>(id, owner, stationA, stationB, color, length, isBlocked, edge));
+            std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
+                std::make_shared<boost::adjacency_list<>::edge_descriptor>(
+                    boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
+            tunnels.push_back(std::make_shared<Tunnel>(id, owner, stationA, stationB, color, length, isBlocked, edgeDescriptor));
         }
         DEBUG_PRINT("Tunnel BatchConstructor finished !");
         

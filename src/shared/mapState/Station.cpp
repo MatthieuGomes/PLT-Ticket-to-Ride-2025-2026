@@ -1,6 +1,7 @@
 #include "Station.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <iostream>
+#include <stdexcept>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true 
@@ -24,7 +25,7 @@ namespace mapState
 
     using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
 
-    Station::Station(std::string name, std::shared_ptr<playersState::Player> owner, bool isBlocked, boost::adjacency_list<>::vertex_descriptor vertex)
+    Station::Station(std::string name, std::shared_ptr<playersState::Player> owner, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertex)
     {
         DEBUG_PRINT("Station creation started ...");
         this->owner = owner;
@@ -66,9 +67,9 @@ namespace mapState
         DEBUG_PRINT("Station " << this->name << " Destroyed !");
     }
 
-    boost::adjacency_list<>::vertex_descriptor *Station::getVertex()
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> Station::getVertex()
     {
-        return &(this->vertex);
+        return this->vertex;
     }
 
     void Station::_display()
@@ -84,16 +85,23 @@ namespace mapState
         }
         cout << "\tBlocked : " << (this->isBlocked ? "Yes" : "No") << "\n";
     }
-    std::vector<std::shared_ptr<Station>> Station::BatchConstructor(std::vector<StationInfo> stationInfos, boost::adjacency_list<> *gameGraph)
+    std::vector<std::shared_ptr<Station>> Station::BatchConstructor(std::vector<StationInfo> stationInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
         DEBUG_PRINT("Station BatchConstructor started ...");
+        if (!gameGraph)
+        {
+            throw std::invalid_argument("Station::BatchConstructor requires a graph");
+        }
         std::vector<std::shared_ptr<Station>> stations;
         for (StationInfo info : stationInfos)
         {
             std::shared_ptr<playersState::Player> owner = std::get<0>(info);
             bool isBlocked = std::get<1>(info);
             std::string name = std::get<2>(info);
-            stations.push_back(std::make_shared<Station>(name, owner, isBlocked, boost::add_vertex(*gameGraph)));
+            std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> descriptor =
+                std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+                    boost::add_vertex(*gameGraph));
+            stations.push_back(std::make_shared<Station>(name, owner, isBlocked, descriptor));
         }
         DEBUG_PRINT("Station BatchConstructor finished !");
         return stations;

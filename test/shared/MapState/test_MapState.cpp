@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_CASE(Wrapper)
       Station::genData(nullptr, false, "Station1"),
       Station::genData(nullptr, false, "Station2"),
   };
-  auto station1 = std::make_shared<Station>("Station1", nullptr, false, boost::add_vertex(test_graph));
-  auto station2 = std::make_shared<Station>("Station2", nullptr, false, boost::add_vertex(test_graph));
+  auto station1 = std::make_shared<Station>("Station1", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto station2 = std::make_shared<Station>("Station2", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   std::vector<RoadInfo> roadsInfos = {
       Road::genData(station1, station2, 1, nullptr, cardsState::ColorCard::RED, 3, false),
   };
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(Wrapper)
       Ferry::genData(station1, station2, 3, nullptr, cardsState::ColorCard::GREEN, 5, 1, false),
   };
 
-  mapState::MapState map_state = mapState::MapState(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
+  mapState::MapState map_state = mapState::MapState(nullptr, stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
   BOOST_CHECK_EQUAL(map_state.stations.size(), 2);
   BOOST_CHECK_EQUAL(map_state.roads.size(), 3); // 1 road + 1 tunnel + 1 ferry
   for (int i = 0; i < static_cast<int>(map_state.stations.size()); i++)
@@ -103,15 +103,15 @@ BOOST_AUTO_TEST_CASE(Parameterized)
   std::cout << "Parameterized Constructor Test Started ..." << std::endl;
   mapState::MapState map_state = MapState::Empty();
 
-  boost::adjacency_list<> test_graph = map_state.gameGraph;
+  boost::adjacency_list<> test_graph = boost::adjacency_list<>();
   std::vector<StationInfo> stationsInfos = {
       Station::genData(nullptr, false, "StationA"),
       Station::genData(nullptr, false, "StationB"),
       Station::genData(nullptr, false, "StationC"),
   };
-  auto stationA = std::make_shared<Station>("StationA", nullptr, false, boost::add_vertex(test_graph));
-  auto stationB = std::make_shared<Station>("StationB", nullptr, false, boost::add_vertex(test_graph));
-  auto stationC = std::make_shared<Station>("StationC", nullptr, false, boost::add_vertex(test_graph));
+  auto stationA = std::make_shared<Station>("StationA", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto stationB = std::make_shared<Station>("StationB", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto stationC = std::make_shared<Station>("StationC", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   std::vector<RoadInfo> roadsInfos = {
       Road::genData(stationA, stationB, 1, nullptr, cardsState::ColorCard::RED, 3, false),
       Road::genData(stationB, stationC, 2, nullptr, cardsState::ColorCard::BLUE, 4, true),
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(Parameterized)
       Ferry::genData(stationC, stationA, 4, nullptr, cardsState::ColorCard::YELLOW, 6, 2, true),
   };
 
-  map_state._MapState(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
+  map_state._MapState(map_state.gameGraph, stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
   BOOST_CHECK_EQUAL(map_state.stations.size(), 3);
   BOOST_CHECK_EQUAL(map_state.roads.size(), 4); // 2 roads + 1 tunnel + 1 ferry
   std::cout << "Parameterized Constructor Test Finished !\n"

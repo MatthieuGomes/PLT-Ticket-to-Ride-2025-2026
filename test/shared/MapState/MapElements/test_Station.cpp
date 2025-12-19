@@ -5,6 +5,7 @@
 #include "../../src/shared/playersState/Player.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <memory>
+#include <stdexcept>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -26,8 +27,8 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 std::string test_station_name = "TestStation";
 std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>(1, "TestPlayer", cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
 bool test_is_blocked = false;
-boost::adjacency_list<> test_graph = boost::adjacency_list<>();
-boost::adjacency_list<>::vertex_descriptor test_vertex = boost::add_vertex(test_graph);
+std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
+std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> test_vertex = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph));
 
 BOOST_AUTO_TEST_SUITE(Constructors)
 
@@ -38,7 +39,7 @@ BOOST_AUTO_TEST_CASE(Basic)
   BOOST_CHECK_EQUAL(station.owner->name, test_owner->name);
   BOOST_CHECK_EQUAL(station.isBlocked, test_is_blocked);
   BOOST_CHECK_EQUAL(station.name, test_station_name);
-  BOOST_CHECK_EQUAL(station.vertex, test_vertex);
+  BOOST_CHECK_EQUAL(*station.vertex, *test_vertex);
   std::cout << "Default Constructor Test Finished !\n"<< std::endl;
 }
 
@@ -56,7 +57,7 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
       Station::genData(test_owner1, test_is_blocked1, test_station_name1),
       Station::genData(test_owner2, test_is_blocked2, test_station_name2),
   };
-  std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationInfos, &test_graph);
+  std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationInfos, test_graph);
   BOOST_CHECK_EQUAL(stations.size(), 2);
   BOOST_CHECK_EQUAL(stations[0]->name, test_station_name1);
   BOOST_CHECK_EQUAL(stations[0]->owner->name, test_owner1->name);
@@ -65,6 +66,18 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
   BOOST_CHECK_EQUAL(stations[1]->owner->name, test_owner2->name);
   BOOST_CHECK_EQUAL(stations[1]->isBlocked, test_is_blocked2);
   std::cout << "BatchConstructor Test Finished !\n"<< std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
+{
+  std::vector<StationInfo> stationInfos = {
+      Station::genData(test_owner, test_is_blocked, "NoGraphStation")};
+  // check if exception is thrown if no graph is provided
+  BOOST_CHECK_THROW(Station::BatchConstructor(stationInfos, nullptr), std::invalid_argument);
+
+  std::shared_ptr<boost::adjacency_list<>> graph = std::make_shared<boost::adjacency_list<>>();
+  std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationInfos, graph);
+  BOOST_CHECK_EQUAL(stations.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(GenData)
@@ -115,7 +128,7 @@ BOOST_AUTO_TEST_CASE(GetBlockStatus)
 BOOST_AUTO_TEST_CASE(GetVertex)
 {
   std::cout << "GetVertex Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(*station.getVertex(), test_vertex);
+  BOOST_CHECK_EQUAL(*station.getVertex(), *test_vertex);
   std::cout << "GetVertex Test Finished !\n"<< std::endl;
 }
 
