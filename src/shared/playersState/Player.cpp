@@ -13,7 +13,7 @@ using namespace cardsState;
 using namespace mapState;
 namespace playersState
 {
-   Player::Player(int id, std::string name, ColorCard color, int score, int nbWagons, int nbStations, int nbRoads, PlayerCards *hand) : id(id), name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
+   Player::Player(int id, std::string name, ColorCard color, int score, int nbWagons, int nbStations, int nbRoads, std::shared_ptr<cardsState::PlayerCards> hand) : id(id), name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
    {
    }
 
@@ -77,12 +77,12 @@ namespace playersState
    {
       this->color = color;
    }
-   cardsState::PlayerCards *Player::getHand()
+   std::shared_ptr<cardsState::PlayerCards> Player::getHand()
    {
       return hand;
    }
 
-   void Player::setHand(cardsState::PlayerCards *hand)
+   void Player::setHand(std::shared_ptr<cardsState::PlayerCards> hand)
    {
       this->hand = hand;
    }
@@ -112,7 +112,7 @@ namespace playersState
    int Player::calculateDestinationPoints()
    {
       int total = 0;
-      for (auto *dest : completedDestinations)
+      for (auto dest : completedDestinations)
       {
          if (!dest)
             continue;
@@ -122,7 +122,7 @@ namespace playersState
       return total;
    }
 
-   bool Player::canBuildRoad(mapState::MapState *map, mapState::Station *u, mapState::Station *v)
+   bool Player::canBuildRoad(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Station> u, std::shared_ptr<mapState::Station> v)
    {
       if (!map || !u || !v)
       {
@@ -186,21 +186,21 @@ namespace playersState
       return true;
    }
 
-   int Player::getLongestPathLength(mapState::MapState *map)
+   int Player::getLongestPathLength(std::shared_ptr<mapState::MapState> map)
    {
       if (!map)
          return 0;
 
 
-      std::unordered_map<mapState::Station *, std::vector<std::pair<mapState::Station *, int>>> adj;
-      for (auto *road : map->roads)
+      std::unordered_map<std::shared_ptr<mapState::Station>, std::vector<std::pair<std::shared_ptr<mapState::Station>, int>>> adj;
+      for (std::shared_ptr<mapState::Road> road : map->roads)
       {
          if (!road)
             continue;
-         if (road->getOwner() != this)
+         if (road->getOwner() != std::make_shared<Player>(*this))
             continue;
-         mapState::Station *a = road->getStationA();
-         mapState::Station *b = road->getStationB();
+         std::shared_ptr<mapState::Station> a = road->getStationA();
+         std::shared_ptr<mapState::Station> b = road->getStationB();
          if (!a || !b)
             continue;
          adj[a].push_back({b, road->getLength()});
@@ -211,15 +211,15 @@ namespace playersState
          return 0;
 
 
-      std::function<int(mapState::Station *, std::unordered_set<mapState::Station *> &)> dfs;
-      dfs = [&](mapState::Station *current, std::unordered_set<mapState::Station *> &visited) -> int {
+      std::function<int(std::shared_ptr<mapState::Station>, std::unordered_set<std::shared_ptr<mapState::Station>> &)> dfs;
+      dfs = [&](std::shared_ptr<mapState::Station> current, std::unordered_set<std::shared_ptr<mapState::Station>> &visited) -> int {
          int best = 0;
          auto it = adj.find(current);
          if (it == adj.end())
             return 0;
-         for (auto &p : it->second)
+         for (std::pair<std::shared_ptr<mapState::Station>, int> p : it->second)
          {
-            mapState::Station *nbr = p.first;
+            std::shared_ptr<mapState::Station> nbr = p.first;
             int w = p.second;
             if (visited.find(nbr) != visited.end())
                continue;
@@ -234,10 +234,10 @@ namespace playersState
 
       int longest = 0;
 
-      for (auto &kv : adj)
+      for (std::pair<std::shared_ptr<mapState::Station>, std::vector<std::pair<std::shared_ptr<mapState::Station>, int>>> kv : adj)
       {
-         mapState::Station *start = kv.first;
-         std::unordered_set<mapState::Station *> visited;
+         std::shared_ptr<mapState::Station> start = kv.first;
+         std::unordered_set<std::shared_ptr<mapState::Station>> visited;
          visited.insert(start);
          int len = dfs(start, visited);
          if (len > longest)
@@ -247,13 +247,13 @@ namespace playersState
       return longest;
    }
 
-   std::vector<mapState::Road *> Player::getClaimableRoads(mapState::MapState *map)
+   std::vector<std::shared_ptr<mapState::Road>> Player::getClaimableRoads(std::shared_ptr<mapState::MapState> map)
    {
-      std::vector<mapState::Road *> claimable;
+      std::vector<std::shared_ptr<mapState::Road>> claimable;
 
       if (!map)
          return claimable;
-      for (const std::shared_ptr<mapState::Road> &road : map->roads)
+      for (std::shared_ptr<mapState::Road> road : map->roads)
       {
 
          if (!road)
@@ -261,17 +261,17 @@ namespace playersState
          if (road->getBlockStatus())
             continue;
 
-         mapState::Station *u = nullptr;
-         mapState::Station *v = nullptr;
+         std::shared_ptr<mapState::Station> u = nullptr;
+         std::shared_ptr<mapState::Station> v = nullptr;
 
-         for (const std::shared_ptr<mapState::Station> &s : map->stations)
+         for (std::shared_ptr<mapState::Station> s : map->stations)
          {
             if (!s)
                continue;
             if (s == road->stationA)
-               u = s.get();
+               u = s;
             else if (s == road->stationB)
-               v = s.get();
+               v = s;
             if (u && v)
                break;
          }
@@ -281,7 +281,7 @@ namespace playersState
 
          if (canBuildRoad(map, u, v))
          {
-            claimable.push_back(road.get());
+            claimable.push_back(road);
          }
       }
       return claimable;
@@ -325,7 +325,7 @@ namespace playersState
    }
 
    template <class CardType>
-   void Player::drawCard(cardsState::CardsState* cardsState, CardType *card, int number)
+   void Player::drawCard(std::shared_ptr<cardsState::CardsState> cardsState, std::shared_ptr<CardType> card, int number)
    {
       hand->takeCard<CardType>(cardsState, card, number);
    }

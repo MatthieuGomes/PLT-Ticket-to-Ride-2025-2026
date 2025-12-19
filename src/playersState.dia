@@ -147,13 +147,13 @@
         <dia:point val="10.4315,21.5654"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10.3815,21.5154;29.0765,27.4154"/>
+        <dia:rectangle val="10.3815,21.5154;35.2365,27.4154"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="10.4315,21.5654"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="18.594999999999999"/>
+        <dia:real val="24.755000000000003"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="5.8000000000000007"/>
@@ -255,7 +255,7 @@
             <dia:string>#players#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#std::vector&lt;Player*&gt;#</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;Player&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -314,7 +314,7 @@ constructor#</dia:string>
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#std::vector&lt;Player*&gt;#</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;Player&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -370,7 +370,7 @@ constructor#</dia:string>
                 <dia:string>#players#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#std::vector&lt;Player*&gt;#</dia:string>
+                <dia:string>#std::vector&lt;std::shared_ptr&lt;Player&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -427,16 +427,16 @@ Method - print the players state #</dia:string>
         <dia:point val="50.9652,14.4296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="50.9152,14.3796;81.5452,49.8796"/>
+        <dia:rectangle val="50.9152,14.3796;91.9402,51.4796"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="50.9652,14.4296"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="30.530000000000001"/>
+        <dia:real val="40.924999999999997"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="35.400000000000013"/>
+        <dia:real val="37.000000000000014"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#Player#</dia:string>
@@ -703,7 +703,7 @@ Method - print the players state #</dia:string>
             <dia:string>#hand#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#cardsState::PlayerCards*#</dia:string>
+            <dia:string>#std::shared_ptr&lt;cardsState::PlayerCards&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -726,7 +726,7 @@ Method - print the players state #</dia:string>
             <dia:string>#completedDestinations#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#std::vector&lt;cardsState::DestinationCard*&gt; #</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;cardsState::DestinationCard&gt;&gt; #</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -908,7 +908,7 @@ constructor
                 <dia:string>#hand#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#cardsState::PlayerCards*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;cardsState::PlayerCards&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1153,7 +1153,7 @@ Method - getter nbRoads
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#cardsState::PlayerCards*#</dia:string>
+            <dia:string>#std::shared_ptr&lt;cardsState::PlayerCards&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -1558,7 +1558,7 @@ Method - setter nbRoads
                 <dia:string>#hand #</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#cardsState::PlayerCards*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;cardsState::PlayerCards&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1800,7 +1800,7 @@ Method - calculate player destinations points
                 <dia:string>#map#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::MapState*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;mapState::MapState&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1817,7 +1817,7 @@ Method - calculate player destinations points
                 <dia:string>#u#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::Station*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;mapState::Station&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1834,7 +1834,7 @@ Method - calculate player destinations points
                 <dia:string>#v#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::Station*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;mapState::Station&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1882,7 +1882,7 @@ Method - calculate player destinations points
                 <dia:string>#map#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::MapState*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;mapState::MapState&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1933,7 +1933,7 @@ Method - calculate the longet path  of a player
                 <dia:string>#map#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::MapState*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;mapState::MapState&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1955,7 +1955,7 @@ Method - calculate the longet path  of a player
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#std::vector&lt;mapState::Road*&gt;#</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -1981,7 +1981,7 @@ Method - calculate the longet path  of a player
                 <dia:string>#map#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#mapState::MapState*#</dia:string>
+                <dia:string>#std::shared_ptr&lt;mapState::MapState&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2093,7 +2093,7 @@ Method - display  the informations of  a  player
                 <dia:string>#cardsState#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#cardsState::CardsState *#</dia:string>
+                <dia:string>#std::shared_ptr&lt;cardsState::CardsState&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2110,7 +2110,7 @@ Method - display  the informations of  a  player
                 <dia:string>#card#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#CardType *#</dia:string>
+                <dia:string>#std::shared_ptr&lt;CardType&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>#nullptr#</dia:string>
@@ -2149,19 +2149,19 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O3">
       <dia:attribute name="obj_pos">
-        <dia:point val="29.076,24.4654"/>
+        <dia:point val="35.236,24.4654"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="28.326,23.7054;50.966,32.9696"/>
+        <dia:rectangle val="34.486,23.7054;50.9713,33.7696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="29.076,24.4654"/>
+        <dia:point val="35.236,24.4654"/>
         <dia:point val="43.2133,24.4654"/>
-        <dia:point val="43.2133,32.1296"/>
-        <dia:point val="50.916,32.1296"/>
+        <dia:point val="43.2133,32.9296"/>
+        <dia:point val="50.9213,32.9296"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2273,17 +2273,17 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O5">
       <dia:attribute name="obj_pos">
-        <dia:point val="66.2302,14.3793"/>
+        <dia:point val="71.4277,14.3794"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="26.1212,-14.3021;66.9802,15.1793"/>
+        <dia:rectangle val="26.1212,-14.3021;72.1777,15.1794"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="66.2302,14.3793"/>
-        <dia:point val="66.2302,-2.83226"/>
+        <dia:point val="71.4277,14.3794"/>
+        <dia:point val="71.4277,-2.83226"/>
         <dia:point val="26.1712,-2.83226"/>
         <dia:point val="26.1712,-14.2521"/>
       </dia:attribute>
@@ -2695,18 +2695,18 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O9">
       <dia:attribute name="obj_pos">
-        <dia:point val="81.5457,32.1296"/>
+        <dia:point val="91.9405,32.9296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="80.7957,-26.0366;95.0916,32.9696"/>
+        <dia:rectangle val="91.1905,-26.0366;95.0916,33.7696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="81.5457,32.1296"/>
-        <dia:point val="88.6436,32.1296"/>
-        <dia:point val="88.6436,-25.2766"/>
+        <dia:point val="91.9405,32.9296"/>
+        <dia:point val="93.8411,32.9296"/>
+        <dia:point val="93.8411,-25.2766"/>
         <dia:point val="95.0416,-25.2766"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -2775,18 +2775,18 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O10">
       <dia:attribute name="obj_pos">
-        <dia:point val="81.5457,32.1296"/>
+        <dia:point val="91.9405,32.9296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="80.7957,-20.4244;108.387,32.9696"/>
+        <dia:rectangle val="91.1905,-20.4244;108.387,33.7696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="81.5457,32.1296"/>
-        <dia:point val="95.2912,32.1296"/>
-        <dia:point val="95.2912,-19.6644"/>
+        <dia:point val="91.9405,32.9296"/>
+        <dia:point val="100.489,32.9296"/>
+        <dia:point val="100.489,-19.6644"/>
         <dia:point val="108.337,-19.6644"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -3013,17 +3013,17 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O13">
       <dia:attribute name="obj_pos">
-        <dia:point val="66.2302,14.3793"/>
+        <dia:point val="71.4277,14.3793"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="65.4802,10.6739;140.702,15.1793"/>
+        <dia:rectangle val="70.6777,10.6739;140.702,15.1793"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="66.2302,14.3793"/>
-        <dia:point val="66.2302,12.2016"/>
+        <dia:point val="71.4277,14.3793"/>
+        <dia:point val="71.4277,12.2016"/>
         <dia:point val="140.502,12.2016"/>
         <dia:point val="140.502,10.7239"/>
       </dia:attribute>
@@ -3207,18 +3207,18 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O15">
       <dia:attribute name="obj_pos">
-        <dia:point val="81.4952,36.5296"/>
+        <dia:point val="91.8902,36.5296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="80.7452,21.0865;135.526,37.3696"/>
+        <dia:rectangle val="91.1402,21.0865;135.526,37.3696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="81.4952,36.5296"/>
-        <dia:point val="108.835,36.5296"/>
-        <dia:point val="108.835,21.8465"/>
+        <dia:point val="91.8902,36.5296"/>
+        <dia:point val="114.033,36.5296"/>
+        <dia:point val="114.033,21.8465"/>
         <dia:point val="135.476,21.8465"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -3639,17 +3639,17 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O19">
       <dia:attribute name="obj_pos">
-        <dia:point val="50.9147,32.1296"/>
+        <dia:point val="50.9149,32.9296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="37.5832,-23.6682;51.6647,32.9696"/>
+        <dia:rectangle val="37.5832,-23.6682;51.6649,33.7696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="50.9147,32.1296"/>
-        <dia:point val="43.924,32.1296"/>
+        <dia:point val="50.9149,32.9296"/>
+        <dia:point val="43.924,32.9296"/>
         <dia:point val="43.924,-22.9082"/>
         <dia:point val="37.6332,-22.9082"/>
       </dia:attribute>
@@ -3719,17 +3719,17 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O20">
       <dia:attribute name="obj_pos">
-        <dia:point val="66.2302,14.3793"/>
+        <dia:point val="71.4277,14.3793"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="51.9914,-20.2928;66.9802,15.1793"/>
+        <dia:rectangle val="51.9914,-20.2928;72.1777,15.1793"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="66.2302,14.3793"/>
-        <dia:point val="66.2302,-3.28175"/>
+        <dia:point val="71.4277,14.3793"/>
+        <dia:point val="71.4277,-3.28175"/>
         <dia:point val="52.0414,-3.28175"/>
         <dia:point val="52.0414,-20.2428"/>
       </dia:attribute>
@@ -3799,17 +3799,17 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O21">
       <dia:attribute name="obj_pos">
-        <dia:point val="66.2302,14.3793"/>
+        <dia:point val="71.4277,14.3793"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="65.4802,-21.8062;69.1305,15.1793"/>
+        <dia:rectangle val="68.8805,-21.8062;72.1777,15.1793"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="66.2302,14.3793"/>
-        <dia:point val="66.2302,-4.03845"/>
+        <dia:point val="71.4277,14.3793"/>
+        <dia:point val="71.4277,-4.03845"/>
         <dia:point val="68.9305,-4.03845"/>
         <dia:point val="68.9305,-21.7562"/>
       </dia:attribute>
@@ -4002,17 +4002,17 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O23">
       <dia:attribute name="obj_pos">
-        <dia:point val="66.2302,14.3793"/>
+        <dia:point val="71.4277,14.3793"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="65.4802,-18.7501;77.9202,15.1793"/>
+        <dia:rectangle val="70.6777,-18.7501;77.9202,15.1793"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="66.2302,14.3793"/>
-        <dia:point val="66.2302,-2.5104"/>
+        <dia:point val="71.4277,14.3793"/>
+        <dia:point val="71.4277,-2.5104"/>
         <dia:point val="77.7202,-2.5104"/>
         <dia:point val="77.7202,-18.7001"/>
       </dia:attribute>

@@ -23,7 +23,7 @@ namespace playersState {
             return;
         }
 
-        for (Player* player : players) {
+        for (std::shared_ptr<Player> player : players) {
             cout << "-----------------------------" << endl;
             player->display();
 
