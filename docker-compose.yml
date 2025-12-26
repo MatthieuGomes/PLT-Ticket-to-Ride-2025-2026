@@ -17,8 +17,8 @@ services:
       - ./:/app
       - $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ~/.ssh:/home/${username:-plt}/.ssh:ro
-      - ~/.gitconfig:/home/${username:-plt}/.gitconfig:ro
+      - $HOME/.ssh:/home/${username:-plt}/.ssh:ro
+      - $HOME/.gitconfig:/home/${username:-plt}/.gitconfig:ro
       # - /dev/dri:/dev/dri:cached
     tty: true
     environment:
