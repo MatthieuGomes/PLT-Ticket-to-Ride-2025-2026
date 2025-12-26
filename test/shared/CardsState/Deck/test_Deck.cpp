@@ -3,7 +3,7 @@
 #include "../../src/shared/cardsState/CardsState.h"
 #include "../../src/shared/cardsState/Deck.h"
 
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 #if DEBUG_MODE == true
 #define DEBUG
 #define DEBUG_PRINT(x) std::cout << x << std::endl
@@ -62,13 +62,12 @@ BOOST_AUTO_TEST_CASE(Default)
 {
     {
         std::cout << "Deck Default Constructor<WagonCard> Test Started ..." << std::endl;
-        std::vector<WagonCardInfos> cardArgs = {ColorCard::RED, ColorCard::BLUE};
         WagonCard card1(test_colors[0]);
         WagonCard card2(test_colors[1]);
         std::vector<std::shared_ptr<WagonCard>> cardsVec = std::vector<std::shared_ptr<WagonCard>>{std::make_shared<WagonCard>(card1), std::make_shared<WagonCard>(card2)};
         Deck<WagonCard> deck(cardsVec);
-        BOOST_CHECK_EQUAL(deck.countCards(), sizeof(test_colors) / sizeof(ColorCard));
-        for (unsigned int i = 0; i < static_cast<int>(sizeof(test_colors)) / sizeof(ColorCard); i++)
+                                        BOOST_CHECK_EQUAL(deck.countCards(),test_colors.size());
+                for (unsigned int i = 0; i < static_cast<unsigned int>(test_colors.size()); i++)
         {
             BOOST_CHECK_EQUAL(deck.cards[i]->color, test_colors[i]);
         }

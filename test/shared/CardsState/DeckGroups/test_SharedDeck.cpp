@@ -120,24 +120,23 @@ BOOST_AUTO_TEST_CASE(DrawCardFromFaceUpWagon)
     faceDownV.emplace_back(std::make_shared<WagonCard>(ColorCard::BLUE));
     faceDownV.emplace_back(std::make_shared<WagonCard>(ColorCard::GREEN));
     faceDownV.emplace_back(std::make_shared<WagonCard>(ColorCard::YELLOW));
-    cardsState::SharedDeck<WagonCard> deck(trashV, faceUpV, faceDownV);
+    cardsState::SharedDeck<WagonCard> sharedDecks(trashV, faceUpV, faceDownV);
     std::vector<std::shared_ptr<DestinationCard>> playerDest;
     std::vector<std::shared_ptr<WagonCard>> playerWagon;
-    PlayerCards player(playerDest, playerWagon);
+    std::shared_ptr<PlayerCards> playerCards = std::make_shared<PlayerCards>(playerDest, playerWagon);
 
-    BOOST_CHECK_EQUAL(deck.faceUpCards->countCards(), 2);
-    BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 3);
-    BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 0);
+    BOOST_CHECK_EQUAL(sharedDecks.faceUpCards->countCards(), 2);
+    BOOST_CHECK_EQUAL(sharedDecks.faceDownCards->countCards(), 3);
+    BOOST_CHECK_EQUAL(playerCards->wagonCards->countCards(), 0);
+    auto cardToDraw = sharedDecks.faceUpCards->cards[0];
 
-    auto cardToDraw = deck.faceUpCards->cards[0];
+    sharedDecks.drawCard(playerCards, cardToDraw);
 
-    // deck.drawCard(cardToDraw, &player);
-
-    BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 1);
-    BOOST_CHECK_EQUAL(player.wagonCards->cards[0]->getColor(), ColorCard::RED);
-    BOOST_CHECK_EQUAL(deck.faceUpCards->countCards(), 2);
-    BOOST_CHECK_EQUAL(deck.faceUpCards->cards.back()->getColor(), ColorCard::YELLOW);
-    BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
+    BOOST_CHECK_EQUAL(playerCards->wagonCards->countCards(), 1);
+    BOOST_CHECK_EQUAL(playerCards->wagonCards->cards[0]->getColor(), ColorCard::RED);
+    BOOST_CHECK_EQUAL(sharedDecks.faceUpCards->countCards(), 1);
+    BOOST_CHECK_EQUAL(sharedDecks.faceUpCards->cards.back()->getColor(), ColorCard::LOCOMOTIVE);
+    BOOST_CHECK_EQUAL(sharedDecks.faceDownCards->countCards(), 3);
     std::cout << "DrawCardFromFaceUpWagon Test Finished !\n" << std::endl;
 }
 BOOST_AUTO_TEST_CASE(DrawCardFaceDownCorrectBehavior)
@@ -157,16 +156,16 @@ BOOST_AUTO_TEST_CASE(DrawCardFaceDownCorrectBehavior)
 
     std::vector<std::shared_ptr<DestinationCard>> playerDest;
     std::vector<std::shared_ptr<WagonCard>> playerWagon;
-    PlayerCards player(playerDest, playerWagon);
+    std::shared_ptr<PlayerCards> player = std::make_shared<PlayerCards>(playerDest, playerWagon);
     BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 2);
     BOOST_CHECK_EQUAL(deck.trash->countCards(), 3);
-    BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 0);
+    BOOST_CHECK_EQUAL(player->wagonCards->countCards(), 0);
 
-    // deck.drawCard(10, &player);
+    deck.drawCard(player,nullptr,2);
 
-    BOOST_CHECK_EQUAL(player.wagonCards->countCards(), 5);
+    BOOST_CHECK_EQUAL(player->wagonCards->countCards(), 2);
     BOOST_CHECK_EQUAL(deck.faceDownCards->countCards(), 0);
-    BOOST_CHECK_EQUAL(deck.trash->countCards(), 0);
+    BOOST_CHECK_EQUAL(deck.trash->countCards(), 3);
     std::cout << "DrawCardFaceDownCorrectBehavior Test Finished !\n" << std::endl;
 }
 
