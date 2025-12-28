@@ -6,18 +6,15 @@
 #include "DestinationCard.h"
 #include "WagonCard.h"
 #include <boost/type_index.hpp>
+#include "mapState/Station.h"
 
 
-using DestinationCardInfos = std::tuple< std::shared_ptr<mapState::Station> ,std::shared_ptr<mapState::Station> , int>;
+using DestinationCardInfos = std::tuple<std::shared_ptr<mapState::Station>,std::shared_ptr<mapState::Station>, int>;
 using WagonCardInfos = cardsState::ColorCard;
 
 namespace cardsState
 {
     // class Deck -
-    template  <class CardType>
-      std::vector<std::shared_ptr<CardType>> Deck<CardType>::getCards() {
-        return cards;
-    }
 
     template <>
     Deck<WagonCard>::Deck(std::vector<ColorCard> wagonCardsInfos)
@@ -69,6 +66,11 @@ namespace cardsState
         {
             this->cards = {};
         }
+    }
+
+    template  <class CardType>
+    std::vector<std::shared_ptr<CardType>> Deck<CardType>::getCards() {
+        return cards;
     }
 
     template <class CardType>
