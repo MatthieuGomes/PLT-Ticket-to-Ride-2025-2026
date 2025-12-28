@@ -1,6 +1,4 @@
-
 #include <boost/test/unit_test.hpp>
-
 #include "../../src/shared/playersState/PlayersState.h"
 
 #define DEBUG_MODE false
@@ -13,34 +11,154 @@
 
 using namespace playersState;
 
+int test_init_player1_id = 1 ;
+std::string test_init_player1_name = "Alice" ;
+cardsState::ColorCard test_init_player1_color  = cardsState::ColorCard::RED;
+int test_init_player1_score = 23 ;
+int test_init_player1_nbWagons= 21  ;
+int test_init_player1_nbStations = 10 ;
+int test_init_player1_nbRoads = 5 ;
+
+int test_init_player2_id = 2 ;
+std::string test_init_player2_name = "Bob" ;
+cardsState::ColorCard test_init_player2_color  = cardsState::ColorCard::BLUE;
+int test_init_player2_score = 22 ;
+int test_init_player2_nbWagons= 20  ;
+int test_init_player2_nbStations = 9 ;
+int test_init_player2_nbRoads = 6 ;
+
+
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
   BOOST_CHECK(1);
 }
 
+
+BOOST_AUTO_TEST_SUITE(Operations)
+
+
+BOOST_AUTO_TEST_SUITE(Internal)
+
+
 BOOST_AUTO_TEST_SUITE(Constructors)
 
+BOOST_AUTO_TEST_CASE(TestConstructor)
+{
+  PlayersState ps;
+  BOOST_CHECK(ps.getPlayers().empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
 
 BOOST_AUTO_TEST_SUITE(Getters)
 
+BOOST_AUTO_TEST_CASE(GetPlayers_ShouldReturnCurrentVector)
+{
+  PlayersState ps;
+
+  auto dest = std::make_shared<cardsState::DestinationCard>("paris", "berlin", 12);
+  auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
+
+  std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
+  std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {wagon};
+
+  auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+  auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+
+  auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
+                                     test_init_player1_score, test_init_player1_nbWagons,
+                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+  auto p2 = std::make_shared<Player>(test_init_player2_id, test_init_player2_name, test_init_player2_color,
+                                     test_init_player2_score, test_init_player2_nbWagons,
+                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+
+  std::vector<std::shared_ptr<Player>> v = {p1, p2};
+  ps.setPlayers(v);
+
+  auto result = ps.getPlayers();
+  BOOST_CHECK_EQUAL(result.size(), 2);
+  BOOST_CHECK(result[0] == p1);
+  BOOST_CHECK(result[1] == p2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(Setters)
 
+BOOST_AUTO_TEST_CASE(SetPlayers_ShouldOverrideVectorContent)
+{
+  PlayersState ps;
+
+  auto dest = std::make_shared<cardsState::DestinationCard>("paris", "berlin", 12);
+  auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
+
+  std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
+  std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {wagon};
+
+  auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+  auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+
+  auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
+                                     test_init_player1_score, test_init_player1_nbWagons,
+                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+  auto p2 = std::make_shared<Player>(test_init_player2_id, test_init_player2_name, test_init_player2_color,
+                                     test_init_player2_score, test_init_player2_nbWagons,
+                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+
+  ps.setPlayers({p1, p2});
+
+  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(Operations)
-
-BOOST_AUTO_TEST_SUITE(Internal)
-
-BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Interactions)
+
+BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
+{
+  PlayersState ps;
+
+  auto dest = std::make_shared<cardsState::DestinationCard>("paris", "berlin", 12);
+  auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
+
+  std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
+  std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {wagon};
+
+  auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+  auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+
+  auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
+                                     test_init_player1_score, test_init_player1_nbWagons,
+                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+  auto p2 = std::make_shared<Player>(test_init_player2_id, test_init_player2_name, test_init_player2_color,
+                                     test_init_player2_score, test_init_player2_nbWagons,
+                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+
+  ps.setPlayers({p1, p2});
+
+  std::stringstream buffer;
+  std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+  ps.printPlayersState();
+
+  std::cout.rdbuf(old);
+
+  std::string out = buffer.str();
+
+  BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
+  BOOST_CHECK(out.find("-----------------------------") != std::string::npos);
+  BOOST_CHECK(out.find("Alice") != std::string::npos);
+  BOOST_CHECK(out.find("Bob") != std::string::npos);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

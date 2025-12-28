@@ -106,7 +106,7 @@ namespace playersState
 
    void Player::addScore(int points)
    {
-      score += points;
+      this->score += points;
    }
 
    int Player::calculateDestinationPoints()
@@ -168,7 +168,7 @@ namespace playersState
 
       for (std::shared_ptr<cardsState::WagonCard> card : hand->wagonCards->cards)
       {
-         if (card->color == requiredColor || requiredColor == cardsState::ColorCard::LOCOMOTIVE)
+         if (card->color == requiredColor || card->color == cardsState::ColorCard::LOCOMOTIVE)
          {
             cardsCorrectColor.push_back(card);
          }

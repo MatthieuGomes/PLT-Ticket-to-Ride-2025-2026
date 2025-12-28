@@ -10,7 +10,16 @@ namespace playersState {
 
     }
 
+    std::vector<std::shared_ptr<Player>> PlayersState::getPlayers ()
+    {
+        return this->players;
 
+    }
+    void PlayersState::setPlayers (std::vector<std::shared_ptr<Player>> players)
+    {
+        this->players = players;
+
+    }
     void PlayersState::printPlayersState() {
 
         std::cout << "\n";
