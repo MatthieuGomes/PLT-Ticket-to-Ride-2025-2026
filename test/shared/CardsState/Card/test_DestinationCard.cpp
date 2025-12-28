@@ -10,6 +10,28 @@
 
 using namespace cardsState;
 using namespace mapState;
+#include "cardsState/DestinationCard.h"
+
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
+
+using namespace ::cardsState;
+
+BOOST_AUTO_TEST_CASE(TestStaticAssert)
+{
+  BOOST_CHECK(1);
+}
+
+BOOST_AUTO_TEST_SUITE(Constructor)
+
+// ADD TESTS FOR CONSTRUCTOR
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
 

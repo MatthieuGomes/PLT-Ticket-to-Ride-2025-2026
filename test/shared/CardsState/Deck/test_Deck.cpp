@@ -13,17 +13,39 @@
 
 using namespace ::cardsState;
 
+// MISSING TESTS FOR TRASH, FACEUP, FACEDOWN DECKS !!!
+
 
 using WagonCardInfos = cardsState::ColorCard;
-using DestinationCardInfos =std::tuple<std::shared_ptr<mapState::Station>,std::shared_ptr<mapState::Station>,int>;
+using DestinationCardInfos =std::tuple<std::shared_ptr<mapState::Station>,std::shared_ptr<mapState::Station>, int>;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
     BOOST_CHECK(1);
 }
 
+// ADD STRUCTURE (std::cout) TO ALL TESTS
 BOOST_AUTO_TEST_SUITE(Constructors)
 std::vector<WagonCardInfos> test_colors = {ColorCard::RED, ColorCard::BLUE};
+// ADD TESTS FOR OTHER CONSTRUCTORS
+BOOST_AUTO_TEST_CASE(Default)
+{
+    {
+        std::cout << "Deck Default Constructor<WagonCard> Test Started ..." << std::endl;
+        WagonCard card1(test_colors[0]);
+        WagonCard card2(test_colors[1]);
+        std::vector<std::shared_ptr<WagonCard>> cardsVec = std::vector<std::shared_ptr<WagonCard>>{std::make_shared<WagonCard>(card1), std::make_shared<WagonCard>(card2)};
+        Deck<WagonCard> deck(cardsVec);
+                                        BOOST_CHECK_EQUAL(deck.countCards(),test_colors.size());
+                for (unsigned int i = 0; i < static_cast<unsigned int>(test_colors.size()); i++)
+        {
+            BOOST_CHECK_EQUAL(deck.cards[i]->color, test_colors[i]);
+        }
+        std::cout << "Deck Default Constructor<WagonCard> Test Finished !\n"
+                  << std::endl;
+    }
+    // ADD TEST FOR DESTINATION CARD DECK
+}
 
 BOOST_AUTO_TEST_CASE(BatchWagonDeck)
 {
@@ -89,25 +111,6 @@ BOOST_AUTO_TEST_CASE(BatchDestinationDeck)
     BOOST_CHECK_EQUAL(deck.cards[1]->getPoints(), 7);
 }
 
-
-BOOST_AUTO_TEST_CASE(Default)
-{
-    {
-        std::cout << "Deck Default Constructor<WagonCard> Test Started ..." << std::endl;
-        WagonCard card1(test_colors[0]);
-        WagonCard card2(test_colors[1]);
-        std::vector<std::shared_ptr<WagonCard>> cardsVec = std::vector<std::shared_ptr<WagonCard>>{std::make_shared<WagonCard>(card1), std::make_shared<WagonCard>(card2)};
-        Deck<WagonCard> deck(cardsVec);
-                                        BOOST_CHECK_EQUAL(deck.countCards(),test_colors.size());
-                for (unsigned int i = 0; i < static_cast<unsigned int>(test_colors.size()); i++)
-        {
-            BOOST_CHECK_EQUAL(deck.cards[i]->color, test_colors[i]);
-        }
-        std::cout << "Deck Default Constructor<WagonCard> Test Finished !\n"
-                  << std::endl;
-    }
-}
-
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
@@ -128,9 +131,26 @@ BOOST_AUTO_TEST_CASE(getCards)
     BOOST_CHECK_EQUAL(returnedCards[1]->color, cardArgs[1]);
 }
 
+// ADD TESTS FOR GetCardByTypeName, countCards
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Setters)
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Operations)
+
+BOOST_AUTO_TEST_SUITE(Internal)
+
+// ADD TESTS FOR addCard, removeCard, putCardBack, takeLastCard
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Interactions)
+
+// ADD TESTS FOR moveCardTo
 
 BOOST_AUTO_TEST_SUITE_END()
 

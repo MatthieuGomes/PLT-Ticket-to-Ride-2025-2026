@@ -19,13 +19,15 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 BOOST_AUTO_TEST_SUITE(Constructors)
-BOOST_AUTO_TEST_CASE(DefaultConstructor)
+BOOST_AUTO_TEST_CASE(Default)
 {
+  std::cout << "CardsState Default Constructor Test Started ..." << std::endl;
   CardsState state;
 
   BOOST_CHECK(state.gameDestinationCards);
   BOOST_CHECK(state.gameWagonCards);
   BOOST_CHECK(state.playersCards.empty());
+  std::cout << "CardsState Default Constructor Test Finished !\n" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

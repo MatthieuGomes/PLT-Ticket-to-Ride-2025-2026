@@ -1,14 +1,17 @@
 #include <iostream>
 
 #include "DestinationCard.h"
-#include "mapState/Station.h"
+#include "mapState/MapState.h"
 
 
 
 namespace cardsState {
 
     DestinationCard::DestinationCard(std::shared_ptr<mapState::Station> stationA, std::shared_ptr<mapState::Station> stationB, int points)
-      : stationA(stationA), stationB(stationB), points(points) {}
+      : stationA(stationA), stationB(stationB), points(points) {
+            
+
+    }
 
 
 
