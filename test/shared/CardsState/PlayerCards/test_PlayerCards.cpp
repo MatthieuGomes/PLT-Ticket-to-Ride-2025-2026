@@ -21,8 +21,6 @@ BOOST_AUTO_TEST_CASE(Constructor_WithSharedPtrVectors)
     std::vector<std::shared_ptr<DestinationCard>> destinationCards;
     std::vector<std::shared_ptr<WagonCard>> wagonCards;
 
-    auto d1 = std::make_shared<DestinationCard>("Paris", "Lyon", 5);
-    auto w1 = std::make_shared<WagonCard>(ColorCard::RED);
 
     destinationCards.push_back(d1);
     wagonCards.push_back(w1);
