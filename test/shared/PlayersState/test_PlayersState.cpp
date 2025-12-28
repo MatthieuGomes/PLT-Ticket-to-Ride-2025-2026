@@ -10,6 +10,7 @@
 #endif
 
 using namespace playersState;
+using namespace mapState;
 
 int test_init_player1_id = 1 ;
 std::string test_init_player1_name = "Alice" ;
@@ -26,6 +27,33 @@ int test_init_player2_score = 22 ;
 int test_init_player2_nbWagons= 20  ;
 int test_init_player2_nbStations = 9 ;
 int test_init_player2_nbRoads = 6 ;
+
+std::string test_stationA_name = "Paris";
+std::string test_stationB_name = "Rome";
+int test_points = 12;
+
+std::shared_ptr<playersState::Player> test_owner =
+    std::make_shared<playersState::Player>(1, "TestPlayer",
+        cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
+
+bool test_is_blocked = false;
+
+
+std::shared_ptr<boost::adjacency_list<>> graph =
+    std::make_shared<boost::adjacency_list<>>();
+
+std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexA = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+    boost::add_vertex(*graph));
+
+std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexB = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+    boost::add_vertex(*graph));
+
+
+std::shared_ptr<Station> stationA =
+    std::make_shared<Station>(test_stationA_name, test_owner, test_is_blocked, vertexA);
+
+std::shared_ptr<Station> stationB =
+    std::make_shared<Station>(test_stationB_name, test_owner, test_is_blocked, vertexB);
 
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
@@ -59,13 +87,13 @@ BOOST_AUTO_TEST_CASE(GetPlayers_ShouldReturnCurrentVector)
 {
   PlayersState ps;
 
-  auto dest = std::make_shared<cardsState::DestinationCard>("paris", "berlin", 12);
+  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12);
   auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
 
   std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
   std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {wagon};
 
-  auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+ auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
   auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
 
   auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
@@ -93,7 +121,7 @@ BOOST_AUTO_TEST_CASE(SetPlayers_ShouldOverrideVectorContent)
 {
   PlayersState ps;
 
-  auto dest = std::make_shared<cardsState::DestinationCard>("paris", "berlin", 12);
+  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12);
   auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
 
   std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
@@ -116,9 +144,11 @@ BOOST_AUTO_TEST_CASE(SetPlayers_ShouldOverrideVectorContent)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // GettersAndSetters
+BOOST_AUTO_TEST_SUITE_END() // Internal
+BOOST_AUTO_TEST_SUITE_END() // Operations
+
 
 
 BOOST_AUTO_TEST_SUITE(Interactions)
@@ -127,7 +157,7 @@ BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
 {
   PlayersState ps;
 
-  auto dest = std::make_shared<cardsState::DestinationCard>("paris", "berlin", 12);
+  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB,  12);
   auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
 
   std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
@@ -159,8 +189,6 @@ BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
   BOOST_CHECK(out.find("Alice") != std::string::npos);
   BOOST_CHECK(out.find("Bob") != std::string::npos);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
 

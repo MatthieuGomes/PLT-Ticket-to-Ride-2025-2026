@@ -13,8 +13,9 @@
 
 using namespace ::cardsState;
 
-using DestinationCardInfos = std::tuple<std::string, std::string, int>;
+
 using WagonCardInfos = cardsState::ColorCard;
+using DestinationCardInfos =std::tuple<std::shared_ptr<mapState::Station>,std::shared_ptr<mapState::Station>,int>;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
@@ -38,25 +39,56 @@ BOOST_AUTO_TEST_CASE(BatchWagonDeck)
         BOOST_CHECK_EQUAL(deck.cards[i]->color, cardArgs[i]);
     }
 }
-
 BOOST_AUTO_TEST_CASE(BatchDestinationDeck)
 {
-    std::vector<DestinationCardInfos> cardArgs = {DestinationCardInfos("Paris", "Lyon", 5), DestinationCardInfos("Berlin", "Munich", 7)};
-    Deck<DestinationCard> deck(
-        cardArgs);
+    using namespace mapState;
+
+    // ---- Graph ----
+    auto graph = std::make_shared<boost::adjacency_list<>>();
+
+    auto v1 = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+    auto v2 = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+    auto v3 = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+    auto v4 = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+
+    // ---- Owner ----
+    auto owner = std::make_shared<playersState::Player>(
+        1, "TestPlayer", ColorCard::RED, 0, 45, 3, 5, nullptr);
+
+    bool blocked = false;
+
+    // ---- Stations ----
+    auto paris   = std::make_shared<Station>("Paris", owner, blocked, v1);
+    auto lyon    = std::make_shared<Station>("Lyon", owner, blocked, v2);
+    auto berlin  = std::make_shared<Station>("Berlin", owner, blocked, v3);
+    auto munich  = std::make_shared<Station>("Munich", owner, blocked, v4);
+
+    // ---- Destination cards infos ----
+    std::vector<DestinationCardInfos> cardArgs = {
+        {paris, lyon, 5},
+        {berlin, munich, 7}
+    };
+
+    Deck<DestinationCard> deck(cardArgs);
+
     BOOST_CHECK_EQUAL(deck.countCards(), 2);
 
     BOOST_REQUIRE(deck.cards[0]);
     BOOST_REQUIRE(deck.cards[1]);
 
-    BOOST_CHECK_EQUAL(deck.cards[0]->stationA, "Paris");
-    BOOST_CHECK_EQUAL(deck.cards[0]->stationB, "Lyon");
-    BOOST_CHECK_EQUAL(deck.cards[0]->points, 5);
+    BOOST_CHECK_EQUAL(deck.cards[0]->getstationA()->getName(), "Paris");
+    BOOST_CHECK_EQUAL(deck.cards[0]->getstationB()->getName(), "Lyon");
+    BOOST_CHECK_EQUAL(deck.cards[0]->getPoints(), 5);
 
-    BOOST_CHECK_EQUAL(deck.cards[1]->stationA, "Berlin");
-    BOOST_CHECK_EQUAL(deck.cards[1]->stationB, "Munich");
-    BOOST_CHECK_EQUAL(deck.cards[1]->points, 7);
+    BOOST_CHECK_EQUAL(deck.cards[1]->getstationA()->getName(), "Berlin");
+    BOOST_CHECK_EQUAL(deck.cards[1]->getstationB()->getName(), "Munich");
+    BOOST_CHECK_EQUAL(deck.cards[1]->getPoints(), 7);
 }
+
 
 BOOST_AUTO_TEST_CASE(Default)
 {

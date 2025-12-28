@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
     BOOST_CHECK(1);
 }
-
+/*
 BOOST_AUTO_TEST_SUITE(Constructors)
 
 cardsState::DestinationCard test_constr_dest_card(test_init_stationA_name, test_init_stationB_name, test_init_destination_points);

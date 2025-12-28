@@ -8,7 +8,7 @@
 #include <boost/type_index.hpp>
 
 
-using DestinationCardInfos = std::tuple<std::string, std::string, int>;
+using DestinationCardInfos = std::tuple< std::shared_ptr<mapState::Station> ,std::shared_ptr<mapState::Station> , int>;
 using WagonCardInfos = cardsState::ColorCard;
 
 namespace cardsState
