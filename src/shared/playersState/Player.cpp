@@ -11,6 +11,8 @@
 
 using namespace cardsState;
 using namespace mapState;
+
+#define TEMP_NB_PLAYERS 4
 namespace playersState
 {
    Player::Player(int id, std::string name, ColorCard color, int score, int nbWagons, int nbStations, int nbRoads, std::shared_ptr<cardsState::PlayerCards> hand) : id(id), name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
@@ -121,7 +123,9 @@ namespace playersState
       addScore(total);
       return total;
    }
-
+   // FIXME : Use new isRoadBuildable method from MapState 
+   // !!! point to road now, not stations + 
+   // !!! warning on different types of roads (use typid to test if it's a road, a tunnel or a ferry and change the methodes accordingly)
    bool Player::canBuildRoad(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Station> u, std::shared_ptr<mapState::Station> v)
    {
       if (!map || !u || !v)
@@ -136,56 +140,47 @@ namespace playersState
          return false;
       }
 
-      std::shared_ptr<mapState::Road> road = map->getRoadBetweenStations(sharedU, sharedV);
-      if (!road)
+      std::vector<std::shared_ptr<mapState::Road>> roads = map->getRoadBetweenStations(u, v);
+      if (roads.empty())
       {
+         return false;
          std::cout << " No road exists between "
                    << u->getName() << " and " << v->getName() << "\n";
          return false;
       }
+      
+      return true;
+      // long unsigned int length = road->getLength();
+      // if (nbWagons < length)
+      // {
+      //    std::cout << " Not enough wagons. Needed: "
+      //              << length << " wagons, you have: " << nbWagons << " remaining\n";
+      //    return false;
+      // }
 
-      if (road->getBlockStatus())
-      {
-         std::cout << " The road is blocked.\n";
-         return false;
-      }
-      if (road->getOwner() != nullptr)
-      {
-         std::cout << " The road is already owned by another player.\n";
-         return false;
-      }
-      long unsigned int length = road->getLength();
-      if (nbWagons < length)
-      {
-         std::cout << " Not enough wagons. Needed: "
-                   << length << " wagons, you have: " << nbWagons << " remaining\n";
-         return false;
-      }
+      // cardsState::ColorCard requiredColor = road->getColor();
 
-      cardsState::ColorCard requiredColor = road->getColor();
+      // std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
 
-      std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
+      // for (std::shared_ptr<cardsState::WagonCard> card : hand->wagonCards->cards)
+      // {
+      //    if (card->color == requiredColor || card->color == cardsState::ColorCard::LOCOMOTIVE)
+      //    {
+      //       cardsCorrectColor.push_back(card);
+      //    }
+      // }
+      // if (cardsCorrectColor.size() < length)
+      // {
+      //    std::cout << " Not enough cards of color " << requiredColor
+      //              << ". Needed: " << length << ", you have: " << cardsCorrectColor.size() << "\n";
+      //    return false;
+      // }
 
-      for (std::shared_ptr<cardsState::WagonCard> card : hand->wagonCards->cards)
-      {
-         if (card->color == requiredColor || card->color == cardsState::ColorCard::LOCOMOTIVE)
-         {
-            cardsCorrectColor.push_back(card);
-         }
-      }
-      if (cardsCorrectColor.size() < length)
-      {
-         std::cout << " Not enough cards of color " << requiredColor
-                   << ". Needed: " << length << ", you have: " << cardsCorrectColor.size() << "\n";
-         return false;
-      }
-
-      std::cout << " Player can build road between "
-                << u->getName() << " and " << v->getName() << "\n";
+      // std::cout << " Player can build road between "
+      //           << u->getName() << " and " << v->getName() << "\n";
 
       return true;
    }
-
    int Player::getLongestPathLength(std::shared_ptr<mapState::MapState> map)
    {
       if (!map)
@@ -246,10 +241,10 @@ namespace playersState
 
       return longest;
    }
-
+   // FIXME : Use new getClaimableRoads method from PlayerState !!! point to road now, not stations
    std::vector<std::shared_ptr<mapState::Road>> Player::getClaimableRoads(std::shared_ptr<mapState::MapState> map)
    {
-      std::vector<std::shared_ptr<mapState::Road>> claimable;
+      std::vector<std::shared_ptr<mapState::Road>> claimable={};
 
       if (!map)
          return claimable;
@@ -286,7 +281,6 @@ namespace playersState
       }
       return claimable;
    }
-
    void Player::displayHand()
    {
       if (!hand)

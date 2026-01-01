@@ -4,11 +4,11 @@
 #include <stdexcept>
 
 #define DEBUG_MODE false
-#if DEBUG_MODE == true 
-    #define DEBUG
-    #define DEBUG_PRINT(x) std::cout << x << std::endl
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
 #else
-    #define DEBUG_PRINT(x)
+#define DEBUG_PRINT(x)
 #endif
 
 using namespace std;
@@ -62,6 +62,11 @@ namespace mapState
         this->isBlocked = isBlocked;
     }
 
+    bool Station::isClaimable()
+    {
+        return (this->owner == nullptr);
+    }
+
     Station::~Station()
     {
         DEBUG_PRINT("Station " << this->name << " Destroyed !");
@@ -70,6 +75,40 @@ namespace mapState
     std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> Station::getVertex()
     {
         return this->vertex;
+    }
+
+    std::vector<std::shared_ptr<Station>> Station::getAdjacentStations(std::vector<std::shared_ptr<Road>> roads)
+    {
+        std::vector<std::shared_ptr<Station>> adjacentStations;
+        std::string stationName = this->name;
+        for (const std::shared_ptr<Road> &road : roads)
+        {
+            std::shared_ptr<Station> stationA = road->getStationA();
+            std::shared_ptr<Station> stationB = road->getStationB();
+            if (stationA->getName() == stationName)
+            {
+                adjacentStations.push_back(stationB);
+                continue;
+            }
+            else if (stationB->getName() == stationName)
+            {
+                adjacentStations.push_back(stationA);
+                continue;
+            }
+        }
+        return adjacentStations;
+    }
+    
+    std::shared_ptr<Station> Station::getStationByName(std::vector<std::shared_ptr<Station>> stations, const std::string &name)
+    {
+        for (const std::shared_ptr<Station> &station : stations)
+        {
+            if (station->name == name){
+                return station;
+            }
+                
+        }
+        return nullptr;
     }
 
     void Station::_display()
@@ -108,7 +147,7 @@ namespace mapState
     }
 
     StationInfo Station::genData(std::shared_ptr<playersState::Player> owner, bool isBlocked, std::string name)
-    { 
+    {
         return std::tuple(owner, isBlocked, name);
-    } 
+    }
 }
