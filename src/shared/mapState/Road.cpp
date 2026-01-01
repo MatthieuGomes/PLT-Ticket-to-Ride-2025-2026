@@ -4,12 +4,13 @@
 #include <iostream>
 #include <stdexcept>
 #define DEBUG_MODE false
-#if DEBUG_MODE == true 
-    #define DEBUG
-    #define DEBUG_PRINT(x) std::cout << x << std::endl
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
 #else
-    #define DEBUG_PRINT(x)
+#define DEBUG_PRINT(x)
 #endif
+#define UNDEFINED_ID -1
 
 using namespace std;
 
@@ -30,8 +31,7 @@ namespace mapState
         this->length = length;
         this->isBlocked = isBlocked;
         this->edge = edge;
-        DEBUG_PRINT("Road "<< this->id << " created !");
-
+        DEBUG_PRINT("Road " << this->id << " created !");
     }
     int Road::getId()
     {
@@ -85,6 +85,45 @@ namespace mapState
         cout << "\tIs Blocked: " << (this->isBlocked ? "Yes" : "No") << "\n";
     }
 
+    bool Road::isClaimable(std::vector<std::shared_ptr<Road>> roads, int nbPlayers, std::shared_ptr<playersState::Player> player)
+    {
+        bool claimable = this->owner == nullptr && !this->isBlocked;
+        if (!claimable)
+        {
+            return false;
+        }
+        std::vector<std::shared_ptr<Road>> doubleRoads = Road::getRoadsBetweenStations(roads, this->stationA, this->stationB);
+        for (const std::shared_ptr<Road> &road : doubleRoads)
+        {
+            if (road->id == this->id)
+            {
+                continue;
+            }
+            if (road->getOwner()->getId() == player->getId())
+            {
+                return false;
+            }
+            if (nbPlayers <= 3 && road->getOwner() != nullptr)
+            {
+                return false;
+            }
+        }
+        return claimable;
+    }
+    
+    std::vector<std::shared_ptr<Road>> Road::getClaimableRoads(std::vector<std::shared_ptr<Road>> roads, int nbPlayers, std::shared_ptr<playersState::Player> player)
+    {
+        std::vector<std::shared_ptr<Road>> claimable;
+        for (const std::shared_ptr<Road> &road : roads)
+        {
+            if (road->isClaimable(roads, nbPlayers, player))
+            {
+                claimable.push_back(road);
+            }
+        }
+        return claimable;
+    }
+
     std::shared_ptr<boost::adjacency_list<>::edge_descriptor> Road::getEdge()
     {
         return this->edge;
@@ -128,8 +167,28 @@ namespace mapState
         RoadDetail detail = std::tuple(id, owner, color, length, isBlocked);
         return std::pair(pair, detail);
     }
+    std::vector<std::shared_ptr<Road>> Road::getRoadsBetweenStations(std::vector<std::shared_ptr<Road>> roads, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
+    {
+        std::vector<std::shared_ptr<Road>> matchingRoads = {};
+        if (!(!stationA || !stationB))
+        {
+            for (const std::shared_ptr<Road> &road : roads)
+            {
+                bool stationAAMatch = (road->stationA->getName() == stationA->getName());
+                bool stationABMatch = (road->stationB->getName() == stationA->getName());
+                bool stationBAMatch = (road->stationA->getName() == stationB->getName());
+                bool stationBBMatch = (road->stationB->getName() == stationB->getName());
+                if ((stationAAMatch && stationBBMatch) || (stationABMatch && stationBAMatch))
+                {
+                    matchingRoads.push_back(road);
+                }
+            }
+        }
+
+        return matchingRoads; // Return nullptr if no matching road is found
+    }
     Road::~Road()
     {
-         DEBUG_PRINT("\tRoad " << this->id << " Destroyed !");
+        DEBUG_PRINT("\tRoad " << this->id << " Destroyed !");
     }
 }

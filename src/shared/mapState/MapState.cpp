@@ -238,28 +238,18 @@ namespace mapState
 
     std::shared_ptr<Station> MapState::getStationByName(const std::string &name)
     {
-
-        for (const std::shared_ptr<Station> &s : stations)
-            if (s->name == name)
-                return s;
-        return nullptr;
+        return Station::getStationByName(this->stations, name);
     }
 
-    std::shared_ptr<Road> MapState::getRoadBetweenStations(std::shared_ptr<Station> u, std::shared_ptr<Station> v)
+    std::vector<std::shared_ptr<Road>> MapState::getRoadBetweenStations(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {
-        if (!u || !v)
-        {
-            return nullptr;
-        }
-        for (const std::shared_ptr<Road> &r : roads)
-        {
-            if ((r->stationA->getName() == u->name && r->stationB->getName() == v->name) || (r->stationA->getName() == v->name && r->stationB->getName() == u->name))
-            {
-                return r;
-            }
-        }
-        return nullptr;
-    }   
+        return Road::getRoadsBetweenStations(this->roads, stationA, stationB);
+    }
+
+    std::vector<std::shared_ptr<Road>> MapState::getClaimableRoads(int nbPlayers, std::shared_ptr<playersState::Player> player)
+    {
+        return Road::getClaimableRoads(this->roads, nbPlayers, player);
+    }
 
     Path MapState::findShortestPath(std::shared_ptr<Station> src, std::shared_ptr<Station> dest)
     {
@@ -278,7 +268,6 @@ namespace mapState
 
         std::vector<int> distances(n, std::numeric_limits<int>::max());
         std::vector<vertex_descriptor> predecessors(n);
-
 
         auto weightMap =
             boost::make_static_property_map<edge_descriptor>(1);
@@ -339,24 +328,7 @@ namespace mapState
         {
             return {};
         }
-        std::vector<std::shared_ptr<Station>> adjacentStations;
-        for (const std::shared_ptr<Road> &road : this->roads)
-        {
-#ifdef DEBUG
-            road->display();
-#endif
-            if (road->stationA->getName() == station->getName())
-            {
-                adjacentStations.push_back(road->stationB);
-                continue;
-            }
-            else if (road->stationB->getName() == station->getName())
-            {
-                adjacentStations.push_back(road->stationA);
-                continue;
-            }
-        }
-        return adjacentStations;
+        return station->getAdjacentStations(this->roads);
     }
 
     std::string MapState::toString() const

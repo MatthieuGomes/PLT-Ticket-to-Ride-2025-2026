@@ -12,7 +12,7 @@
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
-#define DEBUG 
+#define DEBUG
 #define DEBUG_PRINT(x) std::cout << x << std::endl
 #else
 #define DEBUG_PRINT(x)
@@ -192,10 +192,13 @@ BOOST_AUTO_TEST_CASE(GetRoadBetweenStations)
   mapState::MapState test_map_state = mapState::MapState();
   std::shared_ptr<mapState::Station> stationA = test_map_state.getStationByName("paris");
   std::shared_ptr<mapState::Station> stationB = test_map_state.getStationByName("berlin");
-  std::shared_ptr<mapState::Road> road = test_map_state.getRoadBetweenStations(stationA, stationB);
-  BOOST_CHECK_NE(road, nullptr);
-  BOOST_CHECK_EQUAL(road->stationA->name, stationA->name);
-  BOOST_CHECK_EQUAL(road->stationB->name, stationB->name);
+  std::vector<std::shared_ptr<mapState::Road>> road = test_map_state.getRoadBetweenStations(stationA, stationB);
+  BOOST_CHECK_NE(road.empty(), true);
+  for (const std::shared_ptr<mapState::Road> &road : road)
+  {
+    BOOST_CHECK_EQUAL(road->stationA->name, stationA->name);
+    BOOST_CHECK_EQUAL(road->stationB->name, stationB->name);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(GetAdjacentStations)
@@ -237,10 +240,11 @@ BOOST_AUTO_TEST_CASE(FindShortestPath)
   std::shared_ptr<mapState::Station> src = test_map_state.getStationByName("paris");
   std::shared_ptr<mapState::Station> dest = test_map_state.getStationByName("rome");
   Path shortestPath = test_map_state.findShortestPath(src, dest);
-  #ifdef DEBUG
-  std::cout<<"Shortest path from " << src->getName() << " to " << dest->getName() << ":\n";
-  for (const std::shared_ptr<Station> &station : shortestPath.STATIONS) {
-      std::cout << station->getName() << " ";
+#ifdef DEBUG
+  std::cout << "Shortest path from " << src->getName() << " to " << dest->getName() << ":\n";
+  for (const std::shared_ptr<Station> &station : shortestPath.STATIONS)
+  {
+    std::cout << station->getName() << " ";
   }
   std::cout << "\nTotal Length: " << shortestPath.TOTALLENGTH << "\n";
   std::cout << "Number of Edges: " << shortestPath.NUMEDGES << "\n";
