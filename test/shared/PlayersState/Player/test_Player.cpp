@@ -296,22 +296,58 @@ BOOST_AUTO_TEST_CASE(addScore)
 
 BOOST_AUTO_TEST_CASE(removeTrain)
 {
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
-    int nb_trains_to_remove = 3;
+
+    std::cout << "RemoveTrain Test Started ..." << std::endl;
     {
-        std::cout << "RemoveTrain Test Started ..." << std::endl;
+        std::cout << "enough trains case ..." << std::endl;
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        int nb_trains_to_remove = 3;
         BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons);
 
         player.removeTrain(nb_trains_to_remove);
         BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons - nb_trains_to_remove);
-        std::cout << "RemoveTrain Test Finished !\n"
-                  << std::endl;
+        std::cout << "enough trains case finished !" << std::endl;
     }
+    {
+        std::cout << "not enough trains case ..." << std::endl;
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        int nb_trains_to_remove = 25;
+        BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons);
+
+        BOOST_CHECK_THROW(player.removeTrain(nb_trains_to_remove), std::invalid_argument);
+        BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons);
+        std::cout << "not enough trains case finished !" << std::endl;
+    }
+    std::cout << "RemoveTrain Test Finished !\n"
+              << std::endl;
 }
 
 // FIXME : add method
 BOOST_AUTO_TEST_CASE(RemoveStation)
 {
+    std::cout << "RemoveStation Test Started ..." << std::endl;
+    {
+        std::cout << "enough stations case ..." << std::endl;
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        int nb_stations_to_remove = 2;
+        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations);
+
+        player.removeStation(nb_stations_to_remove);
+        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations - nb_stations_to_remove);
+        std::cout << "enough stations case finished !" << std::endl;
+    }
+    {
+        std::cout << "not enough stations case ..." << std::endl;
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        int nb_stations_to_remove = 15;
+        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations);
+
+        BOOST_CHECK_THROW(player.removeStation(nb_stations_to_remove), std::invalid_argument);
+        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations);
+        std::cout << "not enough stations case finished !" << std::endl;
+    }
+    std::cout << "RemoveStation Test Finished !\n"
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Internal
@@ -353,31 +389,47 @@ BOOST_AUTO_TEST_CASE(addStation)
 BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
 {
     std::cout << "calculateDestinationPoints Test Started ..." << std::endl;
-    int d1_points = 10;
-    int d2_points = 8;
-    std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("paris", nullptr, false, nullptr);
-    std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("berlin", nullptr, false, nullptr);
-    std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("madrid", nullptr, false, nullptr);
-    std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("rome", nullptr, false, nullptr);
-    std::shared_ptr<cardsState::DestinationCard> d1 = std::make_shared<cardsState::DestinationCard>(d1_stationA, d1_stationB, d1_points);
-    std::shared_ptr<cardsState::DestinationCard> d2 = std::make_shared<cardsState::DestinationCard>(d2_stationA, d2_stationB, d2_points);
-    std::vector<std::shared_ptr<cardsState::DestinationCard>> dest_cards = {d1, d2};
-    std::vector<std::shared_ptr<cardsState::WagonCard>> wagon_cards = {std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED)};
-    std::shared_ptr<cardsState::PlayerCards> test_calculate_hand = std::make_shared<cardsState::PlayerCards>(dest_cards, wagon_cards);
+    {
+        std::cout << "completed destinations not empty case ..." << std::endl;
+        int d1_points = 10;
+        int d2_points = 8;
+        std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("paris", nullptr, false, nullptr);
+        std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("berlin", nullptr, false, nullptr);
+        std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("madrid", nullptr, false, nullptr);
+        std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("rome", nullptr, false, nullptr);
+        std::shared_ptr<cardsState::DestinationCard> d1 = std::make_shared<cardsState::DestinationCard>(d1_stationA, d1_stationB, d1_points);
+        std::shared_ptr<cardsState::DestinationCard> d2 = std::make_shared<cardsState::DestinationCard>(d2_stationA, d2_stationB, d2_points);
+        std::vector<std::shared_ptr<cardsState::DestinationCard>> dest_cards = {d1, d2};
+        std::vector<std::shared_ptr<cardsState::WagonCard>> wagon_cards = {std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED)};
+        std::shared_ptr<cardsState::PlayerCards> test_calculate_hand = std::make_shared<cardsState::PlayerCards>(dest_cards, wagon_cards);
 
-    playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_calculate_hand);
-    BOOST_CHECK_EQUAL(player.score, test_init_player_score);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_calculate_hand);
+        BOOST_CHECK_EQUAL(player.score, test_init_player_score);
 
-    player.completedDestinations.clear();
-    player.completedDestinations.push_back(std::move(d1));
-    player.completedDestinations.push_back(std::move(d2));
+        player.completedDestinations.clear();
+        player.completedDestinations.push_back(std::move(d1));
+        player.completedDestinations.push_back(std::move(d2));
 
-    int gained = player.calculateDestinationPoints();
-    BOOST_CHECK_EQUAL(gained, 18);
+        int gained = player.calculateDestinationPoints();
+        BOOST_CHECK_EQUAL(gained, 18);
+        std::cout << "completed destinations not empty case finished !" << std::endl;
+    }
+    {
+        std::cout << "completed destinations empty case ..." << std::endl;
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
+        BOOST_CHECK_EQUAL(player.score, test_init_player_score);
+
+        player.completedDestinations.clear();
+
+        int gained = player.calculateDestinationPoints();
+        BOOST_CHECK_EQUAL(gained, 0);
+        std::cout << "completed destinations empty case finished !" << std::endl;
+    }
     std::cout << "calculateDestinationPoints Test Finished !\n"
               << std::endl;
 }
 
+// TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
 BOOST_AUTO_TEST_CASE(isRoadBuildable)
 {
     std::cout << "isRoadBuildable Test Started ..." << std::endl;
@@ -430,7 +482,7 @@ BOOST_AUTO_TEST_CASE(isRoadBuildable)
     std::cout << "canBuildRoad Test Finished !\n"
               << std::endl;
 }
-// FIXME : Complete those tests
+// TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
 BOOST_AUTO_TEST_CASE(getClaimableRoads)
 {
     std::cout << "getClaimableRoads Test Started ..." << std::endl;
@@ -461,6 +513,27 @@ BOOST_AUTO_TEST_CASE(getClaimableRoads)
     std::cout << "getClaimableRoads Test Finished !\n"
               << std::endl;
 }
+
+// TODO : complete tests 
+BOOST_AUTO_TEST_CASE(getLongestPathLength)
+{
+    #if DEBUG
+    std::cout << "getLongestPathLength Test Started ..." << std::endl;
+    {
+        std::cout << "normal case started ...  " << std::endl;
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
+
+        int length = player.getLongestPathLength(test_interact_map);
+        std::cout << "calculated length: " << length << std::endl;
+
+        std::cout << "normal case finished !\n"
+                  << std::endl;
+    }
+    std::cout << "getLongestPathLength Test Finished !\n"
+              << std::endl;
+    #endif
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Interactions
 
 BOOST_AUTO_TEST_SUITE_END() // Operations
