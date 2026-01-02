@@ -7,7 +7,21 @@
 #include <unordered_map>
 #include <functional>
 
+#include "PlayersState.h"
+
 #include "mapState/MapState.h"
+#include "mapState/Road.h"
+#include "mapState/Station.h"
+#include "mapState/Tunnel.h"
+#include "mapState/Ferry.h"
+
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
 
 using namespace cardsState;
 using namespace mapState;
@@ -15,18 +29,10 @@ using namespace mapState;
 #define TEMP_NB_PLAYERS 4
 namespace playersState
 {
-   Player::Player(int id, std::string name, ColorCard color, int score, int nbWagons, int nbStations, int nbRoads, std::shared_ptr<cardsState::PlayerCards> hand) : id(id), name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
+   Player::Player(std::string name, PlayerColor color, int score, int nbWagons, int nbStations, int nbRoads, std::shared_ptr<cardsState::PlayerCards> hand) : name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
    {
    }
 
-   int Player::getId()
-   {
-      return id;
-   }
-   void Player::setId(int id)
-   {
-      this->id = id;
-   }
    std::string Player::getName()
    {
       return name;
@@ -47,7 +53,6 @@ namespace playersState
    {
       return nbWagons;
    }
-
    void Player::setNbWagons(int nbWagons)
    {
       this->nbWagons = nbWagons;
@@ -56,12 +61,10 @@ namespace playersState
    {
       return nbStations;
    }
-
    void Player::setNbStations(int nbStations)
    {
       this->nbStations = nbStations;
    }
-
    int Player::getNbRoads()
    {
       return nbRoads;
@@ -71,19 +74,19 @@ namespace playersState
       this->nbRoads = nbRoads;
    }
 
-   cardsState::ColorCard Player::getColor()
+   PlayerColor Player::getColor()
    {
       return color;
    }
-   void Player::setColor(cardsState::ColorCard color)
+   void Player::setColor(PlayerColor color)
    {
       this->color = color;
    }
+   
    std::shared_ptr<cardsState::PlayerCards> Player::getHand()
    {
       return hand;
    }
-
    void Player::setHand(std::shared_ptr<cardsState::PlayerCards> hand)
    {
       this->hand = hand;
@@ -99,11 +102,19 @@ namespace playersState
       nbStations++;
    }
 
-   void Player::removeTrain(int nb)
+   void Player::removeTrain(int num)
    {
-      if (nb > nbWagons)
-         nb = nbWagons;
-      nbWagons -= nb;
+      if (num > this->nbWagons)
+         throw std::invalid_argument("Cannot remove more wagons than available.");
+      this->nbWagons -= num;
+         
+   }
+   //TODO : add tests
+   void Player::removeStation(int nb)
+   {
+      if (nb > this->nbStations)
+         throw std::invalid_argument("Cannot remove more stations than available.");
+      this->nbStations -= nb;
    }
 
    void Player::addScore(int points)
@@ -123,69 +134,95 @@ namespace playersState
       addScore(total);
       return total;
    }
-   // FIXME : Use new isRoadBuildable method from MapState 
-   // !!! point to road now, not stations + 
-   // !!! warning on different types of roads (use typid to test if it's a road, a tunnel or a ferry and change the methodes accordingly)
-   bool Player::canBuildRoad(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Station> u, std::shared_ptr<mapState::Station> v)
+
+   bool Player::isRoadBuildable(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Road> road)
    {
-      if (!map || !u || !v)
+      if (!playersState::PlayersState::isRoadClaimable(map, road, std::make_shared<Player>(*this)))
       {
+         DEBUG_PRINT("Road is not claimable.\n");
          return false;
       }
-
-      std::shared_ptr<mapState::Station> sharedU = map->getStationByName(u->getName());
-      std::shared_ptr<mapState::Station> sharedV = map->getStationByName(v->getName());
-      if (!sharedU || !sharedV)
+      if (typeid(*road) == typeid(mapState::Tunnel))
       {
-         return false;
+         std::shared_ptr<mapState::Tunnel> tunnel = std::dynamic_pointer_cast<mapState::Tunnel>(road);
+         // FIXME : implement Tunnel specific logic here BUT first implement the cards functions to make it possible
+         return true;
       }
-
-      std::vector<std::shared_ptr<mapState::Road>> roads = map->getRoadBetweenStations(u, v);
-      if (roads.empty())
+      else
       {
-         return false;
-         std::cout << " No road exists between "
-                   << u->getName() << " and " << v->getName() << "\n";
-         return false;
+         int length = road->getLength();
+         if (this->nbWagons < length)
+         {
+            DEBUG_PRINT("Not enough wagons. Needed: "
+                        << length << " wagons, you have: " << this->nbWagons << " remaining\n");
+            return false;
+         }
+         cardsState::ColorCard requiredColor = road->getColor();
+
+         std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
+         std::vector<std::shared_ptr<cardsState::WagonCard>> handCards = this->hand->wagonCards->cards;
+         std::vector<std::shared_ptr<cardsState::WagonCard>> handCardsCopy = std::move(handCards);
+         for (std::shared_ptr<cardsState::WagonCard> card : handCards)
+         {
+            if (static_cast<int>(cardsCorrectColor.size()) >= length)
+            {
+               break;
+            }
+            if (card->color == requiredColor)
+            {
+               cardsCorrectColor.push_back(card);
+               handCardsCopy.erase(std::remove(handCardsCopy.begin(), handCardsCopy.end(), card), handCardsCopy.end());
+            }
+         }
+         for (std::shared_ptr<cardsState::WagonCard> card : handCards)
+         {
+            if (static_cast<int>(cardsCorrectColor.size()) >= length)
+            {
+               break;
+            }
+            if (card->color == cardsState::ColorCard::LOCOMOTIVE)
+            {
+               cardsCorrectColor.push_back(card);
+               handCardsCopy.erase(std::remove(handCardsCopy.begin(), handCardsCopy.end(), card), handCardsCopy.end());
+            }
+         }
+         if (static_cast<int>(cardsCorrectColor.size()) < length)
+         {
+            DEBUG_PRINT(" Not enough cards of color " << requiredColor
+                                                      << ". Needed: " << length << ", you have: " << cardsCorrectColor.size() << "\n");
+            return false;
+         }
+         if (typeid(*road) == typeid(mapState::Ferry))
+         {
+            std::shared_ptr<mapState::Ferry> ferry = std::dynamic_pointer_cast<mapState::Ferry>(road);
+            int requiredLocomotives = ferry->getLocomotives();
+            std::vector<std::shared_ptr<cardsState::WagonCard>> remainingLocomotiveCards;
+            for (std::shared_ptr<cardsState::WagonCard> card : handCardsCopy)
+            {
+               if (card->color == cardsState::ColorCard::LOCOMOTIVE)
+               {
+                  remainingLocomotiveCards.push_back(card);
+               }
+            }
+            if (static_cast<int>(remainingLocomotiveCards.size()) < requiredLocomotives)
+            {
+               DEBUG_PRINT(" Not enough locomotive cards. Needed: " << requiredLocomotives
+                                                                    << ", you have: " << remainingLocomotiveCards.size() << "\n");
+               return false;
+            }
+            return true;
+         }
+         else
+         {
+            return true;
+         }
       }
-      
-      return true;
-      // long unsigned int length = road->getLength();
-      // if (nbWagons < length)
-      // {
-      //    std::cout << " Not enough wagons. Needed: "
-      //              << length << " wagons, you have: " << nbWagons << " remaining\n";
-      //    return false;
-      // }
-
-      // cardsState::ColorCard requiredColor = road->getColor();
-
-      // std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
-
-      // for (std::shared_ptr<cardsState::WagonCard> card : hand->wagonCards->cards)
-      // {
-      //    if (card->color == requiredColor || card->color == cardsState::ColorCard::LOCOMOTIVE)
-      //    {
-      //       cardsCorrectColor.push_back(card);
-      //    }
-      // }
-      // if (cardsCorrectColor.size() < length)
-      // {
-      //    std::cout << " Not enough cards of color " << requiredColor
-      //              << ". Needed: " << length << ", you have: " << cardsCorrectColor.size() << "\n";
-      //    return false;
-      // }
-
-      // std::cout << " Player can build road between "
-      //           << u->getName() << " and " << v->getName() << "\n";
-
-      return true;
    }
+   // TODO : Why is it here ? 
    int Player::getLongestPathLength(std::shared_ptr<mapState::MapState> map)
    {
       if (!map)
          return 0;
-
 
       std::unordered_map<std::shared_ptr<mapState::Station>, std::vector<std::pair<std::shared_ptr<mapState::Station>, int>>> adj;
       for (std::shared_ptr<mapState::Road> road : map->roads)
@@ -205,9 +242,9 @@ namespace playersState
       if (adj.empty())
          return 0;
 
-
       std::function<int(std::shared_ptr<mapState::Station>, std::unordered_set<std::shared_ptr<mapState::Station>> &)> dfs;
-      dfs = [&](std::shared_ptr<mapState::Station> current, std::unordered_set<std::shared_ptr<mapState::Station>> &visited) -> int {
+      dfs = [&](std::shared_ptr<mapState::Station> current, std::unordered_set<std::shared_ptr<mapState::Station>> &visited) -> int
+      {
          int best = 0;
          auto it = adj.find(current);
          if (it == adj.end())
@@ -241,75 +278,14 @@ namespace playersState
 
       return longest;
    }
-   // FIXME : Use new getClaimableRoads method from PlayerState !!! point to road now, not stations
    std::vector<std::shared_ptr<mapState::Road>> Player::getClaimableRoads(std::shared_ptr<mapState::MapState> map)
    {
-      std::vector<std::shared_ptr<mapState::Road>> claimable={};
-
-      if (!map)
-         return claimable;
-      for (std::shared_ptr<mapState::Road> road : map->roads)
-      {
-
-         if (!road)
-            continue;
-         if (road->getBlockStatus())
-            continue;
-
-         std::shared_ptr<mapState::Station> u = nullptr;
-         std::shared_ptr<mapState::Station> v = nullptr;
-
-         for (std::shared_ptr<mapState::Station> s : map->stations)
-         {
-            if (!s)
-               continue;
-            if (s == road->stationA)
-               u = s;
-            else if (s == road->stationB)
-               v = s;
-            if (u && v)
-               break;
-         }
-
-         if (!u || !v)
-            continue;
-
-         if (canBuildRoad(map, u, v))
-         {
-            claimable.push_back(road);
-         }
-      }
-      return claimable;
-   }
-   void Player::displayHand()
-   {
-      if (!hand)
-      {
-         std::cout << "Hand not initialized.\n";
-         return;
-      }
-
-      std::cout << "\n=== PLAYER HAND ===\n";
-
-      if (hand->wagonCards)
-      {
-         std::cout << "Wagon cards:\n";
-         hand->wagonCards->display();
-      }
-
-      if (hand->destinationCards)
-      {
-         std::cout << "Destination cards:\n";
-         hand->destinationCards->display();
-      }
-
-      std::cout << "====================\n";
+      return playersState::PlayersState::getClaimableRoads(map, std::make_shared<Player>(*this));
    }
 
    void Player::display()
    {
       std::cout << "player name is " << name << std::endl;
-      std::cout << "player id is " << id << std::endl;
       std::cout << "player color is " << color << std::endl;
       std::cout << "player score is " << score << std::endl;
       std::cout << "player nbWagons is " << nbWagons << std::endl;

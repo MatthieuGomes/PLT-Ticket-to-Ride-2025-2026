@@ -14,7 +14,7 @@ namespace state
     {
         std::cout << "State information goes here." << std::endl;
         cards.printCardsState();
-        players.printPlayersState();
+        players.display();
         map.display();
 
         // Here @theo + @chahrazed + @yosra will implement the details to print their part of the state

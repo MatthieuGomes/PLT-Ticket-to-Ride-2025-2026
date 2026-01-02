@@ -99,7 +99,7 @@ namespace mapState
             {
                 continue;
             }
-            if (road->getOwner()->getId() == player->getId())
+            if (road->getOwner()->getColor() == player->getColor())
             {
                 return false;
             }

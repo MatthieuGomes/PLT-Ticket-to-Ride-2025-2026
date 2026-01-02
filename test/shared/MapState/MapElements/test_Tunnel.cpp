@@ -4,6 +4,7 @@
 #include "../../src/shared/mapState/Tunnel.h"
 #include "../../src/shared/mapState/Station.h"
 #include "../../src/shared/playersState/Player.h"
+#include "../../src/shared/playersState/PlayerColor.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <memory>
 #include <stdexcept>
@@ -28,13 +29,13 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
-std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", std::make_shared<playersState::Player>(1, "OwnerA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr), false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", std::make_shared<playersState::Player>(2, "OwnerB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr), false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", std::make_shared<playersState::Player>("OwnerA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr), false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", std::make_shared<playersState::Player>("OwnerB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr), false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
 int test_tunnel_id = 101;
 bool test_is_blocked = false;
 cardsState::ColorCard test_color = cardsState::ColorCard::GREEN;
-int test_length = 5;
-std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>(3, "TestOwner", cardsState::ColorCard::YELLOW, 0, 40, 4, 6, nullptr);
+  int test_length = 5;
+  std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
 std::shared_ptr<boost::adjacency_list<>::edge_descriptor> test_edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
     boost::add_edge(*(test_stationA->getVertex().get()), *(test_stationB->getVertex().get()), *test_graph).first);
 
@@ -59,15 +60,15 @@ BOOST_AUTO_TEST_CASE(BatchConstructor){
   std::string stationA_name = "BatchStationA";
   std::string stationB_name = "BatchStationB";
   std::string stationC_name = "BatchStationC";
-  std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>(3, "BatchOwnerStationA", cardsState::ColorCard::RED, 0, 30, 2, 4, nullptr);
-  std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>(4, "BatchOwnerStationB", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
-  std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>(5, "BatchOwnerStationC", cardsState::ColorCard::GREEN, 0, 50, 4, 6, nullptr);
+  std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>("BatchOwnerStationA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr);
+  std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>("BatchOwnerStationB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr);
+  std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>("BatchOwnerStationC", playersState::PlayerColor::GREEN, 0, 50, 4, 6, nullptr);
   std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, stationA_owner, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
   std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, stationB_owner, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
   std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, stationC_owner, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-  std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>(4, "BatchOwnerTunnel1", cardsState::ColorCard::WHITE, 0, 50, 5, 7, nullptr);
-  std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>(5, "BatchOwnerTunnel2", cardsState::ColorCard::BLACK, 0, 55, 6, 8, nullptr);
-  std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>(6, "BatchOwnerTunnel3", cardsState::ColorCard::YELLOW, 0, 60, 7, 9, nullptr);
+  std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>("BatchOwnerTunnel1", playersState::PlayerColor::RED, 0, 50, 5, 7, nullptr);
+  std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>("BatchOwnerTunnel2", playersState::PlayerColor::BLACK, 0, 55, 6, 8, nullptr);
+  std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>("BatchOwnerTunnel3", playersState::PlayerColor::YELLOW, 0, 60, 7, 9, nullptr);
   std::vector<TunnelInfo> tunnelInfos = {
       Tunnel::genData(batch_stationA, batch_stationB, 201, batch_owner1, cardsState::ColorCard::PINK, 4, false),
       Tunnel::genData(batch_stationB, batch_stationC, 202, batch_owner2, cardsState::ColorCard::ORANGE, 6, true),
@@ -192,7 +193,7 @@ BOOST_AUTO_TEST_CASE(GetVertexB)
 
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(Setters)
-std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>(4, "NewOwner", cardsState::ColorCard::BLACK, 0, 50, 5, 7, nullptr);
+std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLACK, 0, 50, 5, 7, nullptr);
 BOOST_AUTO_TEST_CASE(SetOwner)
 {
   std::cout << "SetOwner Test Started ..." << std::endl;

@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 std::string test_station_name = "TestStation";
-std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>(1, "TestPlayer", cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
+std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 bool test_is_blocked = false;
 std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
 std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> test_vertex = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph));
@@ -47,10 +47,10 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
 {
   std::cout << "BatchConstructor Test Started ..." << std::endl;
   std::string test_station_name1 = "BatchStation1";
-  std::shared_ptr<playersState::Player> test_owner1 = std::make_shared<playersState::Player>(1, "BatchPlayer1", cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
+  std::shared_ptr<playersState::Player> test_owner1 = std::make_shared<playersState::Player>("BatchPlayer1", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
   bool test_is_blocked1 = false;
   std::string test_station_name2 = "BatchStation2";
-  std::shared_ptr<playersState::Player> test_owner2 = std::make_shared<playersState::Player>(1, "BatchPlayer2", cardsState::ColorCard::BLUE, 0, 42, 1, 3, nullptr);
+  std::shared_ptr<playersState::Player> test_owner2 = std::make_shared<playersState::Player>("BatchPlayer2", playersState::PlayerColor::BLUE, 0, 42, 1, 3, nullptr);
   bool test_is_blocked2 = false;
 
   std::vector<StationInfo> stationInfos = {
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(GetVertex)
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(Setters)
 
-std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>(2, "NewOwner", cardsState::ColorCard::BLUE, 0, 45, 3, 5, nullptr);
+std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr);
 BOOST_AUTO_TEST_CASE(SetOwner)
 {
   std::cout << "SetOwner Test Started ..." << std::endl;
