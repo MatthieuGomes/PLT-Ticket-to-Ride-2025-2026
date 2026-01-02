@@ -78,8 +78,7 @@ BOOST_AUTO_TEST_CASE(BatchDestinationDeck)
         boost::add_vertex(*graph));
 
     // ---- Owner ----
-    auto owner = std::make_shared<playersState::Player>(
-        1, "TestPlayer", ColorCard::RED, 0, 45, 3, 5, nullptr);
+    auto owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
     bool blocked = false;
 

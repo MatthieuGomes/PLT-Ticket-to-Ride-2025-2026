@@ -95,6 +95,7 @@ namespace mapState
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
+    
     MapState::MapState(std::shared_ptr<boost::adjacency_list<>> gameGraph, std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
     {
         DEBUG_PRINT("Parameterized MapState creation started...");
@@ -104,6 +105,9 @@ namespace mapState
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
+
+    // add a constructor without graph input (creates an empty graph INSIDE the constructor and fill it);
+    // add a constructor that takes vector of stations and roads directly (for testing purposes)
 
     void MapState::_MapState(std::shared_ptr<boost::adjacency_list<>> gameGraph, std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
     {
@@ -240,7 +244,7 @@ namespace mapState
     {
         return Station::getStationByName(this->stations, name);
     }
-
+    // FIXME rename getRoadsBetweenStations
     std::vector<std::shared_ptr<Road>> MapState::getRoadBetweenStations(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {
         return Road::getRoadsBetweenStations(this->roads, stationA, stationB);

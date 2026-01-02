@@ -41,8 +41,8 @@ std::string test_stationB_name = "Rome";
 int test_points = 12;
 
 std::shared_ptr<playersState::Player> test_owner =
-    std::make_shared<playersState::Player>(1, "TestPlayer",
-        cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
+    std::make_shared<playersState::Player>("TestPlayer",
+        playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
 bool test_is_blocked = false;
 

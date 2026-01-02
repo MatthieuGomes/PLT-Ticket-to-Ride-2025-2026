@@ -12,17 +12,15 @@
 using namespace playersState;
 using namespace mapState;
 
-int test_init_player1_id = 1 ;
 std::string test_init_player1_name = "Alice" ;
-cardsState::ColorCard test_init_player1_color  = cardsState::ColorCard::RED;
+playersState::PlayerColor test_init_player1_color  = playersState::PlayerColor::RED;
 int test_init_player1_score = 23 ;
 int test_init_player1_nbWagons= 21  ;
 int test_init_player1_nbStations = 10 ;
 int test_init_player1_nbRoads = 5 ;
 
-int test_init_player2_id = 2 ;
 std::string test_init_player2_name = "Bob" ;
-cardsState::ColorCard test_init_player2_color  = cardsState::ColorCard::BLUE;
+playersState::PlayerColor test_init_player2_color  = playersState::PlayerColor::BLUE;
 int test_init_player2_score = 22 ;
 int test_init_player2_nbWagons= 20  ;
 int test_init_player2_nbStations = 9 ;
@@ -33,8 +31,8 @@ std::string test_stationB_name = "Rome";
 int test_points = 12;
 
 std::shared_ptr<playersState::Player> test_owner =
-    std::make_shared<playersState::Player>(1, "TestPlayer",
-        cardsState::ColorCard::RED, 0, 45, 3, 5, nullptr);
+    std::make_shared<playersState::Player>("TestPlayer",
+        playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
 bool test_is_blocked = false;
 
@@ -62,28 +60,22 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 }
 
 
-BOOST_AUTO_TEST_SUITE(Operations)
-
-
-BOOST_AUTO_TEST_SUITE(Internal)
-
-
 BOOST_AUTO_TEST_SUITE(Constructors)
 
-BOOST_AUTO_TEST_CASE(TestConstructor)
+BOOST_AUTO_TEST_CASE(Empty)
 {
   PlayersState ps;
   BOOST_CHECK(ps.getPlayers().empty());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // Constructors
 
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
 
 BOOST_AUTO_TEST_SUITE(Getters)
 
-BOOST_AUTO_TEST_CASE(GetPlayers_ShouldReturnCurrentVector)
+BOOST_AUTO_TEST_CASE(GetPlayers)
 {
   PlayersState ps;
 
@@ -96,10 +88,10 @@ BOOST_AUTO_TEST_CASE(GetPlayers_ShouldReturnCurrentVector)
  auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
   auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
 
-  auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
+  auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
                                      test_init_player1_score, test_init_player1_nbWagons,
                                      test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
-  auto p2 = std::make_shared<Player>(test_init_player2_id, test_init_player2_name, test_init_player2_color,
+  auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
                                      test_init_player2_score, test_init_player2_nbWagons,
                                      test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
 
@@ -112,12 +104,12 @@ BOOST_AUTO_TEST_CASE(GetPlayers_ShouldReturnCurrentVector)
   BOOST_CHECK(result[1] == p2);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // Getters
 
 
 BOOST_AUTO_TEST_SUITE(Setters)
 
-BOOST_AUTO_TEST_CASE(SetPlayers_ShouldOverrideVectorContent)
+BOOST_AUTO_TEST_CASE(SetPlayers)
 {
   PlayersState ps;
 
@@ -130,10 +122,10 @@ BOOST_AUTO_TEST_CASE(SetPlayers_ShouldOverrideVectorContent)
   auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
   auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
 
-  auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
+  auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
                                      test_init_player1_score, test_init_player1_nbWagons,
                                      test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
-  auto p2 = std::make_shared<Player>(test_init_player2_id, test_init_player2_name, test_init_player2_color,
+  auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
                                      test_init_player2_score, test_init_player2_nbWagons,
                                      test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
 
@@ -142,18 +134,17 @@ BOOST_AUTO_TEST_CASE(SetPlayers_ShouldOverrideVectorContent)
   BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
+BOOST_AUTO_TEST_SUITE_END() // Setters
 
 BOOST_AUTO_TEST_SUITE_END() // GettersAndSetters
-BOOST_AUTO_TEST_SUITE_END() // Internal
-BOOST_AUTO_TEST_SUITE_END() // Operations
 
+BOOST_AUTO_TEST_SUITE(Operations)
 
+BOOST_AUTO_TEST_SUITE(Internal)
 
 BOOST_AUTO_TEST_SUITE(Interactions)
 
-BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
+BOOST_AUTO_TEST_CASE(Display)
 {
   PlayersState ps;
 
@@ -166,10 +157,10 @@ BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
   auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
   auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
 
-  auto p1 = std::make_shared<Player>(test_init_player1_id, test_init_player1_name, test_init_player1_color,
+  auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
                                      test_init_player1_score, test_init_player1_nbWagons,
                                      test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
-  auto p2 = std::make_shared<Player>(test_init_player2_id, test_init_player2_name, test_init_player2_color,
+  auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
                                      test_init_player2_score, test_init_player2_nbWagons,
                                      test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
 
@@ -178,7 +169,7 @@ BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
   std::stringstream buffer;
   std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 
-  ps.printPlayersState();
+  ps.display();
 
   std::cout.rdbuf(old);
 
@@ -190,6 +181,10 @@ BOOST_AUTO_TEST_CASE(PrintPlayersState_WithPlayers)
   BOOST_CHECK(out.find("Bob") != std::string::npos);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // Interactions
+
+
+BOOST_AUTO_TEST_SUITE_END() // Internal
+BOOST_AUTO_TEST_SUITE_END() // Operations
 
 /* vim: set sw=2 sts=2 et : */
