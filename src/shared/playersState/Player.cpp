@@ -106,7 +106,7 @@ namespace playersState
    {
       if (num > this->nbWagons)
          throw std::invalid_argument("Cannot remove more wagons than available.");
-      this->nbWagons -= num;
+      this->nbWagons = this->nbWagons - num;
          
    }
    //TODO : add tests
@@ -125,10 +125,8 @@ namespace playersState
    int Player::calculateDestinationPoints()
    {
       int total = 0;
-      for (auto dest : completedDestinations)
+      for (std::shared_ptr<cardsState::DestinationCard> dest : completedDestinations)
       {
-         if (!dest)
-            continue;
          total += dest->getPoints();
       }
       addScore(total);
