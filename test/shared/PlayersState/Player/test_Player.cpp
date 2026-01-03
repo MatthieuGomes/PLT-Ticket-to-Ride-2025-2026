@@ -20,8 +20,8 @@ std::string test_init_stationA_name = "paris";
 std::string test_init_stationB_name = "rome";
 int test_init_destination_points = 12;
 cardsState::ColorCard test_init_wagon_color = cardsState::ColorCard::RED;
-std::shared_ptr<mapState::Station> test_init_stationA = std::make_shared<mapState::Station>(test_init_stationA_name, nullptr, false, nullptr);
-std::shared_ptr<mapState::Station> test_init_stationB = std::make_shared<mapState::Station>(test_init_stationB_name, nullptr, false, nullptr);
+std::shared_ptr<mapState::Station> test_init_stationA = std::make_shared<mapState::Station>(test_init_stationA_name, nullptr, nullptr);
+std::shared_ptr<mapState::Station> test_init_stationB = std::make_shared<mapState::Station>(test_init_stationB_name, nullptr, nullptr);
 
 std::string test_init_player_name = "yosra";
 PlayerColor test_init_player_color = PlayerColor::RED;
@@ -247,8 +247,8 @@ BOOST_AUTO_TEST_CASE(setHand)
 {
     std::string test_new_stationA_name = "berlin";
     std::string test_new_stationB_name = "rome";
-    std::shared_ptr<mapState::Station> test_new_stationA = std::make_shared<mapState::Station>(test_new_stationA_name, nullptr, false, nullptr);
-    std::shared_ptr<mapState::Station> test_new_stationB = std::make_shared<mapState::Station>(test_new_stationB_name, nullptr, false, nullptr);
+    std::shared_ptr<mapState::Station> test_new_stationA = std::make_shared<mapState::Station>(test_new_stationA_name, nullptr, nullptr);
+    std::shared_ptr<mapState::Station> test_new_stationB = std::make_shared<mapState::Station>(test_new_stationB_name, nullptr, nullptr);
 
     int test_new_destination_points = 15;
     cardsState::ColorCard test_new_wagon_color = cardsState::ColorCard::BLUE;
@@ -322,7 +322,6 @@ BOOST_AUTO_TEST_CASE(removeTrain)
               << std::endl;
 }
 
-// FIXME : add method
 BOOST_AUTO_TEST_CASE(RemoveStation)
 {
     std::cout << "RemoveStation Test Started ..." << std::endl;
@@ -393,10 +392,10 @@ BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
         std::cout << "completed destinations not empty case ..." << std::endl;
         int d1_points = 10;
         int d2_points = 8;
-        std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("paris", nullptr, false, nullptr);
-        std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("berlin", nullptr, false, nullptr);
-        std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("madrid", nullptr, false, nullptr);
-        std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("rome", nullptr, false, nullptr);
+        std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("paris", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("berlin", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("madrid", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("rome", nullptr, nullptr);
         std::shared_ptr<cardsState::DestinationCard> d1 = std::make_shared<cardsState::DestinationCard>(d1_stationA, d1_stationB, d1_points);
         std::shared_ptr<cardsState::DestinationCard> d2 = std::make_shared<cardsState::DestinationCard>(d2_stationA, d2_stationB, d2_points);
         std::vector<std::shared_ptr<cardsState::DestinationCard>> dest_cards = {d1, d2};
@@ -458,19 +457,9 @@ BOOST_AUTO_TEST_CASE(isRoadBuildable)
         std::cout << "\tnot enough wagon cards case finished !\n"
                   << std::endl;
     }
-    bool test_blocked_road = true;
-    {
-        std::cout << "\tblocked road case started ...  " << std::endl;
-        BOOST_REQUIRE(road);
-        road->setBlockStatus(test_blocked_road);
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-        BOOST_CHECK_EQUAL(player.isRoadBuildable(test_interact_map, road), false);
-        std::cout << "\tblocked road case finished !\n"
-                  << std::endl;
-    }
+
     std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("owner", PlayerColor::GREEN, 0, 10, 0, 0, test_interact_hand);
     {
-        road->setBlockStatus(false);
         std::cout << "\talready owned case started ...  " << std::endl;
         BOOST_REQUIRE(road);
         road->setOwner(test_owner);

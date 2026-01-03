@@ -23,14 +23,13 @@ struct StationData
 namespace mapState
 {
 
-    using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
+    using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
 
-    Station::Station(std::string name, std::shared_ptr<playersState::Player> owner, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertex)
+    Station::Station(std::string name, std::shared_ptr<playersState::Player> owner, std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertex)
     {
         DEBUG_PRINT("Station creation started ...");
         this->owner = owner;
         this->name = name;
-        this->isBlocked = isBlocked;
         this->vertex = vertex;
         DEBUG_PRINT("Station " << name << " created !");
     }
@@ -52,16 +51,6 @@ namespace mapState
         Station::_display();
     }
 
-    bool Station::getBlockStatus()
-    {
-        return this->isBlocked;
-    }
-
-    void Station::setBlockStatus(bool isBlocked)
-    {
-        this->isBlocked = isBlocked;
-    }
-
     bool Station::isClaimable()
     {
         return (this->owner == nullptr);
@@ -79,7 +68,7 @@ namespace mapState
 
     std::vector<std::shared_ptr<Station>> Station::getAdjacentStations(std::vector<std::shared_ptr<Road>> roads)
     {
-        std::vector<std::shared_ptr<Station>> adjacentStations;
+        std::vector<std::shared_ptr<Station>> adjacentStations = {};
         std::string stationName = this->name;
         for (const std::shared_ptr<Road> &road : roads)
         {
@@ -116,13 +105,12 @@ namespace mapState
         cout << "\tName : " << this->name << "\n";
         if (this->owner != nullptr)
         {
-            cout << "\tOwner : " << "test" << "\n";
+            cout << "\tOwner : " << this->owner->getName() << "\n";
         }
         else
         {
             cout << "\tOwner : None\n";
         }
-        cout << "\tBlocked : " << (this->isBlocked ? "Yes" : "No") << "\n";
     }
     std::vector<std::shared_ptr<Station>> Station::BatchConstructor(std::vector<StationInfo> stationInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
@@ -135,19 +123,18 @@ namespace mapState
         for (StationInfo info : stationInfos)
         {
             std::shared_ptr<playersState::Player> owner = std::get<0>(info);
-            bool isBlocked = std::get<1>(info);
-            std::string name = std::get<2>(info);
+            std::string name = std::get<1>(info);
             std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> descriptor =
                 std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
                     boost::add_vertex(*gameGraph));
-            stations.push_back(std::make_shared<Station>(name, owner, isBlocked, descriptor));
+            stations.push_back(std::make_shared<Station>(name, owner, descriptor));
         }
         DEBUG_PRINT("Station BatchConstructor finished !");
         return stations;
     }
 
-    StationInfo Station::genData(std::shared_ptr<playersState::Player> owner, bool isBlocked, std::string name)
+    StationInfo Station::genData(std::shared_ptr<playersState::Player> owner, std::string name)
     {
-        return std::tuple(owner, isBlocked, name);
+        return std::tuple(owner, name);
     }
 }

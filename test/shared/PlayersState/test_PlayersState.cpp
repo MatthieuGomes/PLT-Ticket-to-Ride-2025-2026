@@ -34,8 +34,6 @@ std::shared_ptr<playersState::Player> test_owner =
     std::make_shared<playersState::Player>("TestPlayer",
                                            playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
-bool test_is_blocked = false;
-
 std::shared_ptr<boost::adjacency_list<>> graph =
     std::make_shared<boost::adjacency_list<>>();
 
@@ -46,10 +44,10 @@ std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexB = std::make_
     boost::add_vertex(*graph));
 
 std::shared_ptr<Station> stationA =
-    std::make_shared<Station>(test_stationA_name, test_owner, test_is_blocked, vertexA);
+    std::make_shared<Station>(test_stationA_name, test_owner, vertexA);
 
 std::shared_ptr<Station> stationB =
-    std::make_shared<Station>(test_stationB_name, test_owner, test_is_blocked, vertexB);
+    std::make_shared<Station>(test_stationB_name, test_owner, vertexB);
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
 {
