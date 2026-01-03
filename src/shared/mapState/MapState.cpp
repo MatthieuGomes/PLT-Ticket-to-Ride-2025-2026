@@ -28,13 +28,13 @@
 
 namespace mapState
 {
-    using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
+    using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
+    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
     using TunnelDetail = RoadDetail;
     using TunnelInfo = RoadInfo;
-    using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int, bool>;
+    using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int>;
     using FerryInfo = std::pair<StationPair, FerryDetail>;
 
     MapState::MapState()
@@ -42,12 +42,11 @@ namespace mapState
         DEBUG_PRINT("default MapState creation started...");
         this->gameGraph = std::make_shared<boost::adjacency_list<>>();
         std::vector<StationInfo> stations = {
-            Station::genData(nullptr, false, "paris"),
-            Station::genData(nullptr, false, "berlin"),
-            Station::genData(nullptr, false, "madrid"),
-            Station::genData(nullptr, false, "rome"),
+            Station::genData(nullptr, "paris"),
+            Station::genData(nullptr, "berlin"),
+            Station::genData(nullptr, "madrid"),
+            Station::genData(nullptr, "rome"),
         };
-
         std::vector<std::shared_ptr<Station>> stationsObject = Station::BatchConstructor(stations, this->gameGraph);
         std::vector<RoadInfo> roads = {
             Road::genData(
@@ -56,16 +55,14 @@ namespace mapState
                 1,
                 nullptr,
                 cardsState::ColorCard::RED,
-                2,
-                false),
+                2),
             Road::genData(
                 stationsObject[2],
                 stationsObject[3],
                 4,
                 nullptr,
                 cardsState::ColorCard::GREEN,
-                6,
-                false),
+                6),
         };
         std::vector<TunnelInfo> tunnels = {
             Tunnel::genData(
@@ -74,8 +71,7 @@ namespace mapState
                 3,
                 nullptr,
                 cardsState::ColorCard::BLACK,
-                4,
-                false),
+                4),
 
         };
         std::vector<FerryInfo> ferrys = {
@@ -86,8 +82,7 @@ namespace mapState
                 nullptr,
                 cardsState::ColorCard::BLUE,
                 3,
-                4,
-                false),
+                4),
         };
         this->_MapState(this->gameGraph, stations, roads, tunnels, ferrys);
 #ifdef DEBUG
@@ -95,7 +90,7 @@ namespace mapState
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
-    
+
     MapState::MapState(std::shared_ptr<boost::adjacency_list<>> gameGraph, std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
     {
         DEBUG_PRINT("Parameterized MapState creation started...");
@@ -105,10 +100,6 @@ namespace mapState
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
-
-    // add a constructor without graph input (creates an empty graph INSIDE the constructor and fill it);
-    // add a constructor that takes vector of stations and roads directly (for testing purposes)
-
     void MapState::_MapState(std::shared_ptr<boost::adjacency_list<>> gameGraph, std::vector<StationInfo> stationsInfos, std::vector<RoadInfo> roadsInfos, std::vector<TunnelInfo> tunnelsInfos, std::vector<FerryInfo> ferrysInfos)
     {
 

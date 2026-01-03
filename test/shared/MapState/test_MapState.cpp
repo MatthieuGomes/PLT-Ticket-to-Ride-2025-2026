@@ -20,13 +20,13 @@
 
 using namespace ::mapState;
 
-using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>;
+using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
 using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
+using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 using TunnelDetail = RoadDetail;
 using TunnelInfo = RoadInfo;
-using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int, bool>;
+using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
@@ -55,19 +55,19 @@ BOOST_AUTO_TEST_CASE(Wrapper)
   std::cout << "Wrapper Constructor Test Started ..." << std::endl;
   boost::adjacency_list<> test_graph = boost::adjacency_list<>();
   std::vector<StationInfo> stationsInfos = {
-      Station::genData(nullptr, false, "Station1"),
-      Station::genData(nullptr, false, "Station2"),
+      Station::genData(nullptr, "Station1"),
+      Station::genData(nullptr, "Station2"),
   };
-  auto station1 = std::make_shared<Station>("Station1", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
-  auto station2 = std::make_shared<Station>("Station2", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto station1 = std::make_shared<Station>("Station1", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto station2 = std::make_shared<Station>("Station2", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   std::vector<RoadInfo> roadsInfos = {
-      Road::genData(station1, station2, 1, nullptr, cardsState::ColorCard::RED, 3, false),
+      Road::genData(station1, station2, 1, nullptr, cardsState::ColorCard::RED, 3),
   };
   std::vector<TunnelInfo> tunnelsInfos = {
-      Tunnel::genData(station2, station1, 2, nullptr, cardsState::ColorCard::BLUE, 4, true),
+      Tunnel::genData(station2, station1, 2, nullptr, cardsState::ColorCard::BLUE, 4),
   };
   std::vector<FerryInfo> ferrysInfos = {
-      Ferry::genData(station1, station2, 3, nullptr, cardsState::ColorCard::GREEN, 5, 1, false),
+      Ferry::genData(station1, station2, 3, nullptr, cardsState::ColorCard::GREEN, 5, 1),
   };
 
   mapState::MapState map_state = mapState::MapState(nullptr, stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
@@ -105,22 +105,22 @@ BOOST_AUTO_TEST_CASE(Parameterized)
 
   boost::adjacency_list<> test_graph = boost::adjacency_list<>();
   std::vector<StationInfo> stationsInfos = {
-      Station::genData(nullptr, false, "StationA"),
-      Station::genData(nullptr, false, "StationB"),
-      Station::genData(nullptr, false, "StationC"),
+      Station::genData(nullptr, "StationA"),
+      Station::genData(nullptr, "StationB"),
+      Station::genData(nullptr, "StationC"),
   };
-  auto stationA = std::make_shared<Station>("StationA", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
-  auto stationB = std::make_shared<Station>("StationB", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
-  auto stationC = std::make_shared<Station>("StationC", nullptr, false, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto stationA = std::make_shared<Station>("StationA", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto stationB = std::make_shared<Station>("StationB", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
+  auto stationC = std::make_shared<Station>("StationC", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   std::vector<RoadInfo> roadsInfos = {
-      Road::genData(stationA, stationB, 1, nullptr, cardsState::ColorCard::RED, 3, false),
-      Road::genData(stationB, stationC, 2, nullptr, cardsState::ColorCard::BLUE, 4, true),
+      Road::genData(stationA, stationB, 1, nullptr, cardsState::ColorCard::RED, 3),
+      Road::genData(stationB, stationC, 2, nullptr, cardsState::ColorCard::BLUE, 4),
   };
   std::vector<TunnelInfo> tunnelsInfos = {
-      Tunnel::genData(stationA, stationC, 3, nullptr, cardsState::ColorCard::GREEN, 5, false),
+      Tunnel::genData(stationA, stationC, 3, nullptr, cardsState::ColorCard::GREEN, 5),
   };
   std::vector<FerryInfo> ferrysInfos = {
-      Ferry::genData(stationC, stationA, 4, nullptr, cardsState::ColorCard::YELLOW, 6, 2, true),
+      Ferry::genData(stationC, stationA, 4, nullptr, cardsState::ColorCard::YELLOW, 6, 2),
   };
 
   map_state._MapState(map_state.gameGraph, stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
@@ -129,6 +129,7 @@ BOOST_AUTO_TEST_CASE(Parameterized)
   std::cout << "Parameterized Constructor Test Finished !\n"
             << std::endl;
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)

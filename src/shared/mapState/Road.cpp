@@ -17,10 +17,10 @@ using namespace std;
 namespace mapState
 {
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>;
+    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
 
-    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
+    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
     {
         DEBUG_PRINT("Road creation started ...");
         this->id = id;
@@ -29,7 +29,6 @@ namespace mapState
         this->stationB = stationB;
         this->color = color;
         this->length = length;
-        this->isBlocked = isBlocked;
         this->edge = edge;
         DEBUG_PRINT("Road " << this->id << " created !");
     }
@@ -49,14 +48,6 @@ namespace mapState
     {
         cout << "\tRoad Details:\n";
         _display();
-    }
-    bool Road::getBlockStatus()
-    {
-        return this->isBlocked;
-    }
-    void Road::setBlockStatus(bool isBlocked)
-    {
-        this->isBlocked = isBlocked;
     }
 
     std::shared_ptr<Station> Road::getStationA()
@@ -82,12 +73,12 @@ namespace mapState
         cout << "\tStation B: " << this->stationB->name << "\n";
         cout << "\tColor: " << static_cast<int>(this->color) << "\n";
         cout << "\tLength: " << this->length << "\n";
-        cout << "\tIs Blocked: " << (this->isBlocked ? "Yes" : "No") << "\n";
+        cout << "\tOwner: " << (this->owner ? this->owner->name : "None") << "\n";
     }
 
     bool Road::isClaimable(std::vector<std::shared_ptr<Road>> roads, int nbPlayers, std::shared_ptr<playersState::Player> player)
     {
-        bool claimable = this->owner == nullptr && !this->isBlocked;
+        bool claimable = this->owner == nullptr;
         if (!claimable)
         {
             return false;
@@ -99,7 +90,7 @@ namespace mapState
             {
                 continue;
             }
-            if (road->getOwner()->getColor() == player->getColor())
+            if (road->getOwner() != nullptr && road->getOwner()->getColor() == player->getColor())
             {
                 return false;
             }
@@ -110,7 +101,7 @@ namespace mapState
         }
         return claimable;
     }
-    
+
     std::vector<std::shared_ptr<Road>> Road::getClaimableRoads(std::vector<std::shared_ptr<Road>> roads, int nbPlayers, std::shared_ptr<playersState::Player> player)
     {
         std::vector<std::shared_ptr<Road>> claimable;
@@ -153,18 +144,17 @@ namespace mapState
             std::shared_ptr<playersState::Player> owner = std::get<1>(detail);
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
-            bool isBlocked = std::get<4>(detail);
             std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
                 std::make_shared<boost::adjacency_list<>::edge_descriptor>(
                     boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
-            roads.push_back(std::make_shared<Road>(id, owner, stationA, stationB, color, length, isBlocked, edgeDescriptor));
+            roads.push_back(std::make_shared<Road>(id, owner, stationA, stationB, color, length, edgeDescriptor));
         }
         return roads;
     }
-    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length, int isBlocked)
+    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
     {
         StationPair pair = std::pair(stationA, stationB);
-        RoadDetail detail = std::tuple(id, owner, color, length, isBlocked);
+        RoadDetail detail = std::tuple(id, owner, color, length);
         return std::pair(pair, detail);
     }
     std::vector<std::shared_ptr<Road>> Road::getRoadsBetweenStations(std::vector<std::shared_ptr<Road>> roads, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)

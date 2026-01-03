@@ -80,13 +80,11 @@ BOOST_AUTO_TEST_CASE(BatchDestinationDeck)
     // ---- Owner ----
     auto owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
-    bool blocked = false;
-
     // ---- Stations ----
-    auto paris   = std::make_shared<Station>("Paris", owner, blocked, v1);
-    auto lyon    = std::make_shared<Station>("Lyon", owner, blocked, v2);
-    auto berlin  = std::make_shared<Station>("Berlin", owner, blocked, v3);
-    auto munich  = std::make_shared<Station>("Munich", owner, blocked, v4);
+    auto paris   = std::make_shared<Station>("Paris", owner, v1);
+    auto lyon    = std::make_shared<Station>("Lyon", owner, v2);
+    auto berlin  = std::make_shared<Station>("Berlin", owner, v3);
+    auto munich  = std::make_shared<Station>("Munich", owner, v4);
 
     // ---- Destination cards infos ----
     std::vector<DestinationCardInfos> cardArgs = {

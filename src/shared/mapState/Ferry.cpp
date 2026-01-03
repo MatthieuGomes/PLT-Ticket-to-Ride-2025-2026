@@ -14,9 +14,9 @@ using namespace std;
 namespace mapState
 {
     using StationPair = std::pair<std::shared_ptr<Station>,std::shared_ptr<Station>>;
-    using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int,int, bool>;
+    using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int,int>;
     using FerryInfo = std::pair<StationPair,FerryDetail>;
-    Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, int locomotives, bool isBlocked, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge) : Road(id, owner, stationA, stationB, color, lenght, isBlocked, edge)
+    Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, int locomotives, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge) : Road(id, owner, stationA, stationB, color, lenght, edge)
     {
         DEBUG_PRINT("Parent constructor finished :");
         
@@ -60,19 +60,18 @@ namespace mapState
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
             int locomotives = std::get<4>(detail);
-            bool isBlocked = std::get<5>(detail);
             std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
                 std::make_shared<boost::adjacency_list<>::edge_descriptor>(
                     boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
-            tunnels.push_back(std::make_shared<Ferry>(id,owner,stationA,stationB,color,length,locomotives,isBlocked,edgeDescriptor));
+            tunnels.push_back(std::make_shared<Ferry>(id,owner,stationA,stationB,color,length,locomotives,edgeDescriptor));
         }
         DEBUG_PRINT("Ferry BatchConstructor finished !");
         return tunnels;
     }
 
-    FerryInfo Ferry::genData (std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color,int locomotives, int length, bool isBlocked){
+    FerryInfo Ferry::genData (std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color,int locomotives, int length){
         StationPair pair = std::pair(stationA,stationB);
-        FerryDetail detail = std::tuple(id,owner,color,locomotives,length,isBlocked);
+        FerryDetail detail = std::tuple(id,owner,color,locomotives,length);
         return std::pair(pair,detail);
     }
 
