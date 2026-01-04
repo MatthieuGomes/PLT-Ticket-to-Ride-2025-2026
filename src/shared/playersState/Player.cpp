@@ -148,6 +148,7 @@ namespace playersState
       }
       else
       {
+         // FIXME : implement no color roads logic !  
          int length = road->getLength();
          if (this->nbWagons < length)
          {

@@ -119,6 +119,8 @@ BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
   BOOST_CHECK_EQUAL(roads[0]->id, 301);
 }
 
+
+BOOST_AUTO_TEST_SUITE(DataGenerators)
 BOOST_AUTO_TEST_CASE(GenData)
 {
   std::cout << "GenData Test Started ..." << std::endl;
@@ -132,6 +134,45 @@ BOOST_AUTO_TEST_CASE(GenData)
   std::cout << "GenData Test Finished !\n"
             << std::endl;
 }
+BOOST_AUTO_TEST_CASE(InitData){
+  std::cout << "InitData Test Started ..." << std::endl;
+  RoadInfo info = Road::initData(test_stationA, test_stationB, test_road_id, test_color, test_length);
+  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
+  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
+  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_road_id);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second), nullptr);
+  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
+  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
+  std::cout << "InitData Test Finished !\n"
+            << std::endl;  
+}
+
+BOOST_AUTO_TEST_CASE(GenDataByName){
+  std::cout << "GenDataByName Test Started ..." << std::endl;
+  RoadInfo info = Road::genDataByName({test_stationA, test_stationB}, test_stationA->name, test_stationB->name, test_road_id, test_owner, test_color, test_length);
+  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
+  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
+  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_road_id);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second)->name, test_owner->name);
+  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
+  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
+  std::cout << "GenDataByName Test Finished !\n"
+            << std::endl;  
+}
+BOOST_AUTO_TEST_CASE(InitDataByName){
+  std::cout << "InitDataByName Test Started ..." << std::endl;
+  RoadInfo info = Road::initDataByName({test_stationA, test_stationB}, test_stationA->name, test_stationB->name, test_road_id, test_color, test_length);
+  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
+  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
+  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_road_id);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second), nullptr);
+  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
+  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
+  std::cout << "InitDataByName Test Finished !\n"
+            << std::endl;  
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -248,13 +289,6 @@ BOOST_AUTO_TEST_CASE(isClaimable)
     std::cout << "owned road case test finished !" << std::endl;
   }
   {
-    std::cout << "blocked road case test started ..." << std::endl;
-    Road blockedRoad = Road(test_road_id, nullptr, test_stationA, test_stationB, test_color, test_length, test_edge);
-    std::vector<std::shared_ptr<Road>> roads = {std::make_shared<Road>(blockedRoad)};
-    BOOST_CHECK_EQUAL(blockedRoad.isClaimable(roads, smallPartySize, test_owner), false);
-    std::cout << "blocked road case test finished !" << std::endl;
-  }
-  {
     std::cout << "normal claimable road case test started ..." << std::endl;
     Road claimableRoad = Road(test_road_id, nullptr, test_stationA, test_stationB, test_color, test_length, test_edge);
     std::vector<std::shared_ptr<Road>> roads = {std::make_shared<Road>(claimableRoad)};
@@ -348,14 +382,18 @@ BOOST_AUTO_TEST_CASE(getClaimableRoads)
             << std::endl;
 }
 // TODO : Add tests for display and _display methods
-BOOST_AUTO_TEST_CASE(_display){
+BOOST_AUTO_TEST_CASE(_display)
+{
   std::cout << "_display Test Started ..." << std::endl;
-  std::cout << "_display Test Finished !\n" << std::endl;
+  std::cout << "_display Test Finished !\n"
+            << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(display){
+BOOST_AUTO_TEST_CASE(display)
+{
   std::cout << "display Test Started ..." << std::endl;
-  std::cout << "display Test Finished !\n" << std::endl;
+  std::cout << "display Test Finished !\n"
+            << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

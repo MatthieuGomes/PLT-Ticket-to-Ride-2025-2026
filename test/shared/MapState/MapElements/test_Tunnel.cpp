@@ -101,6 +101,7 @@ BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
   BOOST_CHECK_EQUAL(tunnels.size(), 1);
   BOOST_CHECK_EQUAL(tunnels[0]->id, 401);
 }
+BOOST_AUTO_TEST_SUITE(DataGenerators)
 
 BOOST_AUTO_TEST_CASE(GenData)
 {
@@ -115,6 +116,51 @@ BOOST_AUTO_TEST_CASE(GenData)
   std::cout << "GenData Test Finished !\n"
             << std::endl;
 }
+BOOST_AUTO_TEST_CASE(InitData){
+  std::cout << "InitData Test Started ..." << std::endl;
+  TunnelInfo info = Tunnel::initData(test_stationA, test_stationB, test_tunnel_id, test_color, test_length);
+  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
+  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
+  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second), nullptr);
+  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
+  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
+
+  std::cout << "InitData Test Finished !\n"
+            << std::endl;  
+}
+BOOST_AUTO_TEST_CASE(GenDataByName){
+  std::cout << "GenDataByName Test Started ..." << std::endl;
+  std::vector<std::shared_ptr<Station>> stations = {test_stationA, test_stationB};
+  TunnelInfo info = Tunnel::genDataByName(stations, "StationA", "StationB", test_tunnel_id, test_owner, test_color, test_length);
+  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
+  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
+  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second)->name, test_owner->name);
+  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
+  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
+
+  std::cout << "GenDataByName Test Finished !\n"
+            << std::endl;  
+}
+BOOST_AUTO_TEST_CASE(InitDataByNameData){
+  std::cout << "InitDataByName Test Started ..." << std::endl;
+  std::vector<std::shared_ptr<Station>> stations = {test_stationA, test_stationB};
+  TunnelInfo info = Tunnel::initDataByName(stations, "StationA", "StationB", test_tunnel_id, test_color, test_length);
+  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
+  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
+  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
+  BOOST_CHECK_EQUAL(std::get<1>(info.second), nullptr);
+  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
+  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
+
+  std::cout << "InitDataByName Test Finished !\n"
+            << std::endl;
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
 
 BOOST_AUTO_TEST_SUITE_END() // Constructors
 

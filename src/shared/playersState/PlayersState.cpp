@@ -33,8 +33,7 @@ namespace playersState
     } 
     bool PlayersState::isRoadClaimable(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Road> road, std::shared_ptr<Player> player)
     {
-        // FIXME ? Maybe create a isRoadClaimable method in MapState to use less parameters
-        return road->isClaimable(map->getRoads(), PlayersState::nbPlayers, player);
+        return map->isRoadClaimable(PlayersState::nbPlayers, road, player);
     }
     void PlayersState::display()
     {
