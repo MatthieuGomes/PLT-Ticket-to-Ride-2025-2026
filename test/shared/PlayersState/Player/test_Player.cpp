@@ -12,8 +12,6 @@
 #define DEBUG_PRINT(x)
 #endif
 
-// FIXME : needs new constructors for mapstate to be able to test more correctly
-
 using namespace ::playersState;
 
 std::string test_init_stationA_name = "paris";
@@ -434,7 +432,7 @@ BOOST_AUTO_TEST_CASE(isRoadBuildable)
     std::cout << "isRoadBuildable Test Started ..." << std::endl;
     std::shared_ptr<mapState::Station> test_stationA = test_interact_map->getStationByName(test_interract_stationA_name);
     std::shared_ptr<mapState::Station> test_stationB = test_interact_map->getStationByName(test_interract_stationB_name);
-    std::vector<std::shared_ptr<mapState::Road>> roads = test_interact_map->getRoadBetweenStations(test_stationA, test_stationB);
+    std::vector<std::shared_ptr<mapState::Road>> roads = test_interact_map->getRoadsBetweenStations(test_stationA, test_stationB);
     std::shared_ptr<mapState::Road> road = roads[0];
     BOOST_REQUIRE(test_stationA);
     BOOST_REQUIRE(test_stationB);

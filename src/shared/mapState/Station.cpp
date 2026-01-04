@@ -87,15 +87,15 @@ namespace mapState
         }
         return adjacentStations;
     }
-    
+
     std::shared_ptr<Station> Station::getStationByName(std::vector<std::shared_ptr<Station>> stations, const std::string &name)
     {
         for (const std::shared_ptr<Station> &station : stations)
         {
-            if (station->name == name){
+            if (station->name == name)
+            {
                 return station;
             }
-                
         }
         return nullptr;
     }
@@ -137,4 +137,9 @@ namespace mapState
     {
         return std::tuple(owner, name);
     }
+    StationInfo Station::initData(std::string name)
+    {
+        return Station::genData(nullptr, name);
+    }
+
 }

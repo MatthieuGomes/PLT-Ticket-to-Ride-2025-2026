@@ -3,11 +3,11 @@
 #include <stdexcept>
 
 #define DEBUG_MODE false
-#if DEBUG_MODE == true 
-    #define DEBUG
-    #define DEBUG_PRINT(x) std::cout << x << std::endl
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
 #else
-    #define DEBUG_PRINT(x)
+#define DEBUG_PRINT(x)
 #endif
 
 using namespace std;
@@ -21,7 +21,7 @@ namespace mapState
     Tunnel::Tunnel(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
         : Road(id, owner, stationA, stationB, color, lenght, edge)
     {
-        DEBUG_PRINT("Parent constructor finished : Tunnel "<< this->id <<" created !");
+        DEBUG_PRINT("Parent constructor finished : Tunnel " << this->id << " created !");
     }
 
     Tunnel::~Tunnel()
@@ -63,13 +63,29 @@ namespace mapState
             tunnels.push_back(std::make_shared<Tunnel>(id, owner, stationA, stationB, color, length, edgeDescriptor));
         }
         DEBUG_PRINT("Tunnel BatchConstructor finished !");
-        
+
         return tunnels;
     }
 
     TunnelInfo Tunnel::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
     {
         return Road::genData(stationA, stationB, id, owner, color, length);
+    }
+    TunnelInfo Tunnel::initData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, cardsState::ColorCard color, int length)
+    {
+        return Tunnel::genData(stationA, stationB, id, nullptr, color, length);
+    }
+    TunnelInfo Tunnel::genDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
+    {
+        std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
+        std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);
+        return Tunnel::genData(stationA, stationB, id, owner, color, length);
+    }
+    TunnelInfo Tunnel::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, cardsState::ColorCard color, int length)
+    {
+        std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
+        std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);
+        return Tunnel::genData(stationA, stationB, id, nullptr, color, length);
     }
 
 }

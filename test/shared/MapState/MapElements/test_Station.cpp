@@ -75,6 +75,7 @@ BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
   std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationInfos, graph);
   BOOST_CHECK_EQUAL(stations.size(), 1);
 }
+BOOST_AUTO_TEST_SUITE()
 
 BOOST_AUTO_TEST_CASE(GenData)
 {
@@ -85,6 +86,18 @@ BOOST_AUTO_TEST_CASE(GenData)
   std::cout << "GenData Test Finished !\n"
             << std::endl;
 }
+
+BOOST_AUTO_TEST_CASE(InitData)
+{
+  std::cout << "InitData Test Started ..." << std::endl;
+  StationInfo info = Station::initData( test_station_name);
+  BOOST_CHECK_EQUAL(std::get<0>(info), nullptr);
+  BOOST_CHECK_EQUAL(std::get<1>(info), test_station_name);
+  std::cout << "InitData Test Finished !\n"
+            << std::endl;
+}
+
+BOOST_AUTO_TEST_SUITE_END() // DataGenerators
 
 BOOST_AUTO_TEST_SUITE_END() // Constructors
 
