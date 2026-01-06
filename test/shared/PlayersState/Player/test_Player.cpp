@@ -350,9 +350,9 @@ BOOST_AUTO_TEST_CASE(RemoveStation)
 BOOST_AUTO_TEST_SUITE_END() // Internal
 
 BOOST_AUTO_TEST_SUITE(Interactions)
-std::string test_interract_stationA_name = "paris";
-std::string test_interract_stationB_name = "berlin";
-std::shared_ptr<mapState::MapState> test_interact_map = std::make_shared<mapState::MapState>();
+std::string test_interract_stationA_name = "A";
+std::string test_interract_stationB_name = "B";
+std::shared_ptr<mapState::MapState> test_interact_map = std::make_shared<mapState::MapState>(mapState::MapState::Test());
 cardsState::DestinationCard test_interact_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points);
 cardsState::WagonCard test_interact_wagon_card(test_init_wagon_color);
 std::vector<std::shared_ptr<cardsState::DestinationCard>> test_interact_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
@@ -390,10 +390,10 @@ BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
         std::cout << "completed destinations not empty case ..." << std::endl;
         int d1_points = 10;
         int d2_points = 8;
-        std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("paris", nullptr, nullptr);
-        std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("berlin", nullptr, nullptr);
-        std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("madrid", nullptr, nullptr);
-        std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("rome", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("A", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("B", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("C", nullptr, nullptr);
+        std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("D", nullptr, nullptr);
         std::shared_ptr<cardsState::DestinationCard> d1 = std::make_shared<cardsState::DestinationCard>(d1_stationA, d1_stationB, d1_points);
         std::shared_ptr<cardsState::DestinationCard> d2 = std::make_shared<cardsState::DestinationCard>(d2_stationA, d2_stationB, d2_points);
         std::vector<std::shared_ptr<cardsState::DestinationCard>> dest_cards = {d1, d2};

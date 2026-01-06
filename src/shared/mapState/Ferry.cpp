@@ -16,6 +16,10 @@ namespace mapState
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
     using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, int, int>;
     using FerryInfo = std::pair<StationPair, FerryDetail>;
+    Ferry::Ferry() : Road()
+    {
+    }
+
     Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int locomotives, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge) : Road(id, owner, stationA, stationB, cardsState::ColorCard::NONE, length, edge)
     {
         DEBUG_PRINT("Parent constructor finished :");
@@ -24,6 +28,17 @@ namespace mapState
         this->locomotives = locomotives;
         DEBUG_PRINT("Ferry " << this->id << " created !");
     }
+
+    Ferry Ferry::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int locomotives, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
+    {
+        DEBUG_PRINT("Ferry creation started ...");
+        std::shared_ptr<playersState::Player> owner = nullptr;
+        std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
+            boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
+        return Ferry(id, owner, stationA, stationB, locomotives, length, edge);
+        DEBUG_PRINT("Ferry " << this->id << " created !");
+    }
+
     Ferry::~Ferry()
     {
         DEBUG_PRINT("\tFerry " << this->id << " Destroyed !");
