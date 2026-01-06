@@ -12,6 +12,8 @@ namespace {
 // Frame geometry: 2 cells for borders and content starts 1 cell in.
 const int kFrameInset = 2;
 const int kFrameOffset = 1;
+// Keep at least one message so the panel can display something.
+const int kMinMaxMessages = 1;
 
 int clampValue(int value, int minValue, int maxValue) {
   if (value < minValue) {
@@ -43,13 +45,23 @@ void writeClampedLine(Terminal& term, int row, int col, int width,
 
 }  // namespace
 
-InfoPanel::InfoPanel(int x, int y, int width, int height)
-    : BaseView(x, y, width, height), scrollOffset(0) {
+InfoPanel::InfoPanel(int x, int y, int width, int height, int maxMessages)
+    : BaseView(x, y, width, height),
+      scrollOffset(0),
+      maxMessages(maxMessages) {
+  if (this->maxMessages < kMinMaxMessages) {
+    this->maxMessages = kMinMaxMessages;
+  }
   requestRedraw();
 }
 
 void InfoPanel::addMessage(const std::string& message) {
   messages.push_back(message);
+  // Trim the oldest messages once the buffer limit is reached.
+  if (static_cast<int>(messages.size()) > maxMessages) {
+    const int excess = static_cast<int>(messages.size()) - maxMessages;
+    messages.erase(messages.begin(), messages.begin() + excess);
+  }
   // Keep scroll offset valid as new messages arrive.
   int maxOffset = static_cast<int>(messages.size()) - getVisibleLineCount();
   if (maxOffset < 0) {

@@ -12,10 +12,17 @@ namespace {
 // Frame geometry: 2 cells for the left/right border, and content starts 1 cell in.
 const int kFrameInset = 2;
 const int kFrameOffset = 1;
+// Use a solid gray border (bright black) made of spaces with a gray background.
+const Color kFrameBorderFg = Color::BrightBlack;
+const Color kFrameBorderBg = Color::BrightBlack;
+const char kFrameBorderFill = ' ';
 // Header needs at least corners + 2 chars to be worth drawing.
 const int kHeaderMinWidth = 4;
 // Keep header text away from the left corner.
 const int kHeaderPadding = 2;
+// Title label colors: light gray background with black text.
+const Color kHeaderTextFg = Color::Black;
+const Color kHeaderTextBg = Color::BrightWhite;
 
 }  // namespace
 
@@ -117,36 +124,30 @@ void BaseView::drawFrame(Terminal& term) {
     return;
   }
 
-  term.setBg(bgColor);
-  term.setFg(fgColor);
+  term.setBg(kFrameBorderBg);
+  term.setFg(kFrameBorderFg);
 
-  // Top border.
+  // Top border (solid block).
   term.moveTo(y, x);
-  term.write("+");
-  if (width > kFrameInset) {
-    term.writeRepeat('-', width - kFrameInset);
-  }
-  term.write("+");
+  term.writeRepeat(kFrameBorderFill, width);
 
   // Vertical borders.
   int row = kFrameOffset;
   while (row < height - 1) {
     term.moveTo(y + row, x);
-    term.write("|");
-    if (width > kFrameInset) {
-      term.writeRepeat(' ', width - kFrameInset);
-    }
-    term.write("|");
+    term.writeRepeat(kFrameBorderFill, kFrameOffset);
+    term.moveTo(y + row, x + width - kFrameOffset);
+    term.writeRepeat(kFrameBorderFill, kFrameOffset);
     row += 1;
   }
 
-  // Bottom border.
+  // Bottom border (solid block).
   term.moveTo(y + height - 1, x);
-  term.write("+");
-  if (width > kFrameInset) {
-    term.writeRepeat('-', width - kFrameInset);
-  }
-  term.write("+");
+  term.writeRepeat(kFrameBorderFill, width);
+
+  // Restore view colors for follow-up drawing.
+  term.setBg(bgColor);
+  term.setFg(fgColor);
 }
 
 void BaseView::drawHeader(Terminal& term) {
@@ -166,8 +167,13 @@ void BaseView::drawHeader(Terminal& term) {
 
   term.setBg(bgColor);
   term.setFg(fgColor);
+  term.setBg(kHeaderTextBg);
+  term.setFg(kHeaderTextFg);
   term.moveTo(y, x + kHeaderPadding);
   term.write(text);
+  // Restore view colors for the remaining drawing operations.
+  term.setBg(bgColor);
+  term.setFg(fgColor);
 }
 
 void BaseView::drawContent(Terminal& term) {

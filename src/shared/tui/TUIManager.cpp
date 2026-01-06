@@ -34,6 +34,8 @@ const int kContentVerticalPadding = kStatusBarHeight + kCommandInputHeight;
 // MapView gets roughly 2/3 of the remaining vertical space.
 const int kMapHeightNumerator = 2;
 const int kMapHeightDenominator = 3;
+// InfoPanel keeps only the most recent messages.
+const int kInfoPanelMaxMessages = 200;
 // Keep input short to avoid overwriting the frame borders.
 const int kMaxInputLength = 50;
 // TUI refresh throttle to avoid busy looping.
@@ -45,6 +47,13 @@ const int kSelectTimeoutUsec = 0;
 // Termios settings for non-blocking character input.
 const int kTermiosVmin = 0;
 const int kTermiosVtime = 0;
+// Escape sequence parsing (PgUp/PgDn are ESC [ 5/6 ~).
+const char kEscape = 27;
+const char kEscapeBracket = '[';
+const char kEscapeTerminator = '~';
+const char kPageUpCode = '5';
+const char kPageDownCode = '6';
+const int kMinScrollLines = 1;
 // Key codes for basic input handling.
 const char kNewline = '\n';
 const char kCarriageReturn = '\r';
@@ -120,6 +129,7 @@ void TUIManager::init() {
     statusbar->setTitle("StatusBar");
     statusbar->setGameInfo("Ticket to Ride", "0.1");
     statusbar->setTurn(1);
+    statusbar->setColors(Color::White, Color::Red);
   }
   if (!mapview) {
     mapview = new MapView(
@@ -138,7 +148,8 @@ void TUIManager::init() {
         kTerminalOrigin,
         kTerminalOrigin,
         cols,
-        std::max(kMinDimension, rows - kContentVerticalPadding));
+        std::max(kMinDimension, rows - kContentVerticalPadding),
+        kInfoPanelMaxMessages);
     infopanel->setTitle("InfoPanel");
     infopanel->addMessage("Welcome to Ticket to Ride!");
   }
@@ -304,7 +315,32 @@ void TUIManager::runMainLoop() {
       char ch = '\0';
       bool updated = false;
       while (pollChar(ch)) {
-        if (ch == kNewline || ch == kCarriageReturn) {
+        if (ch == kEscape && infopanel != nullptr) {
+          // Handle PageUp/PageDown escape sequences to scroll the info panel.
+          char seq1 = '\0';
+          if (!pollChar(seq1) || seq1 != kEscapeBracket) {
+            continue;
+          }
+          char seq2 = '\0';
+          if (!pollChar(seq2)) {
+            continue;
+          }
+          if (seq2 != kPageUpCode && seq2 != kPageDownCode) {
+            continue;
+          }
+          char seq3 = '\0';
+          if (!pollChar(seq3) || seq3 != kEscapeTerminator) {
+            continue;
+          }
+
+          int scrollAmount = infopanel->getVisibleLineCount();
+          if (scrollAmount < kMinScrollLines) {
+            scrollAmount = kMinScrollLines;
+          }
+          const int delta = (seq2 == kPageUpCode) ? scrollAmount : -scrollAmount;
+          infopanel->scroll(delta);
+          updated = true;
+        } else if (ch == kNewline || ch == kCarriageReturn) {
           // Submit current input line.
           std::string input = commandinput->getInput();
           if (!input.empty()) {
