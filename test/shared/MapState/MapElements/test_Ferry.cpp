@@ -55,6 +55,22 @@ BOOST_AUTO_TEST_CASE(Default)
             << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(EMPTY)
+{
+  std::cout << "Empty Player Constructor Test Started ..." << std::endl;
+      Ferry ferry;
+      BOOST_CHECK_EQUAL(ferry.id, -1);
+      BOOST_CHECK_EQUAL(ferry.owner, nullptr);
+      BOOST_CHECK_EQUAL(ferry.stationA, nullptr);
+      BOOST_CHECK_EQUAL(ferry.stationB, nullptr);
+      BOOST_CHECK_EQUAL(ferry.color, cardsState::ColorCard::LOCOMOTIVE);
+      BOOST_CHECK_EQUAL(ferry.length, -1);
+      BOOST_CHECK_EQUAL(ferry.edge, nullptr);
+      BOOST_CHECK_EQUAL(ferry.locomotives, -1);
+      std::cout << "Empty Player Constructor Test Finished !\n"
+                << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(BatchConstructor)
 {
   std::cout << "BatchConstructor Test Started ..." << std::endl;

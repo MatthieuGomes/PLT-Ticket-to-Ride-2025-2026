@@ -36,17 +36,17 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 
 BOOST_AUTO_TEST_SUITE(Constructors)
 
-BOOST_AUTO_TEST_CASE(DefaultEmpty)
+BOOST_AUTO_TEST_CASE(Empty)
 {
-  std::cout << "Default Constructor Test Started ..." << std::endl;
+  std::cout << "Empty Constructor Test Started ..." << std::endl;
   mapState::MapState map_state = mapState::MapState();
 #ifdef DEBUG
   map_state.display();
 #endif
-  BOOST_CHECK_EQUAL(map_state.gameGraph != nullptr, true);
+  BOOST_CHECK(map_state.gameGraph != nullptr);
   BOOST_CHECK_EQUAL(map_state.stations.size(), 0);
   BOOST_CHECK_EQUAL(map_state.roads.size(), 0);
-  std::cout << "Default Constructor Test Finished !\n"
+  std::cout << "Empty Constructor Test Finished !\n"
             << std::endl;
 }
 

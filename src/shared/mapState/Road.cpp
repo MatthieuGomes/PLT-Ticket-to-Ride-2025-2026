@@ -10,7 +10,6 @@
 #else
 #define DEBUG_PRINT(x)
 #endif
-#define UNDEFINED_ID -1
 
 using namespace std;
 
@@ -19,7 +18,26 @@ namespace mapState
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
     using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
-    Road::Road() {}
+
+    /*
+    cardsState::ColorCard Road::possibleColors[9] = {
+        cardsState::ColorCard::RED,
+        cardsState::ColorCard::BLUE,
+        cardsState::ColorCard::GREEN,
+        cardsState::ColorCard::WHITE,
+        cardsState::ColorCard::BLACK,
+        cardsState::ColorCard::YELLOW,
+        cardsState::ColorCard::PINK,
+        cardsState::ColorCard::ORANGE,
+        cardsState::ColorCard::NONE,
+    };
+    */
+
+    Road::Road() {
+        this->id = -1;
+        this->color = cardsState::ColorCard::LOCOMOTIVE;
+        this->length = -1;
+    }
     Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
     {
         DEBUG_PRINT("Road creation started ...");

@@ -3,18 +3,36 @@
 
 using namespace std;
 
+
 namespace playersState
 {
+    using playersInfos = std::tuple<std::string, PlayerColor, int, int, int,int, std::shared_ptr<cardsState::PlayerCards>>;
+    using playersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
+
+    int PlayersState::nbPlayers = 0;
+
     PlayersState::PlayersState()
     {
-        this->players = {};
-        PlayersState::nbPlayers = static_cast<int>(players.size());   
     }
 
     PlayersState::PlayersState(std::vector<std::shared_ptr<Player>> players)
     {
         this->players = players;
         PlayersState::nbPlayers = static_cast<int>(players.size());   
+    }
+
+    PlayersState::PlayersState(std::vector<playersInfos> infos)
+    {
+        this->players = Player::BatchFromInfos(infos);
+        PlayersState::nbPlayers = static_cast<int>(this->players.size());   
+    }
+
+    PlayersState PlayersState::InitFromInfos(std::vector<playersInitInfos> infos)
+    {
+        PlayersState state;
+        state.players = Player::BatchFromInitInfos(infos);
+        PlayersState::nbPlayers = static_cast<int>(state.players.size());   
+        return state;
     }
 
     std::vector<std::shared_ptr<Player>> PlayersState::getPlayers()
