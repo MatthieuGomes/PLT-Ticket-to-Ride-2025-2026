@@ -9,6 +9,14 @@
 
 namespace tui {
 
+namespace {
+
+// Frame geometry: 2 cells for borders and content starts 1 cell in.
+const int kFrameInset = 2;
+const int kFrameOffset = 1;
+
+}  // namespace
+
 StatusBar::StatusBar(int x, int y, int width, int height)
     : BaseView(x, y, width, height) {
   gameName.clear();
@@ -55,6 +63,7 @@ void StatusBar::drawHeader(Terminal& term) {
   term.setBg(bgColor);
   term.setFg(fgColor);
 
+  // Compose a single-line status string: game/version, turn, and player name.
   std::ostringstream statusLine;
   if (!gameName.empty()) {
     statusLine << gameName;
@@ -80,13 +89,14 @@ void StatusBar::drawHeader(Terminal& term) {
   }
 
   std::string text = statusLine.str();
-  const int available = std::max(0, width - 2);
+  const int available = std::max(0, width - kFrameInset);
   if (static_cast<int>(text.size()) > available) {
     text.resize(available);
   }
 
+  // Keep text in the middle row for a compact bar.
   const int textRow = y + height / 2;
-  const int textCol = x + 1;
+  const int textCol = x + kFrameOffset;
   term.moveTo(textRow, textCol);
   term.write(text);
   if (static_cast<int>(text.size()) < available) {

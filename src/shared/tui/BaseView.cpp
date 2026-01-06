@@ -7,6 +7,18 @@
 
 namespace tui {
 
+namespace {
+
+// Frame geometry: 2 cells for the left/right border, and content starts 1 cell in.
+const int kFrameInset = 2;
+const int kFrameOffset = 1;
+// Header needs at least corners + 2 chars to be worth drawing.
+const int kHeaderMinWidth = 4;
+// Keep header text away from the left corner.
+const int kHeaderPadding = 2;
+
+}  // namespace
+
 BaseView::BaseView(int x, int y, int width, int height, const std::string& title)
     : x(x),
       y(y),
@@ -70,6 +82,7 @@ void BaseView::clear(Terminal& term) {
   if (width <= 0 || height <= 0) {
     return;
   }
+  // Clear the full view area using the current view colors.
   term.setBg(bgColor);
   term.setFg(fgColor);
   term.clearRegion(y, x, width, height);
@@ -86,6 +99,7 @@ void BaseView::refresh(Terminal& term) {
   if (!needsRedraw) {
     return;
   }
+  // Always clear before redrawing to avoid leftover text from previous frames.
   clear(term);
   draw(term);
   needsRedraw = false;
@@ -99,35 +113,38 @@ void BaseView::drawFrame(Terminal& term) {
   if (width <= 0 || height <= 0) {
     return;
   }
-  if (width < 2 || height < 2) {
+  if (width < kFrameInset || height < kFrameInset) {
     return;
   }
 
   term.setBg(bgColor);
   term.setFg(fgColor);
 
+  // Top border.
   term.moveTo(y, x);
   term.write("+");
-  if (width > 2) {
-    term.writeRepeat('-', width - 2);
+  if (width > kFrameInset) {
+    term.writeRepeat('-', width - kFrameInset);
   }
   term.write("+");
 
-  int row = 1;
+  // Vertical borders.
+  int row = kFrameOffset;
   while (row < height - 1) {
     term.moveTo(y + row, x);
     term.write("|");
-    if (width > 2) {
-      term.writeRepeat(' ', width - 2);
+    if (width > kFrameInset) {
+      term.writeRepeat(' ', width - kFrameInset);
     }
     term.write("|");
     row += 1;
   }
 
+  // Bottom border.
   term.moveTo(y + height - 1, x);
   term.write("+");
-  if (width > 2) {
-    term.writeRepeat('-', width - 2);
+  if (width > kFrameInset) {
+    term.writeRepeat('-', width - kFrameInset);
   }
   term.write("+");
 }
@@ -136,19 +153,20 @@ void BaseView::drawHeader(Terminal& term) {
   if (title.empty()) {
     return;
   }
-  if (width < 4 || height < 1) {
+  if (width < kHeaderMinWidth || height < 1) {
     return;
   }
 
   std::string text = title;
-  const int maxLen = width - 4;
+  // Truncate the title so it stays inside the frame.
+  const int maxLen = width - kHeaderMinWidth;
   if (static_cast<int>(text.size()) > maxLen) {
     text.resize(static_cast<std::size_t>(maxLen));
   }
 
   term.setBg(bgColor);
   term.setFg(fgColor);
-  term.moveTo(y, x + 2);
+  term.moveTo(y, x + kHeaderPadding);
   term.write(text);
 }
 

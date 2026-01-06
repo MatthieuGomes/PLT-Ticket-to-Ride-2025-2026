@@ -15,11 +15,21 @@
 
 namespace tui {
 
+namespace {
+
+// Frame geometry: 2 cells for borders and content starts 1 cell in.
+const int kFrameInset = 2;
+const int kFrameOffset = 1;
+// Sentinel used when no station is highlighted.
+const int kNoHighlight = -1;
+
+}  // namespace
+
 MapView::MapView(int x, int y, int width, int height)
     : BaseView(x, y, width, height),
       mapState(nullptr),
       highlightCurrentPlayer(false),
-      highlightNodeId(-1) {
+      highlightNodeId(kNoHighlight) {
   requestRedraw();
 }
 
@@ -28,8 +38,9 @@ void MapView::setMapState(mapState::MapState* state) {
     return;
   }
   mapState = state;
+  // Reset highlight if the map goes away.
   if (!mapState) {
-    highlightNodeId = -1;
+    highlightNodeId = kNoHighlight;
   }
   requestRedraw();
 }
@@ -55,13 +66,13 @@ void MapView::refreshOwnerships() {
 }
 
 void MapView::drawContent(Terminal& term) {
-  if (width <= 2 || height <= 2) {
+  if (width <= kFrameInset || height <= kFrameInset) {
     return;
   }
 
-  const int contentWidth = width - 2;
-  const int contentRows = height - 2;
-  int row = y + 1;
+  const int contentWidth = width - kFrameInset;
+  const int contentRows = height - kFrameInset;
+  int row = y + kFrameOffset;
   const int endRow = row + contentRows;
 
   term.setBg(bgColor);
@@ -69,10 +80,11 @@ void MapView::drawContent(Terminal& term) {
 
   if (!mapState) {
     const std::string placeholder = "No map data";
-    writeClampedLine(term, row, x + 1, contentWidth, placeholder);
+    // Fill the view with a placeholder line and blank lines.
+    writeClampedLine(term, row, x + kFrameOffset, contentWidth, placeholder);
     ++row;
     while (row < endRow) {
-      writeClampedLine(term, row, x + 1, contentWidth, "");
+      writeClampedLine(term, row, x + kFrameOffset, contentWidth, "");
       ++row;
     }
     return;
@@ -89,8 +101,9 @@ void MapView::drawContent(Terminal& term) {
     highlightedStation = stations[static_cast<std::size_t>(highlightNodeId)];
   }
 
+  // Station list.
   const std::string stationsHeader = "Stations";
-  writeClampedLine(term, row, x + 1, contentWidth, stationsHeader);
+  writeClampedLine(term, row, x + kFrameOffset, contentWidth, stationsHeader);
   ++row;
   for (const std::shared_ptr<mapState::Station>& station : stations) {
     if (row >= endRow) {
@@ -107,20 +120,21 @@ void MapView::drawContent(Terminal& term) {
       line << " (blocked)";
     }
 
-      writeClampedLine(term, row, x + 1, contentWidth, line.str());
-      ++row;
+    writeClampedLine(term, row, x + kFrameOffset, contentWidth, line.str());
+    ++row;
   }
 
   if (row < endRow) {
-    writeClampedLine(term, row, x + 1, contentWidth, "");
+    writeClampedLine(term, row, x + kFrameOffset, contentWidth, "");
     ++row;
   }
   if (row < endRow) {
     const std::string routesHeader = "Routes";
-    writeClampedLine(term, row, x + 1, contentWidth, routesHeader);
+    writeClampedLine(term, row, x + kFrameOffset, contentWidth, routesHeader);
     ++row;
   }
 
+  // Route list.
   for (const std::shared_ptr<mapState::Road>& road : roads) {
     if (row >= endRow) {
       break;
@@ -140,17 +154,18 @@ void MapView::drawContent(Terminal& term) {
       line << " [" << road->getOwner()->getName() << "]";
     }
 
-    writeClampedLine(term, row, x + 1, contentWidth, line.str());
+    writeClampedLine(term, row, x + kFrameOffset, contentWidth, line.str());
     ++row;
   }
 
   while (row < endRow) {
-    writeClampedLine(term, row, x + 1, contentWidth, "");
+    writeClampedLine(term, row, x + kFrameOffset, contentWidth, "");
     ++row;
   }
 }
 
 std::string MapView::colorCardToString(cardsState::ColorCard color) {
+  // Compact labels keep the route list readable.
   switch (color) {
     case cardsState::ColorCard::RED: return "Red";
     case cardsState::ColorCard::BLUE: return "Blue";
@@ -173,6 +188,7 @@ void MapView::writeClampedLine(
     int col,
     int width,
     const std::string& text) {
+  // Truncate line to fit the frame and clear the rest of the row.
   std::string buffer = text;
   if (static_cast<int>(buffer.size()) > width) {
     buffer.resize(width);

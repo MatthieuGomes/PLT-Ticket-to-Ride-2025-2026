@@ -15,9 +15,16 @@ void testSFML() {
 }
 // end of test SFML
 
+namespace {
+
+const int kDefaultCols = 100;
+const int kDefaultRows = 30;
+
+}  // namespace
+
 static void getTerminalSize(int& cols, int& rows) {
-    cols = 100;
-    rows = 30;
+    cols = kDefaultCols;
+    rows = kDefaultRows;
 
     struct winsize ws;
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0) {
@@ -50,8 +57,8 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"tui")==0) {
-        int cols = 100;
-        int rows = 30;
+        int cols = kDefaultCols;
+        int rows = kDefaultRows;
         getTerminalSize(cols, rows);
 
         tui::Terminal term;

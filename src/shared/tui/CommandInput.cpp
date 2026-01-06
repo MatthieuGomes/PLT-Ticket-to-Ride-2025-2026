@@ -8,8 +8,16 @@ namespace tui {
 
 namespace {
 
+// Frame geometry: 2 cells for borders and content starts 1 cell in.
+const int kFrameInset = 2;
+const int kFrameOffset = 1;
+// Prompt prefix shown before user input.
+const char kPrompt[] = "> ";
+const int kPromptLength = static_cast<int>(sizeof(kPrompt) - 1);
+
 void writeClampedLine(Terminal& term, int row, int col, int width,
                       const std::string& text) {
+  // Clamp text to the available width, then pad with spaces to clear leftovers.
   std::string buffer = text;
   if (width <= 0) {
     return;
@@ -57,8 +65,8 @@ void CommandInput::parseCommand(std::string& out) {
 }
 
 void CommandInput::drawContent(Terminal& term) {
-  const int contentWidth = width - 2;
-  const int contentHeight = height - 2;
+  const int contentWidth = width - kFrameInset;
+  const int contentHeight = height - kFrameInset;
   if (contentWidth <= 0 || contentHeight <= 0) {
     return;
   }
@@ -66,22 +74,24 @@ void CommandInput::drawContent(Terminal& term) {
   term.setBg(bgColor);
   term.setFg(fgColor);
 
-  std::string line = "> " + currentInput;
-  writeClampedLine(term, y + 1, x + 1, contentWidth, line);
+  // Draw current input on the first line.
+  std::string line = std::string(kPrompt) + currentInput;
+  writeClampedLine(term, y + kFrameOffset, x + kFrameOffset, contentWidth, line);
 
-  int row = 1;
+  // Clear the remaining content area.
+  int row = kFrameOffset;
   while (row < contentHeight) {
-    writeClampedLine(term, y + 1 + row, x + 1, contentWidth, "");
+    writeClampedLine(term, y + kFrameOffset + row, x + kFrameOffset, contentWidth, "");
     row += 1;
   }
 
-  const int promptLen = 2;
-  int cursorCol = x + 1 + promptLen + static_cast<int>(currentInput.size());
-  const int maxCol = x + 1 + contentWidth;
+  // Place cursor after the prompt + input, clamped to the frame width.
+  int cursorCol = x + kFrameOffset + kPromptLength + static_cast<int>(currentInput.size());
+  const int maxCol = x + kFrameOffset + contentWidth;
   if (cursorCol > maxCol) {
     cursorCol = maxCol;
   }
-  term.moveTo(y + 1, cursorCol);
+  term.moveTo(y + kFrameOffset, cursorCol);
 }
 
 }  // namespace tui
