@@ -100,27 +100,23 @@ void TUIManager::updateLayout(int newCols, int newRows) {
     contentHeight = 1;
   }
 
-  int mapWidth = std::max(20, cols * 2 / 3);
-  if (mapWidth >= cols) {
-    mapWidth = cols - 1;
-  }
-  mapWidth = clampPositive(mapWidth, 1);
-
-  int infoWidth = cols - mapWidth;
-  if (infoWidth < 1) {
-    infoWidth = 1;
-    mapWidth = clampPositive(cols - infoWidth, 1);
-  }
-
   statusbar->setPosition(1, 1);
   statusbar->setSize(cols, statusHeight);
 
   const int contentY = 1 + statusHeight;
-  mapview->setPosition(1, contentY);
-  mapview->setSize(mapWidth, contentHeight);
+  int mapHeight = contentHeight * 2 / 3;
+  mapHeight = clampPositive(mapHeight, 1);
+  int infoHeight = contentHeight - mapHeight;
+  if (infoHeight < 1) {
+    infoHeight = 1;
+    mapHeight = clampPositive(contentHeight - infoHeight, 1);
+  }
 
-  infopanel->setPosition(1 + mapWidth, contentY);
-  infopanel->setSize(infoWidth, contentHeight);
+  mapview->setPosition(1, contentY);
+  mapview->setSize(cols, mapHeight);
+
+  infopanel->setPosition(1, contentY + mapHeight);
+  infopanel->setSize(cols, infoHeight);
 
   const int commandY = contentY + contentHeight;
   commandinput->setPosition(1, commandY);

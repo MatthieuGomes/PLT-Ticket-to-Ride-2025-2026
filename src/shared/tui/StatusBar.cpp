@@ -44,15 +44,7 @@ void StatusBar::setCurrentPlayer(playersState::Player* player) {
 }
 
 void StatusBar::drawFrame(Terminal& term) {
-  if (width <= 0 || height <= 0) {
-    return;
-  }
-  term.setBg(bgColor);
-  term.setFg(fgColor);
-  for (int row = 0; row < height; ++row) {
-    term.moveTo(y + row, x);
-    term.writeRepeat(' ', width);
-  }
+  BaseView::drawFrame(term);
 }
 
 void StatusBar::drawHeader(Terminal& term) {
