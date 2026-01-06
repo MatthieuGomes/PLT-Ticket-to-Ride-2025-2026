@@ -74,6 +74,14 @@ void CommandInput::drawContent(Terminal& term) {
     writeClampedLine(term, y + 1 + row, x + 1, contentWidth, "");
     row += 1;
   }
+
+  const int promptLen = 2;
+  int cursorCol = x + 1 + promptLen + static_cast<int>(currentInput.size());
+  const int maxCol = x + 1 + contentWidth;
+  if (cursorCol > maxCol) {
+    cursorCol = maxCol;
+  }
+  term.moveTo(y + 1, cursorCol);
 }
 
 }  // namespace tui
