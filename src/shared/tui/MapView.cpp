@@ -22,6 +22,61 @@ const int kFrameInset = 2;
 const int kFrameOffset = 1;
 // Sentinel used when no station is highlighted.
 const int kNoHighlight = -1;
+// Two-character color chip shown for each route.
+const int kRouteChipWidth = 2;
+const int kRouteChipGap = 1;
+
+struct ChipColors {
+  Color left;
+  Color right;
+};
+
+ChipColors colorToChip(cardsState::ColorCard color) {
+  // Use bright variants to keep chips readable on darker backgrounds.
+  switch (color) {
+    case cardsState::ColorCard::RED:
+      return {Color::BrightRed, Color::BrightRed};
+    case cardsState::ColorCard::BLUE:
+      return {Color::BrightBlue, Color::BrightBlue};
+    case cardsState::ColorCard::GREEN:
+      return {Color::BrightGreen, Color::BrightGreen};
+    case cardsState::ColorCard::WHITE:
+      return {Color::BrightWhite, Color::BrightWhite};
+    case cardsState::ColorCard::BLACK:
+      return {Color::BrightBlack, Color::BrightBlack};
+    case cardsState::ColorCard::YELLOW:
+      return {Color::BrightYellow, Color::BrightYellow};
+    case cardsState::ColorCard::PINK:
+      return {Color::BrightMagenta, Color::BrightMagenta};
+    case cardsState::ColorCard::ORANGE:
+      return {Color::BrightOrange, Color::BrightOrange};
+    case cardsState::ColorCard::LOCOMOTIVE:
+      // Locomotive uses split magenta/cyan.
+      return {Color::BrightMagenta, Color::BrightCyan};
+    case cardsState::ColorCard::NONE:
+    default:
+      return {Color::BrightBlack, Color::BrightBlack};
+  }
+}
+
+void drawColorChip(
+    Terminal& term,
+    int row,
+    int col,
+    const ChipColors& chip,
+    Color baseFg,
+    Color baseBg) {
+  // Two adjacent cells form the chip, then restore the view colors.
+  term.setBg(chip.left);
+  term.setFg(chip.left);
+  term.moveTo(row, col);
+  term.writeRepeat(' ', 1);
+  term.setBg(chip.right);
+  term.setFg(chip.right);
+  term.writeRepeat(' ', 1);
+  term.setBg(baseBg);
+  term.setFg(baseFg);
+}
 
 }  // namespace
 
@@ -145,16 +200,39 @@ void MapView::drawContent(Terminal& term) {
         highlightCurrentPlayer && road->getOwner() != nullptr;
 
     line << (emphasizeOwner ? "*" : " ") << road->getStationA()->getName()
-         << "-" << road->getStationB()->getName() << " ";
-
-    line << colorCardToString(road->getColor())
+         << "-" << road->getStationB()->getName()
          << " len:" << road->getLength();
 
     if (road->getOwner() != nullptr) {
       line << " [" << road->getOwner()->getName() << "]";
     }
+    if (road->getBlockStatus()) {
+      line << " !";
+    }
 
-    writeClampedLine(term, row, x + kFrameOffset, contentWidth, line.str());
+    const bool drawChip = contentWidth >= kRouteChipWidth;
+    int gap = 0;
+    if (drawChip && contentWidth > kRouteChipWidth + kRouteChipGap) {
+      gap = kRouteChipGap;
+    }
+    int textWidth = contentWidth;
+    if (drawChip) {
+      textWidth = contentWidth - kRouteChipWidth - gap;
+      if (textWidth < 0) {
+        textWidth = 0;
+      }
+    }
+
+    writeClampedLine(term, row, x + kFrameOffset, textWidth, line.str());
+    if (gap > 0) {
+      term.moveTo(row, x + kFrameOffset + textWidth);
+      term.writeRepeat(' ', gap);
+    }
+    if (drawChip) {
+      const ChipColors chip = colorToChip(road->getColor());
+      const int chipCol = x + kFrameOffset + textWidth + gap;
+      drawColorChip(term, row, chipCol, chip, fgColor, bgColor);
+    }
     ++row;
   }
 

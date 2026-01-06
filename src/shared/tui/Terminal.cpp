@@ -43,6 +43,12 @@ const int kAnsiBgBrightCyan = 106;
 const int kAnsiBgBrightWhite = 107;
 const int kAnsiBgDefault = 49;
 
+// 256-color indexes used for orange shades (not in the base 16-color set).
+const int kAnsi256Foreground = 38;
+const int kAnsi256Background = 48;
+const int kAnsi256Orange = 208;
+const int kAnsi256BrightOrange = 214;
+
 // ANSI reset and cursor control sequences.
 const int kAnsiReset = 0;
 // Terminal coordinates are 1-based.
@@ -50,12 +56,26 @@ const int kMinPosition = 1;
 const char kAnsiCursorHide[] = "\033[?25l";
 const char kAnsiCursorShow[] = "\033[?25h";
 
+bool isExtendedColor(tui::Color color) {
+  return color == tui::Color::Orange || color == tui::Color::BrightOrange;
+}
+
+int extendedColorIndex(tui::Color color) {
+  if (color == tui::Color::BrightOrange) {
+    return kAnsi256BrightOrange;
+  }
+  return kAnsi256Orange;
+}
+
 int colorToAnsi(tui::Color color, bool background) {
   switch (color) {
     case tui::Color::Black:        return background ? kAnsiBgBlack : kAnsiFgBlack;
     case tui::Color::Red:          return background ? kAnsiBgRed : kAnsiFgRed;
     case tui::Color::Green:        return background ? kAnsiBgGreen : kAnsiFgGreen;
     case tui::Color::Yellow:       return background ? kAnsiBgYellow : kAnsiFgYellow;
+    case tui::Color::Orange:
+    case tui::Color::BrightOrange:
+      return background ? kAnsiBgDefault : kAnsiFgDefault;
     case tui::Color::Blue:         return background ? kAnsiBgBlue : kAnsiFgBlue;
     case tui::Color::Magenta:      return background ? kAnsiBgMagenta : kAnsiFgMagenta;
     case tui::Color::Cyan:         return background ? kAnsiBgCyan : kAnsiFgCyan;
@@ -74,6 +94,16 @@ int colorToAnsi(tui::Color color, bool background) {
   }
 }
 
+void appendColorSequence(std::string& out, tui::Color color, bool background) {
+  if (isExtendedColor(color)) {
+    const int mode = background ? kAnsi256Background : kAnsi256Foreground;
+    out += "\033[" + std::to_string(mode) + ";5;"
+        + std::to_string(extendedColorIndex(color)) + "m";
+    return;
+  }
+  out += "\033[" + std::to_string(colorToAnsi(color, background)) + "m";
+}
+
 }  // namespace
 
 namespace tui {
@@ -89,11 +119,11 @@ void Terminal::moveTo(int row, int col) {
 }
 
 void Terminal::setFg(Color color) {
-  out += "\033[" + std::to_string(colorToAnsi(color, /*background=*/false)) + "m";
+  appendColorSequence(out, color, /*background=*/false);
 }
 
 void Terminal::setBg(Color color) {
-  out += "\033[" + std::to_string(colorToAnsi(color, /*background=*/true)) + "m";
+  appendColorSequence(out, color, /*background=*/true);
 }
 
 void Terminal::resetStyles() {
