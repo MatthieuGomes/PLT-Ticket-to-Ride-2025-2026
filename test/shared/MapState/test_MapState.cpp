@@ -22,7 +22,7 @@ using namespace ::mapState;
 
 using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
 using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
+using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, RoadColor, int>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 using TunnelDetail = RoadDetail;
 using TunnelInfo = RoadInfo;
@@ -61,10 +61,10 @@ BOOST_AUTO_TEST_CASE(Wrapper)
   auto station1 = std::make_shared<Station>("Station1", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   auto station2 = std::make_shared<Station>("Station2", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   std::vector<RoadInfo> roadsInfos = {
-      Road::genData(station1, station2, 1, nullptr, cardsState::ColorCard::RED, 3),
+      Road::genData(station1, station2, 1, nullptr, RoadColor::RED, 3),
   };
   std::vector<TunnelInfo> tunnelsInfos = {
-      Tunnel::genData(station2, station1, 2, nullptr, cardsState::ColorCard::BLUE, 4),
+      Tunnel::genData(station2, station1, 2, nullptr, RoadColor::BLUE, 4),
   };
   std::vector<FerryInfo> ferrysInfos = {
       Ferry::genData(station1, station2, 3, nullptr, 5, 1),
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE(Parameterized)
   auto stationB = std::make_shared<Station>("StationB", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   auto stationC = std::make_shared<Station>("StationC", nullptr, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(test_graph)));
   std::vector<RoadInfo> roadsInfos = {
-      Road::genData(stationA, stationB, 1, nullptr, cardsState::ColorCard::RED, 3),
-      Road::genData(stationB, stationC, 2, nullptr, cardsState::ColorCard::BLUE, 4),
+      Road::genData(stationA, stationB, 1, nullptr, RoadColor::RED, 3),
+      Road::genData(stationB, stationC, 2, nullptr, RoadColor::BLUE, 4),
   };
   std::vector<TunnelInfo> tunnelsInfos = {
-      Tunnel::genData(stationA, stationC, 3, nullptr, cardsState::ColorCard::GREEN, 5),
+      Tunnel::genData(stationA, stationC, 3, nullptr, RoadColor::GREEN, 5),
   };
   std::vector<FerryInfo> ferrysInfos = {
       Ferry::genData(stationC, stationA, 4, nullptr, 6, 2),
@@ -215,95 +215,95 @@ BOOST_AUTO_TEST_CASE(Europe)
     stationsObject = Station::BatchConstructor(stationsInfos, gameGraph);
 
     std::vector<RoadInfo> roadsInfos = {
-        Road::initDataByName(stationsObject, "lisboa", "madrid", 1, cardsState::ColorCard::PINK, 3),
-        Road::initDataByName(stationsObject, "lisboa", "cadiz", 2, cardsState::ColorCard::BLUE, 2),
-        Road::initDataByName(stationsObject, "cadiz", "madrid", 3, cardsState::ColorCard::ORANGE, 3),
-        Road::initDataByName(stationsObject, "madrid", "barcelona", 4, cardsState::ColorCard::YELLOW, 2),
-        Road::initDataByName(stationsObject, "barcelona", "marseille", 5, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "marseille", "paris", 6, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "marseille", "pamplona", 7, cardsState::ColorCard::RED, 4),
-        Road::initDataByName(stationsObject, "pamplona", "paris", 8, cardsState::ColorCard::GREEN, 4),
-        Road::initDataByName(stationsObject, "pamplona", "paris", 9, cardsState::ColorCard::BLUE, 4),
-        Road::initDataByName(stationsObject, "pamplona", "brest", 10, cardsState::ColorCard::PINK, 4),
-        Road::initDataByName(stationsObject, "brest", "dieppe", 11, cardsState::ColorCard::ORANGE, 2),
-        Road::initDataByName(stationsObject, "brest", "paris", 12, cardsState::ColorCard::BLACK, 3),
-        Road::initDataByName(stationsObject, "paris", "frankfurt", 13, cardsState::ColorCard::WHITE, 3),
-        Road::initDataByName(stationsObject, "paris", "frankfurt", 14, cardsState::ColorCard::ORANGE, 3),
-        Road::initDataByName(stationsObject, "paris", "bruxelles", 15, cardsState::ColorCard::YELLOW, 2),
-        Road::initDataByName(stationsObject, "paris", "bruxelles", 16, cardsState::ColorCard::RED, 2),
-        Road::initDataByName(stationsObject, "paris", "dieppe", 17, cardsState::ColorCard::PINK, 1),
-        Road::initDataByName(stationsObject, "dieppe", "bruxelles", 18, cardsState::ColorCard::GREEN, 2),
-        Road::initDataByName(stationsObject, "bruxelles", "frankfurt", 19, cardsState::ColorCard::BLUE, 2),
-        Road::initDataByName(stationsObject, "bruxelles", "amsterdam", 20, cardsState::ColorCard::BLACK, 1),
-        Road::initDataByName(stationsObject, "amsterdam", "frankfurt", 21, cardsState::ColorCard::WHITE, 2),
-        Road::initDataByName(stationsObject, "amsterdam", "essen", 22, cardsState::ColorCard::YELLOW, 3),
-        Road::initDataByName(stationsObject, "essen", "berlin", 23, cardsState::ColorCard::BLUE, 2),
-        Road::initDataByName(stationsObject, "essen", "frankfurt", 24, cardsState::ColorCard::GREEN, 2),
-        Road::initDataByName(stationsObject, "frankfurt", "berlin", 25, cardsState::ColorCard::BLACK, 3),
-        Road::initDataByName(stationsObject, "frankfurt", "berlin", 26, cardsState::ColorCard::RED, 3),
-        Road::initDataByName(stationsObject, "frankfurt", "münchen", 27, cardsState::ColorCard::PINK, 2),
-        Road::initDataByName(stationsObject, "münchen", "wien", 28, cardsState::ColorCard::ORANGE, 3),
-        Road::initDataByName(stationsObject, "wien", "zagrab", 29, cardsState::ColorCard::NONE, 2),
-        Road::initDataByName(stationsObject, "wien", "budapest", 30, cardsState::ColorCard::RED, 1),
-        Road::initDataByName(stationsObject, "wien", "budapest", 31, cardsState::ColorCard::WHITE, 1),
-        Road::initDataByName(stationsObject, "wien", "berlin", 32, cardsState::ColorCard::GREEN, 3),
-        Road::initDataByName(stationsObject, "wien", "warszawa", 33, cardsState::ColorCard::BLUE, 4),
-        Road::initDataByName(stationsObject, "budapest", "sarajevo", 34, cardsState::ColorCard::PINK, 3),
-        Road::initDataByName(stationsObject, "budapest", "zagrab", 35, cardsState::ColorCard::ORANGE, 2),
-        Road::initDataByName(stationsObject, "zagrab", "sarajevo", 36, cardsState::ColorCard::RED, 3),
-        Road::initDataByName(stationsObject, "zagrab", "venizia", 37, cardsState::ColorCard::NONE, 2),
-        Road::initDataByName(stationsObject, "venizia", "roma", 38, cardsState::ColorCard::BLACK, 2),
-        Road::initDataByName(stationsObject, "roma", "brindisi", 39, cardsState::ColorCard::WHITE, 2),
-        Road::initDataByName(stationsObject, "sarajevo", "athina", 40, cardsState::ColorCard::GREEN, 4),
-        Road::initDataByName(stationsObject, "athina", "sofia", 41, cardsState::ColorCard::PINK, 3),
-        Road::initDataByName(stationsObject, "sofia", "constantinople", 42, cardsState::ColorCard::BLUE, 3),
-        Road::initDataByName(stationsObject, "constantinople", "bucuresti", 43, cardsState::ColorCard::YELLOW, 3),
-        Road::initDataByName(stationsObject, "bucuresti", "kyiv", 44, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "bucuresti", "sevastopol", 45, cardsState::ColorCard::WHITE, 4),
-        Road::initDataByName(stationsObject, "sevastopol", "rostov", 46, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "rostov", "sochi", 47, cardsState::ColorCard::NONE, 2),
-        Road::initDataByName(stationsObject, "rostov", "kharkov", 48, cardsState::ColorCard::GREEN, 2),
-        Road::initDataByName(stationsObject, "kharkov", "kyiv", 49, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "kharkov", "moskva", 50, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "moskva", "smolensk", 51, cardsState::ColorCard::ORANGE, 2),
-        Road::initDataByName(stationsObject, "moskva", "petrograd", 52, cardsState::ColorCard::WHITE, 4),
-        Road::initDataByName(stationsObject, "petrograd", "wilno", 53, cardsState::ColorCard::BLUE, 4),
-        Road::initDataByName(stationsObject, "petrograd", "riga", 54, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "wilno", "riga", 55, cardsState::ColorCard::GREEN, 4),
-        Road::initDataByName(stationsObject, "wilno", "warszawa", 56, cardsState::ColorCard::RED, 3),
-        Road::initDataByName(stationsObject, "wilno", "moskva", 57, cardsState::ColorCard::YELLOW, 3),
-        Road::initDataByName(stationsObject, "wilno", "kyiv", 58, cardsState::ColorCard::NONE, 2),
-        Road::initDataByName(stationsObject, "kyiv", "smolensk", 59, cardsState::ColorCard::RED, 3),
-        Road::initDataByName(stationsObject, "kyiv", "warszawa", 60, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "warszawa", "berlin", 61, cardsState::ColorCard::PINK, 4),
-        Road::initDataByName(stationsObject, "warszawa", "berlin", 62, cardsState::ColorCard::YELLOW, 4),
-        Road::initDataByName(stationsObject, "warszawa", "danzig", 63, cardsState::ColorCard::NONE, 2),
-        Road::initDataByName(stationsObject, "danzig", "berlin", 64, cardsState::ColorCard::NONE, 4),
-        Road::initDataByName(stationsObject, "danzig", "riga", 65, cardsState::ColorCard::BLACK, 3),
-        Road::initDataByName(stationsObject, "erzurum", "angora", 66, cardsState::ColorCard::BLACK, 3),
-        Road::initDataByName(stationsObject, "stockholm", "kobenhavn", 67, cardsState::ColorCard::WHITE, 3),
-        Road::initDataByName(stationsObject, "stockholm", "kobenhavn", 68, cardsState::ColorCard::YELLOW, 3),
-        Road::initDataByName(stationsObject, "edinburgh", "london", 69, cardsState::ColorCard::BLACK, 4),
-        Road::initDataByName(stationsObject, "edinburgh", "london", 70, cardsState::ColorCard::ORANGE, 4),
+        Road::initDataByName(stationsObject, "lisboa", "madrid", 1, RoadColor::PINK, 3),
+        Road::initDataByName(stationsObject, "lisboa", "cadiz", 2, RoadColor::BLUE, 2),
+        Road::initDataByName(stationsObject, "cadiz", "madrid", 3, RoadColor::ORANGE, 3),
+        Road::initDataByName(stationsObject, "madrid", "barcelona", 4, RoadColor::YELLOW, 2),
+        Road::initDataByName(stationsObject, "barcelona", "marseille", 5, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "marseille", "paris", 6, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "marseille", "pamplona", 7, RoadColor::RED, 4),
+        Road::initDataByName(stationsObject, "pamplona", "paris", 8, RoadColor::GREEN, 4),
+        Road::initDataByName(stationsObject, "pamplona", "paris", 9, RoadColor::BLUE, 4),
+        Road::initDataByName(stationsObject, "pamplona", "brest", 10, RoadColor::PINK, 4),
+        Road::initDataByName(stationsObject, "brest", "dieppe", 11, RoadColor::ORANGE, 2),
+        Road::initDataByName(stationsObject, "brest", "paris", 12, RoadColor::BLACK, 3),
+        Road::initDataByName(stationsObject, "paris", "frankfurt", 13, RoadColor::WHITE, 3),
+        Road::initDataByName(stationsObject, "paris", "frankfurt", 14, RoadColor::ORANGE, 3),
+        Road::initDataByName(stationsObject, "paris", "bruxelles", 15, RoadColor::YELLOW, 2),
+        Road::initDataByName(stationsObject, "paris", "bruxelles", 16, RoadColor::RED, 2),
+        Road::initDataByName(stationsObject, "paris", "dieppe", 17, RoadColor::PINK, 1),
+        Road::initDataByName(stationsObject, "dieppe", "bruxelles", 18, RoadColor::GREEN, 2),
+        Road::initDataByName(stationsObject, "bruxelles", "frankfurt", 19, RoadColor::BLUE, 2),
+        Road::initDataByName(stationsObject, "bruxelles", "amsterdam", 20, RoadColor::BLACK, 1),
+        Road::initDataByName(stationsObject, "amsterdam", "frankfurt", 21, RoadColor::WHITE, 2),
+        Road::initDataByName(stationsObject, "amsterdam", "essen", 22, RoadColor::YELLOW, 3),
+        Road::initDataByName(stationsObject, "essen", "berlin", 23, RoadColor::BLUE, 2),
+        Road::initDataByName(stationsObject, "essen", "frankfurt", 24, RoadColor::GREEN, 2),
+        Road::initDataByName(stationsObject, "frankfurt", "berlin", 25, RoadColor::BLACK, 3),
+        Road::initDataByName(stationsObject, "frankfurt", "berlin", 26, RoadColor::RED, 3),
+        Road::initDataByName(stationsObject, "frankfurt", "münchen", 27, RoadColor::PINK, 2),
+        Road::initDataByName(stationsObject, "münchen", "wien", 28, RoadColor::ORANGE, 3),
+        Road::initDataByName(stationsObject, "wien", "zagrab", 29, RoadColor::NONE, 2),
+        Road::initDataByName(stationsObject, "wien", "budapest", 30, RoadColor::RED, 1),
+        Road::initDataByName(stationsObject, "wien", "budapest", 31, RoadColor::WHITE, 1),
+        Road::initDataByName(stationsObject, "wien", "berlin", 32, RoadColor::GREEN, 3),
+        Road::initDataByName(stationsObject, "wien", "warszawa", 33, RoadColor::BLUE, 4),
+        Road::initDataByName(stationsObject, "budapest", "sarajevo", 34, RoadColor::PINK, 3),
+        Road::initDataByName(stationsObject, "budapest", "zagrab", 35, RoadColor::ORANGE, 2),
+        Road::initDataByName(stationsObject, "zagrab", "sarajevo", 36, RoadColor::RED, 3),
+        Road::initDataByName(stationsObject, "zagrab", "venizia", 37, RoadColor::NONE, 2),
+        Road::initDataByName(stationsObject, "venizia", "roma", 38, RoadColor::BLACK, 2),
+        Road::initDataByName(stationsObject, "roma", "brindisi", 39, RoadColor::WHITE, 2),
+        Road::initDataByName(stationsObject, "sarajevo", "athina", 40, RoadColor::GREEN, 4),
+        Road::initDataByName(stationsObject, "athina", "sofia", 41, RoadColor::PINK, 3),
+        Road::initDataByName(stationsObject, "sofia", "constantinople", 42, RoadColor::BLUE, 3),
+        Road::initDataByName(stationsObject, "constantinople", "bucuresti", 43, RoadColor::YELLOW, 3),
+        Road::initDataByName(stationsObject, "bucuresti", "kyiv", 44, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "bucuresti", "sevastopol", 45, RoadColor::WHITE, 4),
+        Road::initDataByName(stationsObject, "sevastopol", "rostov", 46, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "rostov", "sochi", 47, RoadColor::NONE, 2),
+        Road::initDataByName(stationsObject, "rostov", "kharkov", 48, RoadColor::GREEN, 2),
+        Road::initDataByName(stationsObject, "kharkov", "kyiv", 49, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "kharkov", "moskva", 50, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "moskva", "smolensk", 51, RoadColor::ORANGE, 2),
+        Road::initDataByName(stationsObject, "moskva", "petrograd", 52, RoadColor::WHITE, 4),
+        Road::initDataByName(stationsObject, "petrograd", "wilno", 53, RoadColor::BLUE, 4),
+        Road::initDataByName(stationsObject, "petrograd", "riga", 54, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "wilno", "riga", 55, RoadColor::GREEN, 4),
+        Road::initDataByName(stationsObject, "wilno", "warszawa", 56, RoadColor::RED, 3),
+        Road::initDataByName(stationsObject, "wilno", "moskva", 57, RoadColor::YELLOW, 3),
+        Road::initDataByName(stationsObject, "wilno", "kyiv", 58, RoadColor::NONE, 2),
+        Road::initDataByName(stationsObject, "kyiv", "smolensk", 59, RoadColor::RED, 3),
+        Road::initDataByName(stationsObject, "kyiv", "warszawa", 60, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "warszawa", "berlin", 61, RoadColor::PINK, 4),
+        Road::initDataByName(stationsObject, "warszawa", "berlin", 62, RoadColor::YELLOW, 4),
+        Road::initDataByName(stationsObject, "warszawa", "danzig", 63, RoadColor::NONE, 2),
+        Road::initDataByName(stationsObject, "danzig", "berlin", 64, RoadColor::NONE, 4),
+        Road::initDataByName(stationsObject, "danzig", "riga", 65, RoadColor::BLACK, 3),
+        Road::initDataByName(stationsObject, "erzurum", "angora", 66, RoadColor::BLACK, 3),
+        Road::initDataByName(stationsObject, "stockholm", "kobenhavn", 67, RoadColor::WHITE, 3),
+        Road::initDataByName(stationsObject, "stockholm", "kobenhavn", 68, RoadColor::YELLOW, 3),
+        Road::initDataByName(stationsObject, "edinburgh", "london", 69, RoadColor::BLACK, 4),
+        Road::initDataByName(stationsObject, "edinburgh", "london", 70, RoadColor::ORANGE, 4),
     };
     std::vector<TunnelInfo> tunnelsInfos = {
-        Tunnel::initDataByName(stationsObject, "madrid", "pamplona", 71, cardsState::ColorCard::BLACK, 3),
-        Tunnel::initDataByName(stationsObject, "madrid", "pamplona", 72, cardsState::ColorCard::WHITE, 3),
-        Tunnel::initDataByName(stationsObject, "pamplona", "barcelona", 73, cardsState::ColorCard::NONE, 2),
-        Tunnel::initDataByName(stationsObject, "zürich", "paris", 74, cardsState::ColorCard::NONE, 3),
-        Tunnel::initDataByName(stationsObject, "zürich", "münchen", 75, cardsState::ColorCard::YELLOW, 2),
-        Tunnel::initDataByName(stationsObject, "zürich", "marseille", 76, cardsState::ColorCard::PINK, 2),
-        Tunnel::initDataByName(stationsObject, "marseille", "roma", 77, cardsState::ColorCard::NONE, 4),
-        Tunnel::initDataByName(stationsObject, "zürich", "venizia", 78, cardsState::ColorCard::GREEN, 2),
-        Tunnel::initDataByName(stationsObject, "venizia", "münchen", 79, cardsState::ColorCard::BLUE, 2),
-        Tunnel::initDataByName(stationsObject, "petrograd", "stockholm", 80, cardsState::ColorCard::NONE, 8),
-        Tunnel::initDataByName(stationsObject, "budapest", "kyiv", 81, cardsState::ColorCard::NONE, 6),
-        Tunnel::initDataByName(stationsObject, "budapest", "bucuresti", 82, cardsState::ColorCard::NONE, 4),
-        Tunnel::initDataByName(stationsObject, "sofia", "bucuresti", 83, cardsState::ColorCard::NONE, 2),
-        Tunnel::initDataByName(stationsObject, "sofia", "sarajevo", 84, cardsState::ColorCard::NONE, 2),
-        Tunnel::initDataByName(stationsObject, "constantinople", "smyrna", 85, cardsState::ColorCard::NONE, 2),
-        Tunnel::initDataByName(stationsObject, "smyrna", "angora", 86, cardsState::ColorCard::ORANGE, 3),
-        Tunnel::initDataByName(stationsObject, "angora", "constantinople", 87, cardsState::ColorCard::NONE, 2),
+        Tunnel::initDataByName(stationsObject, "madrid", "pamplona", 71, RoadColor::BLACK, 3),
+        Tunnel::initDataByName(stationsObject, "madrid", "pamplona", 72, RoadColor::WHITE, 3),
+        Tunnel::initDataByName(stationsObject, "pamplona", "barcelona", 73, RoadColor::NONE, 2),
+        Tunnel::initDataByName(stationsObject, "zürich", "paris", 74, RoadColor::NONE, 3),
+        Tunnel::initDataByName(stationsObject, "zürich", "münchen", 75, RoadColor::YELLOW, 2),
+        Tunnel::initDataByName(stationsObject, "zürich", "marseille", 76, RoadColor::PINK, 2),
+        Tunnel::initDataByName(stationsObject, "marseille", "roma", 77, RoadColor::NONE, 4),
+        Tunnel::initDataByName(stationsObject, "zürich", "venizia", 78, RoadColor::GREEN, 2),
+        Tunnel::initDataByName(stationsObject, "venizia", "münchen", 79, RoadColor::BLUE, 2),
+        Tunnel::initDataByName(stationsObject, "petrograd", "stockholm", 80, RoadColor::NONE, 8),
+        Tunnel::initDataByName(stationsObject, "budapest", "kyiv", 81, RoadColor::NONE, 6),
+        Tunnel::initDataByName(stationsObject, "budapest", "bucuresti", 82, RoadColor::NONE, 4),
+        Tunnel::initDataByName(stationsObject, "sofia", "bucuresti", 83, RoadColor::NONE, 2),
+        Tunnel::initDataByName(stationsObject, "sofia", "sarajevo", 84, RoadColor::NONE, 2),
+        Tunnel::initDataByName(stationsObject, "constantinople", "smyrna", 85, RoadColor::NONE, 2),
+        Tunnel::initDataByName(stationsObject, "smyrna", "angora", 86, RoadColor::ORANGE, 3),
+        Tunnel::initDataByName(stationsObject, "angora", "constantinople", 87, RoadColor::NONE, 2),
     };
     std::vector<FerryInfo> ferrysInfos = {
         Ferry::initDataByName(stationsObject, "london", "dieppe", 88, 1, 2),
@@ -487,9 +487,9 @@ BOOST_AUTO_TEST_CASE(GetClaimableRoads)
   StationInfo stationDInfo = Station::initData("StationD");
   std::vector<StationInfo> stationsInfos = {stationAInfo, stationBInfo, stationCInfo, stationDInfo};
   std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationsInfos, test_map_state.gameGraph);
-  RoadInfo roadABInfo = Road::genDataByName(stations, "StationA", "StationB", 1, std::make_shared<playersState::Player>(test_player), cardsState::ColorCard::RED, 3);
-  RoadInfo roadACInfo = Road::genDataByName(stations, "StationA", "StationC", 2, nullptr, cardsState::BLUE, 4);
-  RoadInfo roadADInfo = Road::genDataByName(stations, "StationA", "StationD", 3, nullptr, cardsState::GREEN, 2);
+  RoadInfo roadABInfo = Road::genDataByName(stations, "StationA", "StationB", 1, std::make_shared<playersState::Player>(test_player), RoadColor::RED, 3);
+  RoadInfo roadACInfo = Road::genDataByName(stations, "StationA", "StationC", 2, nullptr, RoadColor::BLUE, 4);
+  RoadInfo roadADInfo = Road::genDataByName(stations, "StationA", "StationD", 3, nullptr, RoadColor::GREEN, 2);
   std::vector<RoadInfo> roadsInfos = {roadABInfo, roadACInfo, roadADInfo};
   test_map_state.fillMapWithInfos(stationsInfos, roadsInfos, {}, {}, test_map_state.gameGraph);
   std::vector<std::shared_ptr<Road>> claimableRoads = test_map_state.getClaimableRoads(4, std::make_shared<playersState::Player>(test_player));
@@ -509,9 +509,9 @@ BOOST_AUTO_TEST_CASE(IsRoadClaimable)
   StationInfo stationDInfo = Station::initData("StationD");
   std::vector<StationInfo> stationsInfos = {stationAInfo, stationBInfo, stationCInfo, stationDInfo};
   std::vector<std::shared_ptr<Station>> stations = Station::BatchConstructor(stationsInfos, test_map_state.gameGraph);
-  RoadInfo roadABInfo = Road::genDataByName(stations, "StationA", "StationB", 1, std::make_shared<playersState::Player>(test_player), cardsState::ColorCard::RED, 3);
-  RoadInfo roadACInfo = Road::genDataByName(stations, "StationA", "StationC", 2, nullptr, cardsState::BLUE, 4);
-  RoadInfo roadADInfo = Road::genDataByName(stations, "StationA", "StationD", 3, nullptr, cardsState::GREEN, 2);
+  RoadInfo roadABInfo = Road::genDataByName(stations, "StationA", "StationB", 1, std::make_shared<playersState::Player>(test_player), RoadColor::RED, 3);
+  RoadInfo roadACInfo = Road::genDataByName(stations, "StationA", "StationC", 2, nullptr, RoadColor::BLUE, 4);
+  RoadInfo roadADInfo = Road::genDataByName(stations, "StationA", "StationD", 3, nullptr, RoadColor::GREEN, 2);
   std::vector<RoadInfo> roadsInfos = {roadABInfo, roadACInfo, roadADInfo};
   test_map_state.fillMapWithInfos(stationsInfos, roadsInfos, {}, {}, test_map_state.gameGraph);
   std::shared_ptr<Road> roadAC = test_map_state.getRoadsBetweenStations(stations[0], stations[2])[0];

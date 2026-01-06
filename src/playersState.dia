@@ -922,7 +922,7 @@ Method - print the players state #</dia:string>
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#possibleColors[5]#</dia:string>
+            <dia:string>#possibleColors[6]#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#PlayerColor#</dia:string>
@@ -4600,19 +4600,19 @@ Method - display  the informations of  a  player
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O22">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.0891,39.0608"/>
+        <dia:point val="31.8599,45.617"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="32.0391,39.0108;37.8341,45.9108"/>
+        <dia:rectangle val="31.8099,45.567;37.7999,53.267"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="32.0891,39.0608"/>
+        <dia:point val="31.8599,45.617"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="5.6950000000000003"/>
+        <dia:real val="5.8899999999999997"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="6.8000000000000007"/>
+        <dia:real val="7.6000000000000005"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#PlayerColor#</dia:string>
@@ -4707,6 +4707,29 @@ Method - display  the informations of  a  player
       <dia:attribute name="attributes">
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
+            <dia:string>#UNKNOWN#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>#404#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
             <dia:string>#RED#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
@@ -4782,7 +4805,7 @@ Method - display  the informations of  a  player
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#5#</dia:string>
+            <dia:string>#4#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -4805,7 +4828,7 @@ Method - display  the informations of  a  player
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#6#</dia:string>
+            <dia:string>#5#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -4833,7 +4856,7 @@ Method - display  the informations of  a  player
         <dia:point val="56.9134,40.5296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="37.7802,39.7696;57.6634,43.3008"/>
+        <dia:rectangle val="37.75,39.7696;57.6634,50.257"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -4841,8 +4864,8 @@ Method - display  the informations of  a  player
       <dia:attribute name="orth_points">
         <dia:point val="56.9134,40.5296"/>
         <dia:point val="51.6535,40.5296"/>
-        <dia:point val="51.6535,42.4608"/>
-        <dia:point val="37.8302,42.4608"/>
+        <dia:point val="51.6535,49.417"/>
+        <dia:point val="37.8,49.417"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -4905,7 +4928,7 @@ Method - display  the informations of  a  player
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O2" connection="104"/>
-        <dia:connection handle="1" to="O22" connection="18"/>
+        <dia:connection handle="1" to="O22" connection="20"/>
       </dia:connections>
       <dia:childnode parent="O0"/>
     </dia:object>

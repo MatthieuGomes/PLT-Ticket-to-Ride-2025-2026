@@ -35,7 +35,12 @@ namespace playersState
    int Player::startNbWagons = 45;
    int Player::startNbStations = 3;
 
-   PlayerColor Player::possibleColors[5] = {PlayerColor::RED, PlayerColor::BLUE, PlayerColor::GREEN, PlayerColor::BLACK, PlayerColor::YELLOW};
+   PlayerColor Player::possibleColors[6] = {PlayerColor::RED,
+                                            PlayerColor::BLUE,
+                                            PlayerColor::GREEN,
+                                            PlayerColor::BLACK,
+                                            PlayerColor::YELLOW,
+                                            PlayerColor::UNKNOWN};
 
    Player::Player()
    {
@@ -238,13 +243,13 @@ namespace playersState
                         << length << " wagons, you have: " << this->nbWagons << " remaining\n");
             return false;
          }
-         cardsState::ColorCard requiredColor = road->getColor();
+         RoadColor requiredColor = road->getColor();
 
          std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
          std::vector<std::shared_ptr<cardsState::WagonCard>> handCards = this->hand->wagonCards->cards;
          std::vector<std::shared_ptr<cardsState::WagonCard>> handCardsCopy = std::vector<std::shared_ptr<cardsState::WagonCard>>(handCards);
 
-         if (cardsState::ColorCard::NONE == requiredColor)
+         if (RoadColor::NONE == requiredColor)
          {
             std::vector<std::shared_ptr<cardsState::WagonCard>> longestSet;
             std::unordered_map<cardsState::ColorCard, std::vector<std::shared_ptr<cardsState::WagonCard>>> colorMap;
@@ -294,7 +299,7 @@ namespace playersState
                {
                   break;
                }
-               else if (card->color == requiredColor)
+               else if (card->getColor() == requiredColor)
                {
                   cardsCorrectColor.push_back(card);
                   handCardsCopy.erase(std::remove(handCardsCopy.begin(), handCardsCopy.end(), card), handCardsCopy.end());

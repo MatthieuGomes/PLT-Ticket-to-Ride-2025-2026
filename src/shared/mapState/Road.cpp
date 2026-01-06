@@ -16,29 +16,30 @@ using namespace std;
 namespace mapState
 {
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
+    using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, RoadColor, int>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
 
-    /*
-    cardsState::ColorCard Road::possibleColors[9] = {
-        cardsState::ColorCard::RED,
-        cardsState::ColorCard::BLUE,
-        cardsState::ColorCard::GREEN,
-        cardsState::ColorCard::WHITE,
-        cardsState::ColorCard::BLACK,
-        cardsState::ColorCard::YELLOW,
-        cardsState::ColorCard::PINK,
-        cardsState::ColorCard::ORANGE,
-        cardsState::ColorCard::NONE,
+    
+    RoadColor Road::possibleColors[10] = {
+        RoadColor::UNKNOWN,
+        RoadColor::RED,
+        RoadColor::BLUE,
+        RoadColor::GREEN,
+        RoadColor::WHITE,
+        RoadColor::BLACK,
+        RoadColor::YELLOW,
+        RoadColor::PINK,
+        RoadColor::ORANGE,
+        RoadColor::NONE
     };
-    */
+
 
     Road::Road() {
         this->id = -1;
-        this->color = cardsState::ColorCard::LOCOMOTIVE;
+        this->color = RoadColor::UNKNOWN;
         this->length = -1;
     }
-    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
+    Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, RoadColor color, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
     {
         DEBUG_PRINT("Road creation started ...");
         this->id = id;
@@ -50,7 +51,7 @@ namespace mapState
         this->edge = edge;
         DEBUG_PRINT("Road " << this->id << " created !");
     }
-    Road Road::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
+    Road Road::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, RoadColor color, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
         DEBUG_PRINT("Road creation started ...");
         std::shared_ptr<playersState::Player> owner = nullptr;
@@ -85,7 +86,7 @@ namespace mapState
     {
         return this->stationB;
     }
-    cardsState::ColorCard Road::getColor()
+    RoadColor Road::getColor()
     {
         return this->color;
     }
@@ -169,7 +170,7 @@ namespace mapState
             std::shared_ptr<Station> stationB = pair.second;
             int id = std::get<0>(detail);
             std::shared_ptr<playersState::Player> owner = std::get<1>(detail);
-            cardsState::ColorCard color = std::get<2>(detail);
+            RoadColor color = std::get<2>(detail);
             int length = std::get<3>(detail);
             std::shared_ptr<std::size_t> stationAVertex = stationA->getVertex();
             std::shared_ptr<std::size_t> stationBVertex = stationB->getVertex(); 
@@ -180,23 +181,23 @@ namespace mapState
         }
         return roads;
     }
-    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
+    RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, RoadColor color, int length)
     {
         StationPair pair = std::pair(stationA, stationB);
         RoadDetail detail = std::tuple(id, owner, color, length);
         return std::pair(pair, detail);
     }
-    RoadInfo Road::initData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, cardsState::ColorCard color, int length)
+    RoadInfo Road::initData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, RoadColor color, int length)
     {
         return Road::genData(stationA, stationB, id, nullptr, color, length);
     }
-    RoadInfo Road::genDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
+    RoadInfo Road::genDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, std::shared_ptr<playersState::Player> owner, RoadColor color, int length)
     {
         std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
         std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);
         return Road::genData(stationA, stationB, id, owner, color, length);
     }
-    RoadInfo Road::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, cardsState::ColorCard color, int length)
+    RoadInfo Road::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, RoadColor color, int length)
     {
         std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
         std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(Default)
   BOOST_CHECK_EQUAL(test_ferry.owner->name, test_owner->name);
   BOOST_CHECK_EQUAL(test_ferry.stationA, test_stationA);
   BOOST_CHECK_EQUAL(test_ferry.stationB, test_stationB);
-  BOOST_CHECK_EQUAL(test_ferry.color, cardsState::ColorCard::NONE);
+  BOOST_CHECK_EQUAL(test_ferry.color, RoadColor::NONE);
   BOOST_CHECK_EQUAL(test_ferry.length, test_length);
   BOOST_CHECK_EQUAL(*test_ferry.edge, *test_edge);
   BOOST_CHECK_EQUAL(test_ferry.locomotives, test_locomotives);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(EMPTY)
       BOOST_CHECK_EQUAL(ferry.owner, nullptr);
       BOOST_CHECK_EQUAL(ferry.stationA, nullptr);
       BOOST_CHECK_EQUAL(ferry.stationB, nullptr);
-      BOOST_CHECK_EQUAL(ferry.color, cardsState::ColorCard::LOCOMOTIVE);
+      BOOST_CHECK_EQUAL(ferry.color, RoadColor::UNKNOWN);
       BOOST_CHECK_EQUAL(ferry.length, -1);
       BOOST_CHECK_EQUAL(ferry.edge, nullptr);
       BOOST_CHECK_EQUAL(ferry.locomotives, -1);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
     BOOST_CHECK_EQUAL(ferries[i]->owner->name, std::get<1>(std::get<1>(ferryInfos[i]))->name);
     BOOST_CHECK_EQUAL(ferries[i]->stationA, std::get<0>(std::get<0>(ferryInfos[i])));
     BOOST_CHECK_EQUAL(ferries[i]->stationB, std::get<1>(std::get<0>(ferryInfos[i])));
-    BOOST_CHECK_EQUAL(ferries[i]->color, cardsState::ColorCard::NONE);
+    BOOST_CHECK_EQUAL(ferries[i]->color, RoadColor::NONE);
     BOOST_CHECK_EQUAL(ferries[i]->locomotives, std::get<2>(std::get<1>(ferryInfos[i])));
     BOOST_CHECK_EQUAL(ferries[i]->length, std::get<3>(std::get<1>(ferryInfos[i])));
   }
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(GetEdge)
 BOOST_AUTO_TEST_CASE(GetColor)
 {
   std::cout << "GetColor Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getColor(), cardsState::ColorCard::NONE);
+  BOOST_CHECK_EQUAL(test_ferry_getters_and_setters.getColor(), RoadColor::NONE);
   std::cout << "GetColor Test Finished !\n"
             << std::endl;
 }
