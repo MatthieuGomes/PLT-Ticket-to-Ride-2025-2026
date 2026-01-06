@@ -9,6 +9,10 @@ namespace tui {
 
 namespace {
 
+// Frame geometry: 2 cells for borders and content starts 1 cell in.
+const int kFrameInset = 2;
+const int kFrameOffset = 1;
+
 int clampValue(int value, int minValue, int maxValue) {
   if (value < minValue) {
     return minValue;
@@ -21,6 +25,7 @@ int clampValue(int value, int minValue, int maxValue) {
 
 void writeClampedLine(Terminal& term, int row, int col, int width,
                       const std::string& text) {
+  // Clamp text to available width, then pad to clear leftover characters.
   std::string buffer = text;
   if (width <= 0) {
     return;
@@ -45,6 +50,7 @@ InfoPanel::InfoPanel(int x, int y, int width, int height)
 
 void InfoPanel::addMessage(const std::string& message) {
   messages.push_back(message);
+  // Keep scroll offset valid as new messages arrive.
   int maxOffset = static_cast<int>(messages.size()) - getVisibleLineCount();
   if (maxOffset < 0) {
     maxOffset = 0;
@@ -62,6 +68,7 @@ void InfoPanel::clearMessages() {
 }
 
 void InfoPanel::scroll(int delta) {
+  // Clamp scrolling so we never go past the available message range.
   int maxOffset = static_cast<int>(messages.size()) - getVisibleLineCount();
   if (maxOffset < 0) {
     maxOffset = 0;
@@ -71,7 +78,8 @@ void InfoPanel::scroll(int delta) {
 }
 
 int InfoPanel::getVisibleLineCount() const {
-  int lines = height - 2;
+  // Content height excludes the top/bottom frame border.
+  int lines = height - kFrameInset;
   if (lines < 0) {
     lines = 0;
   }
@@ -79,12 +87,13 @@ int InfoPanel::getVisibleLineCount() const {
 }
 
 void InfoPanel::drawContent(Terminal& term) {
-  const int contentWidth = width - 2;
+  const int contentWidth = width - kFrameInset;
   const int contentHeight = getVisibleLineCount();
   if (contentWidth <= 0 || contentHeight <= 0) {
     return;
   }
 
+  // If the view shrinks, adjust scroll offset so it stays within bounds.
   int maxOffset = static_cast<int>(messages.size()) - contentHeight;
   if (maxOffset < 0) {
     maxOffset = 0;
@@ -95,6 +104,7 @@ void InfoPanel::drawContent(Terminal& term) {
 
   int startIndex = 0;
   if (static_cast<int>(messages.size()) > contentHeight) {
+    // Show the most recent messages, with scroll offset applied.
     startIndex = static_cast<int>(messages.size()) - contentHeight - scrollOffset;
   }
 
@@ -108,7 +118,7 @@ void InfoPanel::drawContent(Terminal& term) {
     if (index >= 0 && index < static_cast<int>(messages.size())) {
       line = messages[static_cast<std::size_t>(index)];
     }
-    writeClampedLine(term, y + 1 + row, x + 1, contentWidth, line);
+    writeClampedLine(term, y + kFrameOffset + row, x + kFrameOffset, contentWidth, line);
     row += 1;
   }
 }
