@@ -79,6 +79,7 @@ void StatusBar::drawHeader(Terminal& term) {
       statusLine << " | ";
     }
     statusLine << "Turn " << currentTurn;
+    statusLine << " | Your turn";
   }
 
   if (currentPlayer != nullptr) {
