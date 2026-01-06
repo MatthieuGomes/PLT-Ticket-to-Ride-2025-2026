@@ -55,6 +55,21 @@ BOOST_AUTO_TEST_CASE(Basic)
             << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(EMPTY)
+{
+  std::cout << "Empty Player Constructor Test Started ..." << std::endl;
+      Tunnel tunnel;
+      BOOST_CHECK_EQUAL(tunnel.id, -1);
+      BOOST_CHECK_EQUAL(tunnel.owner, nullptr);
+      BOOST_CHECK_EQUAL(tunnel.stationA, nullptr);
+      BOOST_CHECK_EQUAL(tunnel.stationB, nullptr);
+      BOOST_CHECK_EQUAL(tunnel.color, cardsState::ColorCard::LOCOMOTIVE);
+      BOOST_CHECK_EQUAL(tunnel.length, -1);
+      BOOST_CHECK_EQUAL(tunnel.edge, nullptr);
+      std::cout << "Empty Player Constructor Test Finished !\n"
+                << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(BatchConstructor)
 {
   std::cout << "BatchConstructor Test Started ..." << std::endl;

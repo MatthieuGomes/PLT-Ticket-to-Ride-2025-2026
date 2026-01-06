@@ -12,6 +12,9 @@
 using namespace playersState;
 using namespace mapState;
 
+using playersInfos = std::tuple<std::string, PlayerColor, int, int, int, int, std::shared_ptr<cardsState::PlayerCards>>;
+using playersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
+
 std::string test_init_player1_name = "Alice";
 playersState::PlayerColor test_init_player1_color = playersState::PlayerColor::RED;
 int test_init_player1_score = 23;
@@ -60,6 +63,7 @@ BOOST_AUTO_TEST_CASE(Empty)
 {
   PlayersState ps;
   BOOST_CHECK(ps.getPlayers().empty());
+  BOOST_CHECK_EQUAL(PlayersState::nbPlayers, 0);
 }
 BOOST_AUTO_TEST_CASE(Default)
 {
@@ -67,6 +71,33 @@ BOOST_AUTO_TEST_CASE(Default)
   BOOST_CHECK_EQUAL(ps.getPlayers().size(), 1);
   BOOST_CHECK_EQUAL(ps.getPlayers()[0], test_owner);
 }
+
+BOOST_AUTO_TEST_CASE(FromInfos)
+{
+  std::vector<playersInfos> infos = {
+      std::make_tuple(test_init_player1_name, test_init_player1_color,
+                      test_init_player1_score, test_init_player1_nbWagons,
+                      test_init_player1_nbStations, test_init_player1_nbRoads, nullptr),
+      std::make_tuple(test_init_player2_name, test_init_player2_color,
+                      test_init_player2_score, test_init_player2_nbWagons,
+                      test_init_player2_nbStations, test_init_player2_nbRoads, nullptr)};
+  PlayersState ps = PlayersState(infos);
+  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
+  BOOST_CHECK_EQUAL(ps.getPlayers()[0]->getName(), test_init_player1_name);
+  BOOST_CHECK_EQUAL(ps.getPlayers()[1]->getName(), test_init_player2_name);
+}
+
+BOOST_AUTO_TEST_CASE(FromInitInfos)
+{
+  std::vector<playersInitInfos> infos = {
+      std::make_tuple(test_init_player1_name, test_init_player1_color, nullptr),
+      std::make_tuple(test_init_player2_name, test_init_player2_color, nullptr)};
+  PlayersState ps = PlayersState::InitFromInfos(infos);
+  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
+  BOOST_CHECK_EQUAL(ps.getPlayers()[0]->getName(), test_init_player1_name);
+  BOOST_CHECK_EQUAL(ps.getPlayers()[1]->getName(), test_init_player2_name);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END() // Constructors
 

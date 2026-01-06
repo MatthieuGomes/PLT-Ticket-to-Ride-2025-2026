@@ -1,4 +1,3 @@
-
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/mapState/Road.h"
@@ -38,6 +37,21 @@ std::shared_ptr<boost::adjacency_list<>::edge_descriptor> test_edge = std::make_
     boost::add_edge(*(test_stationA->getVertex().get()), *(test_stationB->getVertex().get()), *test_graph).first);
 
 BOOST_AUTO_TEST_SUITE(Constructors)
+
+BOOST_AUTO_TEST_CASE(Empty)
+{
+  std::cout << "Empty Player Constructor Test Started ..." << std::endl;
+      Road road;
+      BOOST_CHECK_EQUAL(road.id, -1);
+      BOOST_CHECK_EQUAL(road.owner, nullptr);
+      BOOST_CHECK_EQUAL(road.stationA, nullptr);
+      BOOST_CHECK_EQUAL(road.stationB, nullptr);
+      BOOST_CHECK_EQUAL(road.color, cardsState::ColorCard::LOCOMOTIVE);
+      BOOST_CHECK_EQUAL(road.length, -1);
+      BOOST_CHECK_EQUAL(road.edge, nullptr);
+      std::cout << "Empty Player Constructor Test Finished !\n"
+                << std::endl;
+}
 
 BOOST_AUTO_TEST_CASE(Basic)
 {

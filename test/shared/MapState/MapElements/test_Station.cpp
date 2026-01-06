@@ -31,12 +31,15 @@ std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> test_vertex = std::m
 
 BOOST_AUTO_TEST_SUITE(Constructors)
 
-BOOST_AUTO_TEST_CASE(Default)
+BOOST_AUTO_TEST_CASE(Empty)
 {
-  std::cout << "Default Constructor Test Started ..." << std::endl;
+  std::cout << "Empty Test Started ..." << std::endl;
   Station station = Station();
   BOOST_CHECK(station.name.empty());
   BOOST_CHECK_EQUAL(station.owner, nullptr);
+  BOOST_CHECK_EQUAL(station.vertex, nullptr);
+  std::cout << "Empty Test Finished !\n"
+            << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(Basic)
@@ -75,7 +78,7 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
 BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
 {
   std::vector<StationInfo> stationInfos = {
-      Station::genData(test_owner,  "NoGraphStation")};
+      Station::genData(test_owner, "NoGraphStation")};
   // check if exception is thrown if no graph is provided
   BOOST_CHECK_THROW(Station::BatchConstructor(stationInfos, nullptr), std::invalid_argument);
 
@@ -88,7 +91,7 @@ BOOST_AUTO_TEST_SUITE()
 BOOST_AUTO_TEST_CASE(GenData)
 {
   std::cout << "GenData Test Started ..." << std::endl;
-  StationInfo info = Station::genData(test_owner,  test_station_name);
+  StationInfo info = Station::genData(test_owner, test_station_name);
   BOOST_CHECK_EQUAL(std::get<0>(info)->name, test_owner->name);
   BOOST_CHECK_EQUAL(std::get<1>(info), test_station_name);
   std::cout << "GenData Test Finished !\n"
@@ -98,7 +101,7 @@ BOOST_AUTO_TEST_CASE(GenData)
 BOOST_AUTO_TEST_CASE(InitData)
 {
   std::cout << "InitData Test Started ..." << std::endl;
-  StationInfo info = Station::initData( test_station_name);
+  StationInfo info = Station::initData(test_station_name);
   BOOST_CHECK_EQUAL(std::get<0>(info), nullptr);
   BOOST_CHECK_EQUAL(std::get<1>(info), test_station_name);
   std::cout << "InitData Test Finished !\n"

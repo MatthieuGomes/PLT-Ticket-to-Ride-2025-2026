@@ -13,13 +13,6 @@
 
 using namespace std;
 
-struct StationData
-{
-    int id;
-    std::shared_ptr<playersState::Player> owner;
-    std::string name;
-};
-
 namespace mapState
 {
 

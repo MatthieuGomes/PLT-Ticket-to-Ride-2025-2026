@@ -67,7 +67,7 @@ namespace cardsState
             this->cards = {};
         }
     }
-
+    // TODO : functions to select only cards of a given color
     template  <class CardType>
     std::vector<std::shared_ptr<CardType>> Deck<CardType>::getCards() {
         return cards;
