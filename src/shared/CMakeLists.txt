@@ -6,6 +6,7 @@ generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../state.dia")
 generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../cardsState.dia")
 generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../playersState.dia")
 generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../mapState.dia")
+generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../tui.dia")
 #generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../engine.dia")
 #generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../ai.dia")
 
@@ -22,4 +23,3 @@ target_include_directories(${lib_shared_target} PUBLIC
   )
 
 # vim: set sw=2 sts=2 et:
-

@@ -46,6 +46,11 @@ namespace cardsState {
         Deck<CardType>::_display(indent);
         std::cout << indentation << "===========================\n";
     }
+    template <class CardType>
+    FaceDownCards<CardType>::FaceDownCards(std::vector<std::shared_ptr<CardType>> cards) : Deck<CardType>(cards)
+    {
+        this->className = "FaceDownCards";
+    }
     template class FaceDownCards<DestinationCard>;
     template class FaceDownCards<WagonCard>;
 }
