@@ -19,7 +19,7 @@ namespace mapState
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
     using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
     using RoadInfo = std::pair<StationPair, RoadDetail>;
-
+    Road::Road() {}
     Road::Road(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
     {
         DEBUG_PRINT("Road creation started ...");
@@ -31,6 +31,15 @@ namespace mapState
         this->length = length;
         this->edge = edge;
         DEBUG_PRINT("Road " << this->id << " created !");
+    }
+    Road Road::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
+    {
+        DEBUG_PRINT("Road creation started ...");
+        std::shared_ptr<playersState::Player> owner = nullptr;
+        std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
+            boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
+        DEBUG_PRINT("Road " << id << " created !");
+        return Road(id, owner, stationA, stationB, color, length, edge);
     }
     int Road::getId()
     {
@@ -129,39 +138,28 @@ namespace mapState
     }
     std::vector<std::shared_ptr<Road>> Road::BatchConstructor(std::vector<RoadInfo> roadsInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
-        
         if (!gameGraph)
         {
-            
             throw std::invalid_argument("Road::BatchConstructor requires a graph");
         }
         std::vector<std::shared_ptr<Road>> roads;
-        
-        
         for (RoadInfo info : roadsInfos)
         {
-            
-
             StationPair pair = info.first;
             RoadDetail detail = info.second;
-            
-            
-            
-            
-            
             std::shared_ptr<Station> stationA = pair.first;
             std::shared_ptr<Station> stationB = pair.second;
             int id = std::get<0>(detail);
             std::shared_ptr<playersState::Player> owner = std::get<1>(detail);
             cardsState::ColorCard color = std::get<2>(detail);
             int length = std::get<3>(detail);
+            std::shared_ptr<std::size_t> stationAVertex = stationA->getVertex();
+            std::shared_ptr<std::size_t> stationBVertex = stationB->getVertex(); 
             std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
                 std::make_shared<boost::adjacency_list<>::edge_descriptor>(
                     boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
             roads.push_back(std::make_shared<Road>(id, owner, stationA, stationB, color, length, edgeDescriptor));
-            
         }
-        
         return roads;
     }
     RoadInfo Road::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
@@ -174,13 +172,13 @@ namespace mapState
     {
         return Road::genData(stationA, stationB, id, nullptr, color, length);
     }
-    RoadInfo Road::genDataByName(std::vector<std::shared_ptr<Station>>  stations, const std::string& stationAName, const std::string& stationBName, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
+    RoadInfo Road::genDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
     {
         std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
         std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);
         return Road::genData(stationA, stationB, id, owner, color, length);
     }
-    RoadInfo Road::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string& stationAName, const std::string& stationBName, int id, cardsState::ColorCard color, int length)
+    RoadInfo Road::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, cardsState::ColorCard color, int length)
     {
         std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
         std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);

@@ -25,6 +25,10 @@ namespace mapState
 
     using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
 
+    Station::Station()
+    {
+    }
+
     Station::Station(std::string name, std::shared_ptr<playersState::Player> owner, std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertex)
     {
         DEBUG_PRINT("Station creation started ...");
@@ -32,6 +36,16 @@ namespace mapState
         this->name = name;
         this->vertex = vertex;
         DEBUG_PRINT("Station " << name << " created !");
+    }
+    Station Station::Init(std::string name, std::shared_ptr<boost::adjacency_list<>> gameGraph)
+    {
+        DEBUG_PRINT("Station creation started ...");
+        std::shared_ptr<playersState::Player> owner = nullptr;
+        std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertex =
+            std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+                boost::add_vertex(*gameGraph));
+        DEBUG_PRINT("Station " << name << " created !");
+        return Station(name, owner, vertex);
     }
     std::string Station::getName()
     {
@@ -70,18 +84,31 @@ namespace mapState
     {
         std::vector<std::shared_ptr<Station>> adjacentStations = {};
         std::string stationName = this->name;
+        std::vector<std::string> adjacentStationNames = {};
         for (const std::shared_ptr<Road> &road : roads)
         {
             std::shared_ptr<Station> stationA = road->getStationA();
             std::shared_ptr<Station> stationB = road->getStationB();
+            bool isAlreadyAdded = false;
+            for(const std::string& name : adjacentStationNames) {
+                if(stationA->getName() == name || stationB->getName() == name) {
+                    isAlreadyAdded = true;
+                    break;
+                }
+            }
+            if(isAlreadyAdded) {
+                continue;
+            }
             if (stationA->getName() == stationName)
             {
                 adjacentStations.push_back(stationB);
+                adjacentStationNames.push_back(stationB->getName());
                 continue;
             }
             else if (stationB->getName() == stationName)
             {
                 adjacentStations.push_back(stationA);
+                adjacentStationNames.push_back(stationA->getName());
                 continue;
             }
         }

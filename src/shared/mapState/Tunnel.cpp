@@ -18,10 +18,24 @@ namespace mapState
     using TunnelDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
     using TunnelInfo = std::pair<StationPair, TunnelDetail>;
 
+    Tunnel::Tunnel() : Road()
+    {
+    }
+
     Tunnel::Tunnel(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
         : Road(id, owner, stationA, stationB, color, lenght, edge)
     {
         DEBUG_PRINT("Parent constructor finished : Tunnel " << this->id << " created !");
+    }
+
+    Tunnel Tunnel::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
+    {
+        DEBUG_PRINT("Tunnel creation started ...");
+        std::shared_ptr<playersState::Player> owner = nullptr;
+        std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
+            boost::add_edge(*(stationA->getVertex().get()), *(stationB->getVertex().get()), *gameGraph).first);
+        return Tunnel(id, owner, stationA, stationB, color, length, edge);
+        DEBUG_PRINT("Tunnel " << this->id << " created !");
     }
 
     Tunnel::~Tunnel()

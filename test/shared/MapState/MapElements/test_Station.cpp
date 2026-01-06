@@ -31,6 +31,14 @@ std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> test_vertex = std::m
 
 BOOST_AUTO_TEST_SUITE(Constructors)
 
+BOOST_AUTO_TEST_CASE(Default)
+{
+  std::cout << "Default Constructor Test Started ..." << std::endl;
+  Station station = Station();
+  BOOST_CHECK(station.name.empty());
+  BOOST_CHECK_EQUAL(station.owner, nullptr);
+}
+
 BOOST_AUTO_TEST_CASE(Basic)
 {
   std::cout << "Default Constructor Test Started ..." << std::endl;
