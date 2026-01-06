@@ -18,7 +18,7 @@
 using namespace ::mapState;
 
 using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
+using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, RoadColor, int>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 
 BOOST_AUTO_TEST_CASE(TestStaticAssert)
@@ -30,7 +30,7 @@ std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::ad
 std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", std::make_shared<playersState::Player>("OwnerA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr), std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
 std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", std::make_shared<playersState::Player>("OwnerB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr), std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
 int test_road_id = 101;
-cardsState::ColorCard test_color = cardsState::ColorCard::GREEN;
+RoadColor test_color = RoadColor::GREEN;
 int test_length = 5;
 std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
 std::shared_ptr<boost::adjacency_list<>::edge_descriptor> test_edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(Empty)
       BOOST_CHECK_EQUAL(road.owner, nullptr);
       BOOST_CHECK_EQUAL(road.stationA, nullptr);
       BOOST_CHECK_EQUAL(road.stationB, nullptr);
-      BOOST_CHECK_EQUAL(road.color, cardsState::ColorCard::LOCOMOTIVE);
+      BOOST_CHECK_EQUAL(road.color, RoadColor::UNKNOWN);
       BOOST_CHECK_EQUAL(road.length, -1);
       BOOST_CHECK_EQUAL(road.edge, nullptr);
       std::cout << "Empty Player Constructor Test Finished !\n"
@@ -89,21 +89,21 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
           batch_stationB,
           202,
           batch_owner1,
-          cardsState::ColorCard::ORANGE,
+          RoadColor::ORANGE,
           7),
       Road::genData(
           batch_stationB,
           batch_stationC,
           203,
           batch_owner2,
-          cardsState::ColorCard::PINK,
+          RoadColor::PINK,
           3),
       Road::genData(
           batch_stationA,
           batch_stationC,
           204,
           batch_owner3,
-          cardsState::ColorCard::WHITE,
+          RoadColor::WHITE,
           4),
   };
   std::vector<std::shared_ptr<mapState::Road>> roads = mapState::Road::BatchConstructor(roadInfos, test_graph);
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(BatchConstructor)
 BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
 {
   std::vector<RoadInfo> roadInfos = {
-      Road::genData(test_stationA, test_stationB, 301, test_owner, cardsState::GREEN, 5)};
+      Road::genData(test_stationA, test_stationB, 301, test_owner, RoadColor::GREEN, 5)};
   // check if exception is thrown if no graph is provided
   BOOST_CHECK_THROW(Road::BatchConstructor(roadInfos, nullptr), std::invalid_argument);
 
@@ -372,11 +372,11 @@ BOOST_AUTO_TEST_CASE(getClaimableRoads)
                                                                                                       },
                                                                                                       test_graph);
   std::vector<std::shared_ptr<mapState::Road>> roads = mapState::Road::BatchConstructor({
-                                                                                            Road::genData(test_stations[0], test_stations[1], 401, nullptr, cardsState::ColorCard::RED, 5),
-                                                                                            Road::genData(test_stations[1], test_stations[2], 402, test_owner, cardsState::ColorCard::BLUE, 4),
-                                                                                            Road::genData(test_stations[0], test_stations[2], 403, another_player, cardsState::ColorCard::GREEN, 6),
-                                                                                            Road::genData(test_stations[1], test_stations[2], 404, nullptr, cardsState::ColorCard::YELLOW, 3),
-                                                                                            Road::genData(test_stations[0], test_stations[1], 405, nullptr, cardsState::ColorCard::BLACK, 2),
+                                                                                            Road::genData(test_stations[0], test_stations[1], 401, nullptr, RoadColor::RED, 5),
+                                                                                            Road::genData(test_stations[1], test_stations[2], 402, test_owner, RoadColor::BLUE, 4),
+                                                                                            Road::genData(test_stations[0], test_stations[2], 403, another_player, RoadColor::GREEN, 6),
+                                                                                            Road::genData(test_stations[1], test_stations[2], 404, nullptr, RoadColor::YELLOW, 3),
+                                                                                            Road::genData(test_stations[0], test_stations[1], 405, nullptr, RoadColor::BLACK, 2),
                                                                                         },
                                                                                         test_graph);
 

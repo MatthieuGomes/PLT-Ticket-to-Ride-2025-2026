@@ -21,7 +21,7 @@ namespace mapState
         this->locomotives = -1;
     }
 
-    Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int locomotives, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge) : Road(id, owner, stationA, stationB, cardsState::ColorCard::NONE, length, edge)
+    Ferry::Ferry(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int locomotives, int length, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge) : Road(id, owner, stationA, stationB, RoadColor::NONE, length, edge)
     {
         DEBUG_PRINT("Parent constructor finished :");
 

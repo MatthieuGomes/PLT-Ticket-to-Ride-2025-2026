@@ -15,20 +15,20 @@ using namespace std;
 namespace mapState
 {
     using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
-    using TunnelDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
+    using TunnelDetail = std::tuple<int, std::shared_ptr<playersState::Player>, RoadColor, int>;
     using TunnelInfo = std::pair<StationPair, TunnelDetail>;
 
     Tunnel::Tunnel() : Road()
     {
     }
 
-    Tunnel::Tunnel(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int lenght, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
+    Tunnel::Tunnel(int id, std::shared_ptr<playersState::Player> owner, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, RoadColor color, int lenght, std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edge)
         : Road(id, owner, stationA, stationB, color, lenght, edge)
     {
         DEBUG_PRINT("Parent constructor finished : Tunnel " << this->id << " created !");
     }
 
-    Tunnel Tunnel::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, cardsState::ColorCard color, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
+    Tunnel Tunnel::Init(int id, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, RoadColor color, int length, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
         DEBUG_PRINT("Tunnel creation started ...");
         std::shared_ptr<playersState::Player> owner = nullptr;
@@ -69,7 +69,7 @@ namespace mapState
             std::shared_ptr<Station> stationB = pair.second;
             int id = std::get<0>(detail);
             std::shared_ptr<playersState::Player> owner = std::get<1>(detail);
-            cardsState::ColorCard color = std::get<2>(detail);
+            RoadColor color = std::get<2>(detail);
             int length = std::get<3>(detail);
             std::shared_ptr<boost::adjacency_list<>::edge_descriptor> edgeDescriptor =
                 std::make_shared<boost::adjacency_list<>::edge_descriptor>(
@@ -81,21 +81,21 @@ namespace mapState
         return tunnels;
     }
 
-    TunnelInfo Tunnel::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
+    TunnelInfo Tunnel::genData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, std::shared_ptr<playersState::Player> owner, RoadColor color, int length)
     {
         return Road::genData(stationA, stationB, id, owner, color, length);
     }
-    TunnelInfo Tunnel::initData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, cardsState::ColorCard color, int length)
+    TunnelInfo Tunnel::initData(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB, int id, RoadColor color, int length)
     {
         return Tunnel::genData(stationA, stationB, id, nullptr, color, length);
     }
-    TunnelInfo Tunnel::genDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, std::shared_ptr<playersState::Player> owner, cardsState::ColorCard color, int length)
+    TunnelInfo Tunnel::genDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, std::shared_ptr<playersState::Player> owner, RoadColor color, int length)
     {
         std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
         std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);
         return Tunnel::genData(stationA, stationB, id, owner, color, length);
     }
-    TunnelInfo Tunnel::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, cardsState::ColorCard color, int length)
+    TunnelInfo Tunnel::initDataByName(std::vector<std::shared_ptr<Station>> stations, const std::string &stationAName, const std::string &stationBName, int id, RoadColor color, int length)
     {
         std::shared_ptr<Station> stationA = Station::getStationByName(stations, stationAName);
         std::shared_ptr<Station> stationB = Station::getStationByName(stations, stationBName);

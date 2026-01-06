@@ -133,11 +133,11 @@ BOOST_AUTO_TEST_CASE(GetOwner)
 }
 using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
 using StationPair = std::pair<Station *, Station *>;
-using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int>;
+using RoadDetail = std::tuple<int, std::shared_ptr<playersState::Player>, RoadColor, int>;
 using RoadInfo = std::pair<StationPair, RoadDetail>;
 using TunnelDetail = RoadDetail;
 using TunnelInfo = RoadInfo;
-using FerryDetail = std::tuple<int, playersState::Player *, cardsState::ColorCard, int, int>;
+using FerryDetail = std::tuple<int, playersState::Player *, RoadColor, int, int>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 BOOST_AUTO_TEST_CASE(GetVertex)
@@ -178,8 +178,8 @@ BOOST_AUTO_TEST_CASE(getAdjacentStations)
   std::shared_ptr<Station> stationA = std::make_shared<Station>("StationA", nullptr, test_vertex);
   std::shared_ptr<Station> stationB = std::make_shared<Station>("StationB", nullptr, test_vertex);
   std::shared_ptr<Station> stationC = std::make_shared<Station>("StationC", nullptr, test_vertex);
-  std::shared_ptr<Road> roadAB = std::make_shared<Road>(101, nullptr, stationA, stationB, cardsState::ColorCard::RED, 3, nullptr);
-  std::shared_ptr<Road> roadAC = std::make_shared<Road>(102, nullptr, stationA, stationC, cardsState::ColorCard::BLUE, 4, nullptr);
+  std::shared_ptr<Road> roadAB = std::make_shared<Road>(101, nullptr, stationA, stationB, RoadColor::RED, 3, nullptr);
+  std::shared_ptr<Road> roadAC = std::make_shared<Road>(102, nullptr, stationA, stationC, RoadColor::BLUE, 4, nullptr);
   std::vector<std::shared_ptr<Road>> roads = {roadAB, roadAC};
   {
     std::cout << "adjacent station to A case tests started ..." << std::endl;
