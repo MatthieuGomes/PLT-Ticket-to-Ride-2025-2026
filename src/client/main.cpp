@@ -5,6 +5,9 @@
 #include "client/Client.h"  
 #include <cstring>
 
+#include "tui/Terminal.h"
+#include "tui/TUIManager.h"
+
 void testSFML() {
     sf::Texture texture;
 }
@@ -27,6 +30,16 @@ int main(int argc,char* argv[])
     }
     if (strcmp(argv[1],"state")==0) {
         client.printState();
+        return EXIT_SUCCESS;
+    }
+    if (strcmp(argv[1],"tui")==0) {
+        const int cols = 100;
+        const int rows = 30;
+
+        tui::Terminal term;
+        tui::TUIManager manager(&term, cols, rows);
+        manager.runMainLoop();
+
         return EXIT_SUCCESS;
     }
 
