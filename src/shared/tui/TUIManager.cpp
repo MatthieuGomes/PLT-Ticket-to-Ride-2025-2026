@@ -1,12 +1,16 @@
-#include <iostream>
+#include <algorithm>
+#include <chrono>
+#include <csignal>
+#include <cctype>
+#include <sstream>
+#include <thread>
+
+#include <sys/select.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "playersState/Player.h"
 #include "TUIManager.h"
-
-#include <algorithm>
-#include <chrono>
-#include <sstream>
-#include <thread>
 
 #include "CommandInput.h"
 #include "InfoPanel.h"
@@ -23,6 +27,35 @@ namespace {
 
 int clampPositive(int value, int minimum) {
   return std::max(value, minimum);
+}
+
+volatile sig_atomic_t g_shouldStop = 0;
+
+void handleSigInt(int) {
+  g_shouldStop = 1;
+}
+
+bool pollChar(char& ch) {
+  fd_set readfds;
+  FD_ZERO(&readfds);
+  FD_SET(STDIN_FILENO, &readfds);
+
+  struct timeval timeout;
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
+
+  int result = select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &timeout);
+  if (result <= 0 || !FD_ISSET(STDIN_FILENO, &readfds)) {
+    return false;
+  }
+
+  char buffer = '\0';
+  ssize_t bytes = read(STDIN_FILENO, &buffer, 1);
+  if (bytes != 1) {
+    return false;
+  }
+  ch = buffer;
+  return true;
 }
 
 }  // namespace
@@ -197,16 +230,75 @@ void TUIManager::runMainLoop() {
     return;
   }
 
+  struct termios originalTermios;
+  bool termiosReady = false;
+  if (tcgetattr(STDIN_FILENO, &originalTermios) == 0) {
+    struct termios raw = originalTermios;
+    raw.c_lflag &= static_cast<unsigned long>(~(ECHO | ICANON));
+    raw.c_lflag |= ISIG;
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 0;
+    if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) == 0) {
+      termiosReady = true;
+    }
+  }
+
+  std::signal(SIGINT, handleSigInt);
+
   init();
   running = true;
   term->hideCursor();
 
   while (running) {
+    if (g_shouldStop != 0) {
+      running = false;
+      break;
+    }
+
+    if (commandinput != nullptr) {
+      char ch = '\0';
+      bool updated = false;
+      while (pollChar(ch)) {
+        if (ch == '\n' || ch == '\r') {
+          std::string input = commandinput->getInput();
+          if (!input.empty()) {
+            handleInput(input);
+          }
+          commandinput->clearInput();
+          updated = true;
+        } else if (ch == 127 || ch == '\b') {
+          std::string input = commandinput->getInput();
+          if (!input.empty()) {
+            input.pop_back();
+            commandinput->setInput(input);
+            updated = true;
+          }
+        } else if (std::isprint(static_cast<unsigned char>(ch)) != 0) {
+          std::string input = commandinput->getInput();
+          if (static_cast<int>(input.size()) < 50) {
+            input.push_back(ch);
+            commandinput->setInput(input);
+            updated = true;
+          }
+        }
+      }
+      if (updated) {
+        commandinput->requestRedraw();
+      }
+    }
+
     drawAll();
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
-  term->showCursor();
+  shutdown();
+  term->resetStyles();
+  term->flush();
+
+  if (termiosReady) {
+    tcsetattr(STDIN_FILENO, TCSANOW, &originalTermios);
+  }
+  std::signal(SIGINT, SIG_DFL);
 }
 
 }  // namespace tui
