@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Basic)
             << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(EMPTY)
+BOOST_AUTO_TEST_CASE(Empty)
 {
   std::cout << "Empty Player Constructor Test Started ..." << std::endl;
       Tunnel tunnel;
@@ -68,6 +68,20 @@ BOOST_AUTO_TEST_CASE(EMPTY)
       BOOST_CHECK_EQUAL(tunnel.edge, nullptr);
       std::cout << "Empty Player Constructor Test Finished !\n"
                 << std::endl;
+}
+BOOST_AUTO_TEST_CASE(Init)
+{
+  std::cout << "Init Constructor Test Started ..." << std::endl;
+  mapState::Tunnel test_tunnel = mapState::Tunnel::Init(test_tunnel_id, test_stationA, test_stationB, test_color, test_length, test_graph);
+  BOOST_CHECK_EQUAL(test_tunnel.id, test_tunnel_id);
+  BOOST_CHECK_EQUAL(test_tunnel.owner, nullptr);
+  BOOST_CHECK_EQUAL(test_tunnel.stationA, test_stationA);
+  BOOST_CHECK_EQUAL(test_tunnel.stationB, test_stationB);
+  BOOST_CHECK_EQUAL(test_tunnel.color, test_color);
+  BOOST_CHECK_EQUAL(test_tunnel.length, test_length);
+  BOOST_CHECK(test_tunnel.edge != nullptr);
+  std::cout << "Init Constructor Test Finished !\n"
+            << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(BatchConstructor)

@@ -68,6 +68,21 @@ BOOST_AUTO_TEST_CASE(Basic)
             << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(Init)
+{
+  std::cout << "Init Constructor Test Started ..." << std::endl;
+  mapState::Road test_road = mapState::Road::Init(test_road_id, test_stationA, test_stationB, test_color, test_length, test_graph);
+  BOOST_CHECK_EQUAL(test_road.id, test_road_id);
+  BOOST_CHECK_EQUAL(test_road.owner, nullptr);
+  BOOST_CHECK_EQUAL(test_road.stationA, test_stationA);
+  BOOST_CHECK_EQUAL(test_road.stationB, test_stationB);
+  BOOST_CHECK_EQUAL(test_road.color, test_color);
+  BOOST_CHECK_EQUAL(test_road.length, test_length);
+  BOOST_CHECK(test_road.edge != nullptr);
+  std::cout << "Init Constructor Test Finished !\n"
+            << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(BatchConstructor)
 {
   std::cout << "BatchConstructor Test Started ..." << std::endl;
