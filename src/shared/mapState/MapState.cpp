@@ -314,22 +314,35 @@ namespace mapState
         DEBUG_PRINT("MapState Destroyed");
     }
 
-    void MapState::display() const
+    void MapState::display(int indent) const
     {
-        std::cout << "===== MAP STATE =====\n";
-        std::cout << "Stations:\n";
+        std::string indentation(indent, '\t');
+        std::cout << indentation << "~~~~~ MAP STATE ~~~~~" << std::endl;
+        std::cout << indentation <<"\t" <<"##### STATIONS #####" << std::endl;
         for (const std::shared_ptr<Station> &station : stations)
         {
-            station->display();
-            std::cout << "------------------\n";
+            station->display(indent+2);
         }
-        std::cout << "Roads:\n";
+        std::cout << indentation << "\t" << "#####################" << std::endl;
+        std::cout << indentation << "\t" << "##### ROADS #####" << std::endl;
         for (const std::shared_ptr<Road> &road : roads)
         {
-            road->display();
-            std::cout << "------------------\n";
+            if(typeid(*road) == typeid(Tunnel))
+            {
+                std::shared_ptr<Tunnel> tunnel = std::dynamic_pointer_cast<Tunnel>(road);
+                tunnel->display(indent+2);
+            }
+            else if(typeid(*road) == typeid(Ferry))
+            {
+                std::shared_ptr<Ferry> ferry = std::dynamic_pointer_cast<Ferry>(road);
+                ferry->display(indent+2);
+            }
+            else {
+                road->display(indent+2);
+            }
         }
-        std::cout << "=====================\n";
+        std::cout << indentation << "\t" << "#####################" << std::endl;
+        std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     }
 
     std::vector<std::shared_ptr<Station>> MapState::getStations() const

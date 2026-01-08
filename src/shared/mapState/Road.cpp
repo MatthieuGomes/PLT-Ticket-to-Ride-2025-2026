@@ -85,10 +85,22 @@ namespace mapState
     {
         this->owner = owner;
     }
-    void Road::display()
+    void Road::display(int indent)
     {
-        cout << "\tRoad Details:\n";
-        _display();
+        std::string indentation(indent, '\t');
+        std::cout << "-----ROAD-----" << std::endl;
+        _display(indent);
+        std::cout << "----------------" << std::endl;
+    }
+    void Road::_display(int indent)
+    {
+        std::string indentation(indent, '\t');
+        std::cout << indentation << "Road ID: " << this->id << std::endl;
+        std::cout << indentation << "\tStation A: " << this->stationA->name << std::endl;
+        std::cout << indentation << "\tStation B: " << this->stationB->name << std::endl;
+        std::cout << indentation << "\tColor: " << Road::ColorsNames[this->color] << std::endl;
+        std::cout << indentation << "\tLength: " << this->length << std::endl;
+        std::cout << indentation << "\tOwner: " << (this->owner ? this->owner->name : "None") << std::endl;
     }
 
     std::shared_ptr<Station> Road::getStationA()
@@ -108,14 +120,7 @@ namespace mapState
         return this->length;
     }
 
-    void Road::_display()
-    {
-        cout << "\tStation A: " << this->stationA->name << "\n";
-        cout << "\tStation B: " << this->stationB->name << "\n";
-        cout << "\tColor: " << static_cast<int>(this->color) << "\n";
-        cout << "\tLength: " << this->length << "\n";
-        cout << "\tOwner: " << (this->owner ? this->owner->name : "None") << "\n";
-    }
+    
 
     bool Road::isClaimable(std::vector<std::shared_ptr<Road>> roads, int nbPlayers, std::shared_ptr<playersState::Player> player)
     {

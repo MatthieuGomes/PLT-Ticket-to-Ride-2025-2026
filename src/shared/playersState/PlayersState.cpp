@@ -60,25 +60,22 @@ namespace playersState
     {
         return map->isRoadClaimable(PlayersState::nbPlayers, road, player);
     }
-    void PlayersState::display()
+    void PlayersState::display(int indent)
     {
-
-        std::cout << "\n";
-        std::cout << "====================================\n";
-        std::cout << "         ÉTAT DES JOUEURS           \n";
-        std::cout << "====================================\n";
-
+        std::string indentation(indent, '\t');
+        std::cout << indentation << "~~~~~~ PLAYERS STATE ~~~~~~\n";
+        std::cout << indentation << "\t" << "##### PLAYERS #####\n";
         if (players.empty())
         {
-            std::cout << "Aucun joueur dans la partie.\n";
-            return;
+            std::cout << indentation << "\t\t"<< "No players in the game." << std::endl;
         }
-
+        
         for (std::shared_ptr<Player> player : players)
         {
-            cout << "-----------------------------" << endl;
-            player->display();
+            player->display(indent+2);
         }
+        std::cout << indentation << "\t" << "#######################\n";
+        std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     }
 
 };

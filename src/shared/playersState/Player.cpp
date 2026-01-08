@@ -43,12 +43,12 @@ namespace playersState
                                             PlayerColor::UNKNOWN};
 
    std::unordered_map<PlayerColor, std::string> Player::ColorsNames = {
-         {PlayerColor::RED, "RED"},
-         {PlayerColor::BLUE, "BLUE"},
-         {PlayerColor::GREEN, "GREEN"},
-         {PlayerColor::BLACK, "BLACK"},
-         {PlayerColor::YELLOW, "YELLOW"},
-         {PlayerColor::UNKNOWN, "UNKNOWN"}};
+       {PlayerColor::RED, "RED"},
+       {PlayerColor::BLUE, "BLUE"},
+       {PlayerColor::GREEN, "GREEN"},
+       {PlayerColor::BLACK, "BLACK"},
+       {PlayerColor::YELLOW, "YELLOW"},
+       {PlayerColor::UNKNOWN, "UNKNOWN"}};
 
    Player::Player()
    {
@@ -423,25 +423,25 @@ namespace playersState
       return playersState::PlayersState::getClaimableRoads(map, std::make_shared<Player>(*this));
    }
 
-   void Player::display()
+   void Player::display(int indent)
    {
-      std::cout << "===== PLAYER =====" << std::endl;
-      std::cout << "name: " << name << std::endl;
-      std::cout << "color: " << color << std::endl;
-      std::cout << "score: " << score << std::endl;
-      std::cout << "nbWagons: " << nbWagons << std::endl;
-      std::cout << "nbStations: " << nbStations << std::endl;
-      std::cout << "nbRoads: " << nbRoads << std::endl;
+      std::string indentation(indent, '\t');
+      std::cout << indentation <<"##### PLAYER #####" << std::endl;
+      std::cout << indentation <<"Name: " << name << std::endl;
+      std::cout << indentation <<"Color: " << color << std::endl;
+      std::cout << indentation <<"Score: " << score << std::endl;
+      std::cout << indentation <<"NbWagons: " << nbWagons << std::endl;
+      std::cout << indentation <<"NbStations: " << nbStations << std::endl;
+      std::cout << indentation <<"NbRoads: " << nbRoads << std::endl;
       if (hand)
       {
-         hand->display();
+         hand->display(indent+1);
       }
       else
       {
-         std::cout << "No hand available." << std::endl;
+         std::cout << indentation << "No hand available." << std::endl;
       }
-      std::cout << "==================\n"
-                << std::endl;
+      std::cout << indentation << "#####################" << std::endl;
    }
 
    template <class CardType>

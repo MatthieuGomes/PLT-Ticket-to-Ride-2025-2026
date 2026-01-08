@@ -52,11 +52,7 @@ namespace mapState
     {
         this->owner = owner;
     }
-    void Station::display()
-    {
-        cout << "\tStation Details:\n";
-        Station::_display();
-    }
+    
 
     bool Station::isClaimable()
     {
@@ -120,18 +116,7 @@ namespace mapState
         return nullptr;
     }
 
-    void Station::_display()
-    {
-        cout << "\tName : " << this->name << "\n";
-        if (this->owner != nullptr)
-        {
-            cout << "\tOwner : " << this->owner->getName() << "\n";
-        }
-        else
-        {
-            cout << "\tOwner : None\n";
-        }
-    }
+    
     std::vector<std::shared_ptr<Station>> Station::BatchConstructor(std::vector<StationInfo> stationInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
         DEBUG_PRINT("Station BatchConstructor started ...");
@@ -160,6 +145,20 @@ namespace mapState
     StationInfo Station::initData(std::string name)
     {
         return Station::genData(nullptr, name);
+    }
+
+    void Station::display(int ident)
+    {
+        std::string indentation(ident, '\t'); 
+        std::cout << indentation << "-----STATION-----" << std::endl;
+        Station::_display(ident);
+        std::cout << indentation << "----------------" << std::endl;
+    }
+    void Station::_display(int ident)
+    {
+        std::string indentation(ident, '\t');
+        std::cout << indentation << "\tName : " << this->name << std::endl;
+        std::cout << indentation << "\tOwner : " << (this->owner ? this->owner->getName() : "None") << std::endl;
     }
 
 }
