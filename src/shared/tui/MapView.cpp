@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "Terminal.h"
-#include "cardsState/ColorCard.h"
+#include "mapState/RoadColor.h"
 #include "mapState/MapState.h"
 #include "mapState/Road.h"
 #include "mapState/Station.h"
@@ -31,29 +31,27 @@ struct ChipColors {
   Color right;
 };
 
-ChipColors colorToChip(cardsState::ColorCard color) {
+ChipColors colorToChip(mapState::RoadColor color) {
   // Use bright variants to keep chips readable on darker backgrounds.
   switch (color) {
-    case cardsState::ColorCard::RED:
+    case mapState::RoadColor::RED:
       return {Color::BrightRed, Color::BrightRed};
-    case cardsState::ColorCard::BLUE:
+    case mapState::RoadColor::BLUE:
       return {Color::BrightBlue, Color::BrightBlue};
-    case cardsState::ColorCard::GREEN:
+    case mapState::RoadColor::GREEN:
       return {Color::BrightGreen, Color::BrightGreen};
-    case cardsState::ColorCard::WHITE:
+    case mapState::RoadColor::WHITE:
       return {Color::BrightWhite, Color::BrightWhite};
-    case cardsState::ColorCard::BLACK:
+    case mapState::RoadColor::BLACK:
       return {Color::BrightBlack, Color::BrightBlack};
-    case cardsState::ColorCard::YELLOW:
+    case mapState::RoadColor::YELLOW:
       return {Color::BrightYellow, Color::BrightYellow};
-    case cardsState::ColorCard::PINK:
+    case mapState::RoadColor::PINK:
       return {Color::BrightMagenta, Color::BrightMagenta};
-    case cardsState::ColorCard::ORANGE:
+    case mapState::RoadColor::ORANGE:
       return {Color::BrightOrange, Color::BrightOrange};
-    case cardsState::ColorCard::LOCOMOTIVE:
-      // Locomotive uses split magenta/cyan.
-      return {Color::BrightMagenta, Color::BrightCyan};
-    case cardsState::ColorCard::NONE:
+    case mapState::RoadColor::NONE:
+    case mapState::RoadColor::UNKNOWN:
     default:
       return {Color::BrightBlack, Color::BrightBlack};
   }
@@ -171,9 +169,6 @@ void MapView::drawContent(Terminal& term) {
     if (station->getOwner() != nullptr) {
       line << " [" << station->getOwner()->getName() << "]";
     }
-    if (station->getBlockStatus()) {
-      line << " (blocked)";
-    }
 
     writeClampedLine(term, row, x + kFrameOffset, contentWidth, line.str());
     ++row;
@@ -205,9 +200,6 @@ void MapView::drawContent(Terminal& term) {
 
     if (road->getOwner() != nullptr) {
       line << " [" << road->getOwner()->getName() << "]";
-    }
-    if (road->getBlockStatus()) {
-      line << " !";
     }
 
     const bool drawChip = contentWidth >= kRouteChipWidth;
@@ -242,21 +234,21 @@ void MapView::drawContent(Terminal& term) {
   }
 }
 
-std::string MapView::colorCardToString(cardsState::ColorCard color) {
+std::string MapView::colorCardToString(mapState::RoadColor color) {
   // Compact labels keep the route list readable.
   switch (color) {
-    case cardsState::ColorCard::RED: return "Red";
-    case cardsState::ColorCard::BLUE: return "Blue";
-    case cardsState::ColorCard::GREEN: return "Green";
-    case cardsState::ColorCard::WHITE: return "White";
-    case cardsState::ColorCard::BLACK: return "Black";
-    case cardsState::ColorCard::YELLOW: return "Yellow";
-    case cardsState::ColorCard::PINK: return "Pink";
-    case cardsState::ColorCard::ORANGE: return "Orange";
-    case cardsState::ColorCard::LOCOMOTIVE: return "Loco";
-    case cardsState::ColorCard::NONE:
+    case mapState::RoadColor::RED: return "Red";
+    case mapState::RoadColor::BLUE: return "Blue";
+    case mapState::RoadColor::GREEN: return "Green";
+    case mapState::RoadColor::WHITE: return "White";
+    case mapState::RoadColor::BLACK: return "Black";
+    case mapState::RoadColor::YELLOW: return "Yellow";
+    case mapState::RoadColor::PINK: return "Pink";
+    case mapState::RoadColor::ORANGE: return "Orange";
+    case mapState::RoadColor::NONE: return "-";
+    case mapState::RoadColor::UNKNOWN:
     default:
-      return "-";
+      return "?";
   }
 }
 

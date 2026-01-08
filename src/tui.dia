@@ -3649,7 +3649,7 @@
                 <dia:string>#color#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#cardsState::ColorCard#</dia:string>
+                <dia:string>#mapState::RoadColor#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
