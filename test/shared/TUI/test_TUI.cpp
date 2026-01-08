@@ -333,4 +333,30 @@ BOOST_AUTO_TEST_CASE(InitialDrawAndInput)
   manager.shutdown();
 }
 
+BOOST_AUTO_TEST_CASE(ExternalStatesConstructor)
+{
+  tui::Terminal term("");
+  std::shared_ptr<mapState::MapState> map_state =
+      std::make_shared<mapState::MapState>();
+  std::shared_ptr<playersState::PlayersState> players_state =
+      std::make_shared<playersState::PlayersState>();
+  std::shared_ptr<cardsState::CardsState> cards_state =
+      std::make_shared<cardsState::CardsState>();
+
+  tui::TUIManager manager(&term, 80, 24,
+                          map_state.get(),
+                          players_state.get(),
+                          cards_state.get());
+  manager.init();
+
+  {
+    CoutCapture capture;
+    manager.drawAll();
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "Ticket to Ride"));
+  }
+
+  manager.shutdown();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
