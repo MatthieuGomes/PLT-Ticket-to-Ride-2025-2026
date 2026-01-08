@@ -307,7 +307,7 @@ namespace playersState
                {
                   break;
                }
-               else if (card->getColor() == requiredColor)
+               else if (static_cast<int>(card->getColor()) == static_cast<int>(requiredColor))
                {
                   cardsCorrectColor.push_back(card);
                   handCardsCopy.erase(std::remove(handCardsCopy.begin(), handCardsCopy.end(), card), handCardsCopy.end());
