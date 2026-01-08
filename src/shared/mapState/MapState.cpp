@@ -18,7 +18,7 @@
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/undirected_graph.hpp>
 
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 #if DEBUG_MODE == true
 #define DEBUG
 #define DEBUG_PRINT(x) std::cout << x << std::endl
