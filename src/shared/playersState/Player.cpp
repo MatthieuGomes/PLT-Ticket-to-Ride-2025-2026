@@ -42,13 +42,21 @@ namespace playersState
                                             PlayerColor::YELLOW,
                                             PlayerColor::UNKNOWN};
 
+   // std::unordered_map<PlayerColor, std::string> Player::ColorsNames = {
+   //       {PlayerColor::RED, "RED"},
+   //       {PlayerColor::BLUE, "BLUE"},
+   //       {PlayerColor::GREEN, "GREEN"},
+   //       {PlayerColor::BLACK, "BLACK"},
+   //       {PlayerColor::YELLOW, "YELLOW"},
+   //       {PlayerColor::UNKNOWN, "UNKNOWN"}};
+
    Player::Player()
    {
       this->score = -1;
       this->nbWagons = -1;
       this->nbStations = -1;
       this->nbRoads = -1;
-      this->color = PlayerColor::RED; // Temporary
+      this->color = PlayerColor::UNKNOWN;
    }
 
    Player::Player(std::string name, PlayerColor color, int score, int nbWagons, int nbStations, int nbRoads, std::shared_ptr<cardsState::PlayerCards> hand) : name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
@@ -417,13 +425,23 @@ namespace playersState
 
    void Player::display()
    {
-      std::cout << "player name is " << name << std::endl;
-      std::cout << "player color is " << color << std::endl;
-      std::cout << "player score is " << score << std::endl;
-      std::cout << "player nbWagons is " << nbWagons << std::endl;
-      std::cout << "player nbStations is " << nbStations << std::endl;
-      std::cout << "player nbRoads is " << nbRoads << std::endl;
-      hand->display();
+      std::cout << "===== PLAYER =====" << std::endl;
+      std::cout << "name: " << name << std::endl;
+      std::cout << "color: " << color << std::endl;
+      std::cout << "score: " << score << std::endl;
+      std::cout << "nbWagons: " << nbWagons << std::endl;
+      std::cout << "nbStations: " << nbStations << std::endl;
+      std::cout << "nbRoads: " << nbRoads << std::endl;
+      if (hand)
+      {
+         hand->display();
+      }
+      else
+      {
+         std::cout << "No hand available." << std::endl;
+      }
+      std::cout << "==================\n"
+                << std::endl;
    }
 
    template <class CardType>

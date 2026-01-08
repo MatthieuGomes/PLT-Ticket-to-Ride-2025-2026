@@ -1,8 +1,15 @@
 #include "PlayersState.h"
 #include <iostream>
 
-using namespace std;
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
 
+using namespace std;
 
 namespace playersState
 {

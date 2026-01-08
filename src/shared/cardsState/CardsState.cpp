@@ -1,7 +1,16 @@
 #include "CardsState.h"
 #include "PlayerCards.h"
 #include "SharedDeck.h"
+#include "OutOfGame.h"
 #include <iostream>
+
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
 
 namespace cardsState
 {
@@ -16,24 +25,47 @@ namespace cardsState
   /// class CardsState -
   CardsState::CardsState()
   {
-    this->gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>(std::vector<std::shared_ptr<DestinationCard>>(), std::vector<std::shared_ptr<DestinationCard>>(), std::vector<std::shared_ptr<DestinationCard>>());
-    this->gameWagonCards = std::make_shared<SharedDeck<WagonCard>>(std::vector<std::shared_ptr<WagonCard>>(), std::vector<std::shared_ptr<WagonCard>>(), std::vector<std::shared_ptr<WagonCard>>());
-    this->playersCards = std::vector<std::shared_ptr<PlayerCards>>{};
   }
-  void CardsState::printCardsState()
+
+  CardsState CardsState::Europe(std::vector<std::shared_ptr<mapState::Station>> stations)
   {
-    std::cout << " Current Cards State " << std::endl;
-
-    gameDestinationCards->display();
-    gameWagonCards->display();
-
-    for (const auto &playerCards : playersCards)
+    CardsState cardsState;
+    cardsState.outOfGameCards = std::make_shared<OutOfGame<DestinationCard>>();
+    cardsState.gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>(SharedDeck<DestinationCard>::Europe(stations));
+    cardsState.gameWagonCards = std::make_shared<SharedDeck<WagonCard>>(SharedDeck<WagonCard>::Init());
+    cardsState.playersCards = PlayerCards::BatchStartHand(cardsState.gameDestinationCards, cardsState.gameWagonCards);
+    cardsState.gameDestinationCards->Setup(cardsState.outOfGameCards);
+    cardsState.gameWagonCards->Setup();
+    return cardsState;
+  }
+  // TODO: Parameterized constructor
+  void CardsState::display(int indent)
+  {
+    std::string indentation = std::string(indent, '\t');
+    std::cout << indentation << "~~~~~ CARDS STATE ~~~~~\n";
+    if (this->gameDestinationCards)
     {
-      std::cout << "player cards:" << std::endl;
-      if (playerCards)
+      gameDestinationCards->display(indent + 1);
+    }
+    if (this->gameWagonCards)
+    {
+      gameWagonCards->display(indent + 1);
+    }
+    if (this->outOfGameCards)
+    {
+      outOfGameCards->display(indent + 1);
+    }
+    if (!this->playersCards.empty())
+    {
+      for (const auto &playerCards : this->playersCards)
       {
-        playerCards->display();
+        if (playerCards)
+        {
+          playerCards->display(indent + 1);
+        }
       }
     }
+
+    std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~\n";
   }
 }

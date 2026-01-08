@@ -4,6 +4,7 @@
 
 #include "DestinationCard.h"
 #include "WagonCard.h"
+#include "OutOfGame.h"
 #include <algorithm> // std::shuffle
 #include <random>
 #include "PlayerCards.h"
@@ -11,9 +12,22 @@
 #include <type_traits>
 #include <algorithm> // std::find, std::find_if
 
+#define DEBUG_MODE false
+#if DEBUG_MODE == true
+#define DEBUG
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 namespace cardsState
 {
     // class SharedDeck -
+    template <class CardType>
+    SharedDeck<CardType>::SharedDeck()
+    {
+    }
+
     template <class CardType>
     SharedDeck<CardType>::SharedDeck(std::vector<std::shared_ptr<CardType>> trash, std::vector<std::shared_ptr<CardType>> faceUpCards, std::vector<std::shared_ptr<CardType>> faceDownCards)
     {
@@ -23,15 +37,67 @@ namespace cardsState
     }
 
     template <class CardType>
-    void SharedDeck<CardType>::display()
+    SharedDeck<CardType>::SharedDeck(std::vector<std::shared_ptr<CardType>> faceDownCards)
     {
-        std::cout << " Shared Deck Status: " << std::endl;
-        std::cout << " Trash: " << std::endl;
-        this->trash->display();
-        std::cout << " Face Up Cards: " << std::endl;
-        this->faceUpCards->display();
-        std::cout << " Face Down Cards: " << std::endl;
-        this->faceDownCards->display();
+        this->faceDownCards = std::make_shared<FaceDownCards<CardType>>(faceDownCards);
+    }
+
+    template <>
+    SharedDeck<WagonCard> SharedDeck<WagonCard>::Init()
+    {
+        std::vector<std::shared_ptr<WagonCard>> faceDownCards = WagonCard::StartCards();
+        return SharedDeck<WagonCard>(faceDownCards);
+    }
+
+    template <>
+    SharedDeck<DestinationCard> SharedDeck<DestinationCard>::Europe(std::vector<std::shared_ptr<mapState::Station>> stations)
+    {
+        SharedDeck<DestinationCard> sharedDeck;
+        std::vector<std::shared_ptr<DestinationCard>> destinationCards = DestinationCard::Europe(stations);
+        std::vector<std::shared_ptr<DestinationCard>> faceDownCards = destinationCards;
+        sharedDeck.faceDownCards = std::make_shared<FaceDownCards<DestinationCard>>(faceDownCards);
+        return sharedDeck;
+    }
+    template <>
+    void SharedDeck<DestinationCard>::Setup(std::shared_ptr<OutOfGame<DestinationCard>> outOfGameCards)
+    {
+        std::shared_ptr<FaceDownCards<DestinationCard>> faceDownCards = this->faceDownCards;        int position = 0;
+        for (std::shared_ptr<DestinationCard> card : faceDownCards->getCards())
+        {
+            if (card->isLong)
+            {
+                outOfGameCards->addCard(faceDownCards->removeCard(position));
+                continue;
+            }
+            position++;
+        }
+    }
+
+    template <>
+    void SharedDeck<WagonCard>::Setup()
+    {
+        std::shared_ptr<FaceDownCards<WagonCard>> faceDownCards = this->faceDownCards;
+        for (int i = 0; i < WagonCard::faceUpCardsCount; i++)
+        {   
+            this->turnCardUp();
+        }
+    }
+
+    template <class CardType>
+    void SharedDeck<CardType>::display(int indent)
+    {
+        std::string indentation = std::string(indent, '\t');
+        std::cout << indentation << "###### SHARED DECK ######\n";
+        if(this->trash){
+            this->trash->display(indent+1);
+        }
+        if(this->faceUpCards){
+            this->faceUpCards->display(indent+1);
+        }
+        if(this->faceDownCards){
+            this->faceDownCards->display(indent+1);
+        }
+        std::cout << "########################\n";
     }
 
     template <class CardType>
@@ -44,10 +110,11 @@ namespace cardsState
         }
         int lastIndex = faceDownCards->countCards() - 1;
         auto card = faceDownCards->removeCard(lastIndex);
+        if(this->faceUpCards == nullptr){
+            this->faceUpCards = std::make_shared<FaceUpCards<CardType>>();
+        }
+        this->faceUpCards->addCard(card);
 
-        faceUpCards->addCard(card);
-
-        std::cout << "Card moved from face-down to face-up." << std::endl;
     }
 
     template <class CardType>
@@ -55,12 +122,10 @@ namespace cardsState
     {
         if (faceDownCards->countCards() > 0)
         {
-            std::cout << "Face-down deck is not empty. No refill needed." << std::endl;
             return;
         }
         if (trash->countCards() == 0)
         {
-            std::cout << "Trash is empty. Cannot refill main deck." << std::endl;
             return;
         }
         std::vector<std::shared_ptr<CardType>> temp;
@@ -78,7 +143,6 @@ namespace cardsState
             faceDownCards->addCard(c);
         }
 
-        std::cout << "Main deck refilled from trash." << std::endl;
     }
     template <class CardType>
     void cardsState::SharedDeck<CardType>::trashCard(std::shared_ptr<CardType> card)
