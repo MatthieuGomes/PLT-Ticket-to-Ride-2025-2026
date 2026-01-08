@@ -138,6 +138,11 @@ BOOST_AUTO_TEST_CASE(NamedMapState)
     BOOST_CHECK_EQUAL(mapState.stations.size(), 0);
     BOOST_CHECK_EQUAL(mapState.roads.size(), 0);
   }
+  {
+    MapState mapState = MapState::NamedMapState("nonexistent_map");
+    BOOST_CHECK_EQUAL(mapState.stations.size(), 0);
+    BOOST_CHECK_EQUAL(mapState.roads.size(), 0);
+  }
   std::cout << "NamedMapState Constructor Test Finished !\n"
             << std::endl;
 }
