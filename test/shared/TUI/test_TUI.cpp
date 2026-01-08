@@ -135,6 +135,66 @@ BOOST_AUTO_TEST_CASE(CursorVisibility)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+// TUIManager initialization, drawing, and external state wiring
+BOOST_AUTO_TEST_SUITE(TUIManagerTests)
+
+// End-to-end smoke test for draw and input handling
+BOOST_AUTO_TEST_CASE(InitialDrawAndInput)
+{
+  tui::Terminal term("");
+  tui::TUIManager manager(&term, 80, 24);
+  manager.init();
+
+  {
+    CoutCapture capture;
+    manager.drawAll();
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "Ticket to Ride"));
+    BOOST_CHECK(containsText(out, "Turn 1 | Your turn"));
+    BOOST_CHECK(containsText(out, "Welcome to Ticket to Ride!"));
+  }
+
+  manager.handleInput("hello");
+
+  {
+    CoutCapture capture;
+    manager.drawAll();
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "hello"));
+  }
+
+  manager.shutdown();
+}
+
+// Ensures external state pointers are accepted and drawn
+BOOST_AUTO_TEST_CASE(ExternalStatesConstructor)
+{
+  tui::Terminal term("");
+  std::shared_ptr<mapState::MapState> map_state =
+      std::make_shared<mapState::MapState>();
+  std::shared_ptr<playersState::PlayersState> players_state =
+      std::make_shared<playersState::PlayersState>();
+  std::shared_ptr<cardsState::CardsState> cards_state =
+      std::make_shared<cardsState::CardsState>();
+
+  tui::TUIManager manager(&term, 80, 24,
+                          map_state.get(),
+                          players_state.get(),
+                          cards_state.get());
+  manager.init();
+
+  {
+    CoutCapture capture;
+    manager.drawAll();
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "Ticket to Ride"));
+  }
+
+  manager.shutdown();
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 // BaseView redraw and geometry behavior
 BOOST_AUTO_TEST_SUITE(BaseViewTests)
 
@@ -252,75 +312,6 @@ BOOST_AUTO_TEST_CASE(UpdatesTurnAndPlayer)
     BOOST_CHECK(containsText(out, "Turn 3 | Your turn"));
     BOOST_CHECK(containsText(out, "Bob"));
   }
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
-// CommandInput parsing and prompt rendering
-BOOST_AUTO_TEST_SUITE(CommandInputTests)
-
-// Validates parsing and prompt rendering output
-BOOST_AUTO_TEST_CASE(ParseAndRender)
-{
-  tui::CommandInput input(1, 1, 40, 3);
-  input.setInput("hello");
-
-  std::string parsed;
-  input.parseCommand(parsed);
-  BOOST_CHECK_EQUAL(parsed, "hello");
-
-  tui::Terminal term("");
-  CoutCapture capture;
-  input.refresh(term);
-  term.flush();
-
-  std::string out = capture.str();
-  BOOST_CHECK(containsText(out, "> hello"));
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
-// InfoPanel message buffer and scrolling
-BOOST_AUTO_TEST_SUITE(InfoPanelTests)
-
-// Verifies message buffer trimming at the max limit
-BOOST_AUTO_TEST_CASE(BufferLimit)
-{
-  tui::InfoPanel panel(1, 1, 40, 5, 2);
-  panel.addMessage("MessageOne");
-  panel.addMessage("MessageTwo");
-  panel.addMessage("MessageThree");
-
-  tui::Terminal term("");
-  CoutCapture capture;
-  panel.refresh(term);
-  term.flush();
-
-  std::string out = capture.str();
-  BOOST_CHECK(containsText(out, "MessageTwo"));
-  BOOST_CHECK(containsText(out, "MessageThree"));
-  BOOST_CHECK(!containsText(out, "MessageOne"));
-}
-
-// Checks scrolling changes which lines are visible
-BOOST_AUTO_TEST_CASE(ScrollsMessages)
-{
-  tui::InfoPanel panel(1, 1, 40, 4, 10);
-  panel.addMessage("First");
-  panel.addMessage("Second");
-  panel.addMessage("Third");
-
-  panel.scroll(1);
-
-  tui::Terminal term("");
-  CoutCapture capture;
-  panel.refresh(term);
-  term.flush();
-
-  std::string out = capture.str();
-  BOOST_CHECK(containsText(out, "First"));
-  BOOST_CHECK(containsText(out, "Second"));
-  BOOST_CHECK(!containsText(out, "Third"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -451,62 +442,124 @@ BOOST_AUTO_TEST_CASE(HighlightsAndFlags)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-// TUIManager initialization, drawing, and external state wiring
-BOOST_AUTO_TEST_SUITE(TUIManagerTests)
+// InfoPanel message buffer and scrolling
+BOOST_AUTO_TEST_SUITE(InfoPanelTests)
 
-// End-to-end smoke test for draw and input handling
-BOOST_AUTO_TEST_CASE(InitialDrawAndInput)
+// Verifies message buffer trimming at the max limit
+BOOST_AUTO_TEST_CASE(BufferLimit)
 {
+  tui::InfoPanel panel(1, 1, 40, 5, 2);
+  panel.addMessage("MessageOne");
+  panel.addMessage("MessageTwo");
+  panel.addMessage("MessageThree");
+
   tui::Terminal term("");
-  tui::TUIManager manager(&term, 80, 24);
-  manager.init();
+  CoutCapture capture;
+  panel.refresh(term);
+  term.flush();
 
-  {
-    CoutCapture capture;
-    manager.drawAll();
-    std::string out = capture.str();
-    BOOST_CHECK(containsText(out, "Ticket to Ride"));
-    BOOST_CHECK(containsText(out, "Turn 1 | Your turn"));
-    BOOST_CHECK(containsText(out, "Welcome to Ticket to Ride!"));
-  }
-
-  manager.handleInput("hello");
-
-  {
-    CoutCapture capture;
-    manager.drawAll();
-    std::string out = capture.str();
-    BOOST_CHECK(containsText(out, "hello"));
-  }
-
-  manager.shutdown();
+  std::string out = capture.str();
+  BOOST_CHECK(containsText(out, "MessageTwo"));
+  BOOST_CHECK(containsText(out, "MessageThree"));
+  BOOST_CHECK(!containsText(out, "MessageOne"));
 }
 
-// Ensures external state pointers are accepted and drawn
-BOOST_AUTO_TEST_CASE(ExternalStatesConstructor)
+// Checks scrolling changes which lines are visible
+BOOST_AUTO_TEST_CASE(ScrollsMessages)
 {
-  tui::Terminal term("");
-  std::shared_ptr<mapState::MapState> map_state =
-      std::make_shared<mapState::MapState>();
-  std::shared_ptr<playersState::PlayersState> players_state =
-      std::make_shared<playersState::PlayersState>();
-  std::shared_ptr<cardsState::CardsState> cards_state =
-      std::make_shared<cardsState::CardsState>();
+  tui::InfoPanel panel(1, 1, 40, 4, 10);
+  panel.addMessage("First");
+  panel.addMessage("Second");
+  panel.addMessage("Third");
 
-  tui::TUIManager manager(&term, 80, 24,
-                          map_state.get(),
-                          players_state.get(),
-                          cards_state.get());
-  manager.init();
+  panel.scroll(1);
+
+  tui::Terminal term("");
+  CoutCapture capture;
+  panel.refresh(term);
+  term.flush();
+
+  std::string out = capture.str();
+  BOOST_CHECK(containsText(out, "First"));
+  BOOST_CHECK(containsText(out, "Second"));
+  BOOST_CHECK(!containsText(out, "Third"));
+}
+
+// Ensures clearMessages removes all buffered content
+BOOST_AUTO_TEST_CASE(ClearMessagesEmptiesPanel)
+{
+  tui::InfoPanel panel(1, 1, 40, 4, 10);
+  panel.addMessage("Alpha");
+  panel.addMessage("Beta");
+
+  panel.clearMessages();
+
+  tui::Terminal term("");
+  CoutCapture capture;
+  panel.refresh(term);
+  term.flush();
+
+  std::string out = capture.str();
+  BOOST_CHECK(!containsText(out, "Alpha"));
+  BOOST_CHECK(!containsText(out, "Beta"));
+}
+
+// Verifies scroll offsets are clamped to the valid range
+BOOST_AUTO_TEST_CASE(ScrollClampsToBounds)
+{
+  tui::InfoPanel panel(1, 1, 40, 3, 10);
+  panel.addMessage("First");
+  panel.addMessage("Second");
+  panel.addMessage("Third");
+
+  panel.scroll(100);
 
   {
+    tui::Terminal term("");
     CoutCapture capture;
-    manager.drawAll();
+    panel.refresh(term);
+    term.flush();
+
     std::string out = capture.str();
-    BOOST_CHECK(containsText(out, "Ticket to Ride"));
+    BOOST_CHECK(containsText(out, "First"));
   }
 
-  manager.shutdown();
+  panel.scroll(-100);
+
+  {
+    tui::Terminal term("");
+    CoutCapture capture;
+    panel.refresh(term);
+    term.flush();
+
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "Third"));
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// CommandInput parsing and prompt rendering
+BOOST_AUTO_TEST_SUITE(CommandInputTests)
+
+// Validates parsing and prompt rendering output
+BOOST_AUTO_TEST_CASE(ParseAndRender)
+{
+  tui::CommandInput input(1, 1, 40, 3);
+  input.setInput("hello");
+
+  std::string parsed;
+  input.parseCommand(parsed);
+  BOOST_CHECK_EQUAL(parsed, "hello");
+
+  tui::Terminal term("");
+  CoutCapture capture;
+  input.refresh(term);
+  term.flush();
+
+  std::string out = capture.str();
+  BOOST_CHECK(containsText(out, "> hello"));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
