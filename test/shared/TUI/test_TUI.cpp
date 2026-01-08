@@ -24,6 +24,7 @@
 
 namespace {
 
+// Captures std::cout output for ANSI/string assertions
 class CoutCapture {
  public:
   CoutCapture() : oldBuffer(std::cout.rdbuf(buffer.rdbuf())) {}
@@ -40,10 +41,12 @@ class CoutCapture {
   std::streambuf* oldBuffer;
 };
 
-bool containsText(const std::string& haystack, const std::string& needle) {
-  return haystack.find(needle) != std::string::npos;
+// Substring lookup helper for test assertions
+bool containsText(const std::string& str1, const std::string& str2) {
+  return str1.find(str2) != std::string::npos;
 }
 
+// Minimal BaseView subclass that writes a small content marker
 class TestView : public tui::BaseView {
  public:
   TestView(int x, int y, int width, int height)
@@ -78,8 +81,10 @@ class TestView : public tui::BaseView {
 
 }  // namespace
 
+// Terminal behavior and ANSI output smoke tests
 BOOST_AUTO_TEST_SUITE(TerminalTests)
 
+// Verifies basic ANSI output for cursor positioning and colors
 BOOST_AUTO_TEST_CASE(WriteAndColors)
 {
   tui::Terminal term("");
@@ -98,6 +103,7 @@ BOOST_AUTO_TEST_CASE(WriteAndColors)
   BOOST_CHECK(containsText(out, "X"));
 }
 
+// Validates 256-color output for orange variants
 BOOST_AUTO_TEST_CASE(ExtendedOrangeColors)
 {
   tui::Terminal term("");
@@ -112,6 +118,7 @@ BOOST_AUTO_TEST_CASE(ExtendedOrangeColors)
   BOOST_CHECK(containsText(out, "\033[48;5;214m"));
 }
 
+// Checks cursor hide/show escape sequences are emitted
 BOOST_AUTO_TEST_CASE(CursorVisibility)
 {
   tui::Terminal term("");
@@ -128,8 +135,10 @@ BOOST_AUTO_TEST_CASE(CursorVisibility)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+// BaseView redraw and geometry behavior
 BOOST_AUTO_TEST_SUITE(BaseViewTests)
 
+// Ensures redraw flags toggle correctly on updates
 BOOST_AUTO_TEST_CASE(RedrawFlags)
 {
   TestView view(1, 1, 10, 5);
@@ -149,6 +158,7 @@ BOOST_AUTO_TEST_CASE(RedrawFlags)
   BOOST_CHECK(!view.needsRedrawPublic());
 }
 
+// Confirms resizing and title updates are applied
 BOOST_AUTO_TEST_CASE(SizeAndTitle)
 {
   TestView view(1, 1, 10, 5);
@@ -161,8 +171,10 @@ BOOST_AUTO_TEST_CASE(SizeAndTitle)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+// StatusBar text rendering and state changes
 BOOST_AUTO_TEST_SUITE(StatusBarTests)
 
+// Verifies composed status line with game/turn/player data
 BOOST_AUTO_TEST_CASE(RendersStatusLine)
 {
   std::vector<std::shared_ptr<cardsState::DestinationCard>> destinationCards;
@@ -186,10 +198,68 @@ BOOST_AUTO_TEST_CASE(RendersStatusLine)
   BOOST_CHECK(containsText(out, "Alice"));
 }
 
+// Ensures missing fields produce a minimal status line
+BOOST_AUTO_TEST_CASE(HandlesMissingInfo)
+{
+  tui::StatusBar bar(1, 1, 40, 3);
+  bar.setGameInfo("", "2.0");
+  bar.setTurn(0);
+  bar.setCurrentPlayer(nullptr);
+
+  tui::Terminal term("");
+  CoutCapture capture;
+  bar.refresh(term);
+  term.flush();
+
+  std::string out = capture.str();
+  BOOST_CHECK(containsText(out, "v2.0"));
+  BOOST_CHECK(!containsText(out, "Turn"));
+}
+
+// Confirms updates propagate when turn/player changes
+BOOST_AUTO_TEST_CASE(UpdatesTurnAndPlayer)
+{
+  std::vector<std::shared_ptr<cardsState::DestinationCard>> destinationCards;
+  std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards;
+  cardsState::PlayerCards hand(destinationCards, wagonCards);
+  playersState::Player playerA(1, "Alice", cardsState::ColorCard::RED, 0, 0, 0, 0, &hand);
+  playersState::Player playerB(2, "Bob", cardsState::ColorCard::BLUE, 0, 0, 0, 0, &hand);
+
+  tui::StatusBar bar(1, 1, 60, 3);
+  bar.setGameInfo("TestGame", "1.0");
+  bar.setTurn(1);
+  bar.setCurrentPlayer(&playerA);
+
+  {
+    tui::Terminal term("");
+    CoutCapture capture;
+    bar.refresh(term);
+    term.flush();
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "Turn 1 | Your turn"));
+    BOOST_CHECK(containsText(out, "Alice"));
+  }
+
+  bar.setTurn(3);
+  bar.setCurrentPlayer(&playerB);
+
+  {
+    tui::Terminal term("");
+    CoutCapture capture;
+    bar.refresh(term);
+    term.flush();
+    std::string out = capture.str();
+    BOOST_CHECK(containsText(out, "Turn 3 | Your turn"));
+    BOOST_CHECK(containsText(out, "Bob"));
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
+// CommandInput parsing and prompt rendering
 BOOST_AUTO_TEST_SUITE(CommandInputTests)
 
+// Validates parsing and prompt rendering output
 BOOST_AUTO_TEST_CASE(ParseAndRender)
 {
   tui::CommandInput input(1, 1, 40, 3);
@@ -210,8 +280,10 @@ BOOST_AUTO_TEST_CASE(ParseAndRender)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+// InfoPanel message buffer and scrolling
 BOOST_AUTO_TEST_SUITE(InfoPanelTests)
 
+// Verifies message buffer trimming at the max limit
 BOOST_AUTO_TEST_CASE(BufferLimit)
 {
   tui::InfoPanel panel(1, 1, 40, 5, 2);
@@ -230,6 +302,7 @@ BOOST_AUTO_TEST_CASE(BufferLimit)
   BOOST_CHECK(!containsText(out, "MessageOne"));
 }
 
+// Checks scrolling changes which lines are visible
 BOOST_AUTO_TEST_CASE(ScrollsMessages)
 {
   tui::InfoPanel panel(1, 1, 40, 4, 10);
@@ -252,8 +325,10 @@ BOOST_AUTO_TEST_CASE(ScrollsMessages)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+// MapView rendering with minimal map data
 BOOST_AUTO_TEST_SUITE(MapViewTests)
 
+// Renders a simple map and validates station/route output
 BOOST_AUTO_TEST_CASE(RendersStationsAndRoutes)
 {
   std::shared_ptr<boost::adjacency_list<>> graph =
@@ -304,8 +379,10 @@ BOOST_AUTO_TEST_CASE(RendersStationsAndRoutes)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+// TUIManager initialization, drawing, and external state wiring
 BOOST_AUTO_TEST_SUITE(TUIManagerTests)
 
+// End-to-end smoke test for draw and input handling
 BOOST_AUTO_TEST_CASE(InitialDrawAndInput)
 {
   tui::Terminal term("");
@@ -333,6 +410,7 @@ BOOST_AUTO_TEST_CASE(InitialDrawAndInput)
   manager.shutdown();
 }
 
+// Ensures external state pointers are accepted and drawn
 BOOST_AUTO_TEST_CASE(ExternalStatesConstructor)
 {
   tui::Terminal term("");
