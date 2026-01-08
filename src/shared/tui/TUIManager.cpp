@@ -107,7 +107,33 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       running(false),
       mapstate(nullptr),
       playerstate(nullptr),
-      cardstate(nullptr) {}
+      cardstate(nullptr),
+      ownsMapState(true),
+      ownsPlayerState(true),
+      ownsCardState(true) {}
+      
+// Parametrized constructor to accept external game states
+TUIManager::TUIManager(
+    Terminal* terminal,
+    int cols,
+    int rows,
+    mapState::MapState* mapState,
+    playersState::PlayersState* playerState,
+    cardsState::CardsState* cardState)
+    : cols(cols),
+      rows(rows),
+      term(terminal),
+      statusbar(nullptr),
+      mapview(nullptr),
+      infopanel(nullptr),
+      commandinput(nullptr),
+      running(false),
+      mapstate(mapState),
+      playerstate(playerState),
+      cardstate(cardState),
+      ownsMapState(mapState == nullptr),
+      ownsPlayerState(playerState == nullptr),
+      ownsCardState(cardState == nullptr) {}
 
 void TUIManager::init() {
   cols = clampPositive(cols, kMinDimension);
@@ -116,12 +142,15 @@ void TUIManager::init() {
   // Provide placeholder states for the TUI demo.
   if (!mapstate) {
     mapstate = new mapState::MapState();
+    ownsMapState = true;
   }
   if (!playerstate) {
     playerstate = new playersState::PlayersState();
+    ownsPlayerState = true;
   }
   if (!cardstate) {
     cardstate = new cardsState::CardsState();
+    ownsCardState = true;
   }
 
   if (!statusbar) {
@@ -270,13 +299,19 @@ void TUIManager::shutdown() {
   delete commandinput;
   commandinput = nullptr;
 
-  delete mapstate;
+  if (ownsMapState) {
+    delete mapstate;
+  }
   mapstate = nullptr;
 
-  delete playerstate;
+  if (ownsPlayerState) {
+    delete playerstate;
+  }
   playerstate = nullptr;
 
-  delete cardstate;
+  if (ownsCardState) {
+    delete cardstate;
+  }
   cardstate = nullptr;
 }
 

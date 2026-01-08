@@ -4,11 +4,15 @@
 #include <SFML/Graphics.hpp>
 #include "client/Client.h"  
 #include <cstring>
+#include <memory>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
 #include "tui/Terminal.h"
 #include "tui/TUIManager.h"
+#include "mapState/MapState.h"
+#include "playersState/PlayersState.h"
+#include "cardsState/CardsState.h"
 
 void testSFML() {
     sf::Texture texture;
@@ -62,7 +66,17 @@ int main(int argc,char* argv[])
         getTerminalSize(cols, rows);
 
         tui::Terminal term;
-        tui::TUIManager manager(&term, cols, rows);
+        std::shared_ptr<mapState::MapState> map_state =
+            std::make_shared<mapState::MapState>();
+        std::shared_ptr<playersState::PlayersState> players_state =
+            std::make_shared<playersState::PlayersState>();
+        std::shared_ptr<cardsState::CardsState> cards_state =
+            std::make_shared<cardsState::CardsState>();
+
+        tui::TUIManager manager(&term, cols, rows,
+                                map_state.get(),
+                                players_state.get(),
+                                cards_state.get());
         manager.runMainLoop();
 
         return EXIT_SUCCESS;
