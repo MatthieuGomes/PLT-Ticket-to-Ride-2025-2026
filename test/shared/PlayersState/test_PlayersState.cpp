@@ -18,6 +18,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace playersState;
@@ -65,7 +66,7 @@ std::shared_ptr<Station> stationB =
 
 TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+  CHECK(1);
 }
 
 SUITE_START(Constructors)
@@ -74,7 +75,7 @@ TEST(Default)
 {
   ANN_START("Default Constructor")
   PlayersState ps;
-  BOOST_CHECK(ps.getPlayers().empty());
+  CHECK(ps.getPlayers().empty());
   CHECK_EQ(PlayersState::nbPlayers, 0);
   ANN_END("Default Constructor")
 }
@@ -150,8 +151,8 @@ TEST(getPlayers)
 
   auto result = ps.getPlayers();
   CHECK_EQ(result.size(), 2);
-  BOOST_CHECK(result[0] == p1);
-  BOOST_CHECK(result[1] == p2);
+  CHECK(result[0] == p1);
+  CHECK(result[1] == p2);
   ANN_END("getPlayers")
 }
 
@@ -218,8 +219,8 @@ ps.display();
 std::cout.rdbuf(old);
 std::string out = buffer.str();
 
-BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
-BOOST_CHECK(out.find("Aucun joueur dans la partie.\n") != std::string::npos);
+CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
+CHECK(out.find("Aucun joueur dans la partie.\n") != std::string::npos);
 ANN_END("empty case")
 }
 {
@@ -254,10 +255,10 @@ ANN_END("empty case")
 
   std::string out = buffer.str();
 
-  BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
-  BOOST_CHECK(out.find("-----------------------------") != std::string::npos);
-  BOOST_CHECK(out.find("Alice") != std::string::npos);
-  BOOST_CHECK(out.find("Bob") != std::string::npos);
+  CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
+  CHECK(out.find("-----------------------------") != std::string::npos);
+  CHECK(out.find("Alice") != std::string::npos);
+  CHECK(out.find("Bob") != std::string::npos);
   ANN_END("non-empty case")
 }
 ANN_END("display")

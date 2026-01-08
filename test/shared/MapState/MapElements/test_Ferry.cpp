@@ -25,6 +25,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::mapState;
@@ -35,7 +36,7 @@ using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+  CHECK(1);
 }
 
 std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
@@ -92,7 +93,7 @@ TEST(Init)
   CHECK_EQ(test_ferry.stationB, test_stationB);
   CHECK_EQ(test_ferry.color, RoadColor::NONE);
   CHECK_EQ(test_ferry.length, test_length);
-  BOOST_CHECK(test_ferry.edge != nullptr);
+  CHECK(test_ferry.edge != nullptr);
   CHECK_EQ(test_ferry.locomotives, test_locomotives);
   ANN_END("Init Constructor")
 }

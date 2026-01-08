@@ -21,6 +21,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::playersState;
@@ -44,7 +45,7 @@ int test_init_player_nbRoads = 5;
 
 TEST(TestStaticAssert)
 {
-    BOOST_CHECK(1);
+    CHECK(1);
 }
 
 SUITE_START(Constructors)
@@ -74,7 +75,7 @@ TEST(Default)
 {
     ANN_START("Default Constructor")
     Player player;
-    BOOST_CHECK(player.name.empty());
+    CHECK(player.name.empty());
     CHECK_EQ(player.score, -1);
     CHECK_EQ(player.nbWagons, -1);
     CHECK_EQ(player.nbStations, -1);
@@ -512,8 +513,8 @@ TEST(isRoadBuildable)
     std::shared_ptr<mapState::Station> test_stationB = test_interact_map->getStationByName(test_interract_stationB_name);
     std::vector<std::shared_ptr<mapState::Road>> roads = test_interact_map->getRoadsBetweenStations(test_stationA, test_stationB);
     std::shared_ptr<mapState::Road> road = roads[0];
-    BOOST_REQUIRE(test_stationA);
-    BOOST_REQUIRE(test_stationB);
+    REQUIRE(test_stationA);
+    REQUIRE(test_stationB);
     int test_nb_wagons_insufficient = 1;
     {
         ANN_START("not enough trains case")
@@ -535,7 +536,7 @@ TEST(isRoadBuildable)
     std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("owner", PlayerColor::GREEN, 0, 10, 0, 0, test_interact_hand);
     {
         ANN_START("already owned case")
-        BOOST_REQUIRE(road);
+        REQUIRE(road);
         road->setOwner(test_owner);
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
         CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);

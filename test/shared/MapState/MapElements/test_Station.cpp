@@ -23,6 +23,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::mapState;
@@ -31,7 +32,7 @@ using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::strin
 
 TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+  CHECK(1);
 }
 
 std::string test_station_name = "TestStation";
@@ -45,7 +46,7 @@ TEST(Default)
 {
   ANN_START("Default")
   Station station = Station();
-  BOOST_CHECK(station.name.empty());
+  CHECK(station.name.empty());
   CHECK_EQ(station.owner, nullptr);
   CHECK_EQ(station.vertex, nullptr);
   ANN_END("Default")
@@ -188,7 +189,7 @@ TEST(getAdjacentStations)
     ANN_START("adjacent stations to A case")
     std::vector<std::shared_ptr<Station>> adjacent_to_A = stationA->getAdjacentStations(roads);
     CHECK_EQ(adjacent_to_A.size(), 2);
-    BOOST_CHECK((adjacent_to_A[0] == stationB && adjacent_to_A[1] == stationC) ||
+    CHECK((adjacent_to_A[0] == stationB && adjacent_to_A[1] == stationC) ||
                 (adjacent_to_A[0] == stationC && adjacent_to_A[1] == stationB));
     ANN_END("adjacent stations to A case")
   }
@@ -251,8 +252,8 @@ std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
 station._display();
 std::cout.rdbuf(old);
 std::string out = buffer.str();
-BOOST_CHECK(out.find("Name : NullOwnerStation") != std::string::npos);
-BOOST_CHECK(out.find("Owner : None") != std::string::npos);
+CHECK(out.find("Name : NullOwnerStation") != std::string::npos);
+CHECK(out.find("Owner : None") != std::string::npos);
 ANN_END("null owner case")
 }
 {
@@ -264,8 +265,8 @@ ANN_END("null owner case")
   station._display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Name : DisplayStation") != std::string::npos);
-  BOOST_CHECK(out.find("Owner : DisplayOwner") != std::string::npos);
+  CHECK(out.find("Name : DisplayStation") != std::string::npos);
+  CHECK(out.find("Owner : DisplayOwner") != std::string::npos);
   ANN_END("with owner case")
 }
 {
@@ -276,7 +277,7 @@ ANN_END("null owner case")
   station._display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Name : BlockedStation") != std::string::npos);
+  CHECK(out.find("Name : BlockedStation") != std::string::npos);
   ANN_END("blocked case")
 }
 {
@@ -287,7 +288,7 @@ ANN_END("null owner case")
   station._display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Name : NotBlockedStation") != std::string::npos);
+  CHECK(out.find("Name : NotBlockedStation") != std::string::npos);
   ANN_END("not blocked case")
 }
 ANN_END("_display")
@@ -302,9 +303,9 @@ std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
 station.display();
 std::cout.rdbuf(old);
 std::string out = buffer.str();
-BOOST_CHECK(out.find("Station Details:") != std::string::npos);
-BOOST_CHECK(out.find("Name : DisplayTestStation") != std::string::npos);
-BOOST_CHECK(out.find("Owner : TestPlayer") != std::string::npos);
+CHECK(out.find("Station Details:") != std::string::npos);
+CHECK(out.find("Name : DisplayTestStation") != std::string::npos);
+CHECK(out.find("Owner : TestPlayer") != std::string::npos);
 ANN_END("normal case")
 }
 {
@@ -315,9 +316,9 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Station Details:") != std::string::npos);
-  BOOST_CHECK(out.find("Name : DisplayTestStationNoOwner") != std::string::npos);
-  BOOST_CHECK(out.find("Owner : None") != std::string::npos);
+  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("Name : DisplayTestStationNoOwner") != std::string::npos);
+  CHECK(out.find("Owner : None") != std::string::npos);
   ANN_END("empty owner case")
 }
 {
@@ -328,9 +329,9 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Station Details:") != std::string::npos);
-  BOOST_CHECK(out.find("Name : DisplayTestStationNoOwnerNotBlocked") != std::string::npos);
-  BOOST_CHECK(out.find("Owner : None") != std::string::npos);
+  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("Name : DisplayTestStationNoOwnerNotBlocked") != std::string::npos);
+  CHECK(out.find("Owner : None") != std::string::npos);
   ANN_END("empty owner & not blocked case")
 }
 {
@@ -341,9 +342,9 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Station Details:") != std::string::npos);
-  BOOST_CHECK(out.find("Name : DisplayTestStationWithOwnerBlocked") != std::string::npos);
-  BOOST_CHECK(out.find("Owner : TestPlayer") != std::string::npos);
+  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("Name : DisplayTestStationWithOwnerBlocked") != std::string::npos);
+  CHECK(out.find("Owner : TestPlayer") != std::string::npos);
   ANN_END("with owner & blocked case")
 }
 {
@@ -354,9 +355,9 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  BOOST_CHECK(out.find("Station Details:") != std::string::npos);
-  BOOST_CHECK(out.find("Name : DisplayTestStationWithOwnerNotBlocked") != std::string::npos);
-  BOOST_CHECK(out.find("Owner : TestPlayer") != std::string::npos);
+  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("Name : DisplayTestStationWithOwnerNotBlocked") != std::string::npos);
+  CHECK(out.find("Owner : TestPlayer") != std::string::npos);
   ANN_END("with owner & not blocked case")
 }
 ANN_END("display")

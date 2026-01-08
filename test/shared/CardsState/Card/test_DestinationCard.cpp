@@ -29,6 +29,7 @@ using namespace mapState;
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::cardsState;
