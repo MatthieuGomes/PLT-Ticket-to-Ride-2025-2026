@@ -1,4 +1,3 @@
-
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/mapState/Tunnel.h"
@@ -17,13 +16,24 @@
 #define DEBUG_PRINT(x)
 #endif
 
+#define TEST(x) BOOST_AUTO_TEST_CASE(x)
+#define SUITE_START(x) BOOST_AUTO_TEST_SUITE(x)
+#define SUITE_END() BOOST_AUTO_TEST_SUITE_END()
+#define ANN_START(x) std::cout << "Starting " << x << " test..." << std::endl;
+#define ANN_END(x) std::cout << x << " test finished!" << std::endl;
+#define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
+#define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
+#define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
+#define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define CHECK(x) BOOST_CHECK(x)
+
 using namespace ::mapState;
 
 using StationPair = std::pair<std::shared_ptr<Station>, std::shared_ptr<Station>>;
 using TunnelDetail = std::tuple<int, std::shared_ptr<playersState::Player>, RoadColor, int>;
 using TunnelInfo = std::pair<StationPair, TunnelDetail>;
 
-BOOST_AUTO_TEST_CASE(TestStaticAssert)
+TEST(TestStaticAssert)
 {
   BOOST_CHECK(1);
 }
@@ -38,263 +48,248 @@ std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState
 std::shared_ptr<boost::adjacency_list<>::edge_descriptor> test_edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
     boost::add_edge(*(test_stationA->getVertex().get()), *(test_stationB->getVertex().get()), *test_graph).first);
 
-BOOST_AUTO_TEST_SUITE(Constructors)
+SUITE_START(Constructors)
 
-BOOST_AUTO_TEST_CASE(Basic)
+TEST(Basic)
 {
-  std::cout << "Default Constructor Test Started ..." << std::endl;
-  mapState::Tunnel test_tunnel = mapState::Tunnel(test_tunnel_id, test_owner, test_stationA, test_stationB, test_color, test_length,  test_edge);
-  BOOST_CHECK_EQUAL(test_tunnel.id, test_tunnel_id);
-  BOOST_CHECK_EQUAL(test_tunnel.owner->name, test_owner->name);
-  BOOST_CHECK_EQUAL(test_tunnel.stationA, test_stationA);
-  BOOST_CHECK_EQUAL(test_tunnel.stationB, test_stationB);
-  BOOST_CHECK_EQUAL(test_tunnel.color, test_color);
-  BOOST_CHECK_EQUAL(test_tunnel.length, test_length);
-  BOOST_CHECK_EQUAL(*test_tunnel.edge, *test_edge);
-  std::cout << "Default Constructor Test Finished !\n"
-            << std::endl;
+  ANN_START("Basic Constructor")
+  mapState::Tunnel test_tunnel = mapState::Tunnel(test_tunnel_id, test_owner, test_stationA, test_stationB, test_color, test_length, test_edge);
+  CHECK_EQ(test_tunnel.id, test_tunnel_id);
+  CHECK_EQ(test_tunnel.owner->name, test_owner->name);
+  CHECK_EQ(test_tunnel.stationA, test_stationA);
+  CHECK_EQ(test_tunnel.stationB, test_stationB);
+  CHECK_EQ(test_tunnel.color, test_color);
+  CHECK_EQ(test_tunnel.length, test_length);
+  CHECK_EQ(*test_tunnel.edge, *test_edge);
+  ANN_END("Basic Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(Empty)
+TEST(Default)
 {
-  std::cout << "Empty Player Constructor Test Started ..." << std::endl;
-      Tunnel tunnel;
-      BOOST_CHECK_EQUAL(tunnel.id, -1);
-      BOOST_CHECK_EQUAL(tunnel.owner, nullptr);
-      BOOST_CHECK_EQUAL(tunnel.stationA, nullptr);
-      BOOST_CHECK_EQUAL(tunnel.stationB, nullptr);
-      BOOST_CHECK_EQUAL(tunnel.color, RoadColor::UNKNOWN);
-      BOOST_CHECK_EQUAL(tunnel.length, -1);
-      BOOST_CHECK_EQUAL(tunnel.edge, nullptr);
-      std::cout << "Empty Player Constructor Test Finished !\n"
-                << std::endl;
+  ANN_START("Default Constructor")
+  Tunnel tunnel;
+  CHECK_EQ(tunnel.id, -1);
+  CHECK_EQ(tunnel.owner, nullptr);
+  CHECK_EQ(tunnel.stationA, nullptr);
+  CHECK_EQ(tunnel.stationB, nullptr);
+  CHECK_EQ(tunnel.color, RoadColor::UNKNOWN);
+  CHECK_EQ(tunnel.length, -1);
+  CHECK_EQ(tunnel.edge, nullptr);
+  ANN_END("Default Constructor")
 }
-BOOST_AUTO_TEST_CASE(Init)
+
+TEST(Init)
 {
-  std::cout << "Init Constructor Test Started ..." << std::endl;
+  ANN_START("Init Constructor")
   mapState::Tunnel test_tunnel = mapState::Tunnel::Init(test_tunnel_id, test_stationA, test_stationB, test_color, test_length, test_graph);
-  BOOST_CHECK_EQUAL(test_tunnel.id, test_tunnel_id);
-  BOOST_CHECK_EQUAL(test_tunnel.owner, nullptr);
-  BOOST_CHECK_EQUAL(test_tunnel.stationA, test_stationA);
-  BOOST_CHECK_EQUAL(test_tunnel.stationB, test_stationB);
-  BOOST_CHECK_EQUAL(test_tunnel.color, test_color);
-  BOOST_CHECK_EQUAL(test_tunnel.length, test_length);
+  CHECK_EQ(test_tunnel.id, test_tunnel_id);
+  CHECK_EQ(test_tunnel.owner, nullptr);
+  CHECK_EQ(test_tunnel.stationA, test_stationA);
+  CHECK_EQ(test_tunnel.stationB, test_stationB);
+  CHECK_EQ(test_tunnel.color, test_color);
+  CHECK_EQ(test_tunnel.length, test_length);
   BOOST_CHECK(test_tunnel.edge != nullptr);
-  std::cout << "Init Constructor Test Finished !\n"
-            << std::endl;
+  ANN_END("Init Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(BatchConstructor)
+TEST(BatchConstructor)
 {
-  std::cout << "BatchConstructor Test Started ..." << std::endl;
-  std::string stationA_name = "BatchStationA";
-  std::string stationB_name = "BatchStationB";
-  std::string stationC_name = "BatchStationC";
-  std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>("BatchOwnerStationA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr);
-  std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>("BatchOwnerStationB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr);
-  std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>("BatchOwnerStationC", playersState::PlayerColor::GREEN, 0, 50, 4, 6, nullptr);
-  std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, stationA_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-  std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, stationB_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-  std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, stationC_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-  std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>("BatchOwnerTunnel1", playersState::PlayerColor::RED, 0, 50, 5, 7, nullptr);
-  std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>("BatchOwnerTunnel2", playersState::PlayerColor::BLACK, 0, 55, 6, 8, nullptr);
-  std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>("BatchOwnerTunnel3", playersState::PlayerColor::YELLOW, 0, 60, 7, 9, nullptr);
-  std::vector<TunnelInfo> tunnelInfos = {
-      Tunnel::genData(batch_stationA, batch_stationB, 201, batch_owner1, RoadColor::PINK, 4),
-      Tunnel::genData(batch_stationB, batch_stationC, 202, batch_owner2, RoadColor::ORANGE, 6),
-      Tunnel::genData(batch_stationA, batch_stationC, 203, batch_owner3, RoadColor::BLUE, 5),
-  };
-  std::vector<std::shared_ptr<mapState::Tunnel>> tunnels = mapState::Tunnel::BatchConstructor(tunnelInfos, test_graph);
-  BOOST_CHECK_EQUAL(tunnels.size(), 3);
-  for (int i = 0; i < static_cast<int>(tunnels.size()); i++)
   {
-    BOOST_CHECK_EQUAL(tunnels[i]->id, std::get<0>(std::get<1>(tunnelInfos[i])));
-    BOOST_CHECK_EQUAL(tunnels[i]->owner->name, std::get<1>(std::get<1>(tunnelInfos[i]))->name);
-    BOOST_CHECK_EQUAL(tunnels[i]->stationA, std::get<0>(std::get<0>(tunnelInfos[i])));
-    BOOST_CHECK_EQUAL(tunnels[i]->stationB, std::get<1>(std::get<0>(tunnelInfos[i])));
-    BOOST_CHECK_EQUAL(tunnels[i]->color, std::get<2>(std::get<1>(tunnelInfos[i])));
-    BOOST_CHECK_EQUAL(tunnels[i]->length, std::get<3>(std::get<1>(tunnelInfos[i])));
+    ANN_START("BatchConstructor")
+    std::string stationA_name = "BatchStationA";
+    std::string stationB_name = "BatchStationB";
+    std::string stationC_name = "BatchStationC";
+    std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>("BatchOwnerStationA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr);
+    std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>("BatchOwnerStationB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr);
+    std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>("BatchOwnerStationC", playersState::PlayerColor::GREEN, 0, 50, 4, 6, nullptr);
+    std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, stationA_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+    std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, stationB_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+    std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, stationC_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+    std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>("BatchOwnerTunnel1", playersState::PlayerColor::RED, 0, 50, 5, 7, nullptr);
+    std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>("BatchOwnerTunnel2", playersState::PlayerColor::BLACK, 0, 55, 6, 8, nullptr);
+    std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>("BatchOwnerTunnel3", playersState::PlayerColor::YELLOW, 0, 60, 7, 9, nullptr);
+    std::vector<TunnelInfo> tunnelInfos = {
+        Tunnel::genData(batch_stationA, batch_stationB, 201, batch_owner1, RoadColor::PINK, 4),
+        Tunnel::genData(batch_stationB, batch_stationC, 202, batch_owner2, RoadColor::ORANGE, 6),
+        Tunnel::genData(batch_stationA, batch_stationC, 203, batch_owner3, RoadColor::BLUE, 5),
+    };
+    std::vector<std::shared_ptr<mapState::Tunnel>> tunnels = mapState::Tunnel::BatchConstructor(tunnelInfos, test_graph);
+    CHECK_EQ(tunnels.size(), 3);
+    for (int i = 0; i < static_cast<int>(tunnels.size()); i++)
+    {
+      CHECK_EQ(tunnels[i]->id, std::get<0>(std::get<1>(tunnelInfos[i])));
+      CHECK_EQ(tunnels[i]->owner->name, std::get<1>(std::get<1>(tunnelInfos[i]))->name);
+      CHECK_EQ(tunnels[i]->stationA, std::get<0>(std::get<0>(tunnelInfos[i])));
+      CHECK_EQ(tunnels[i]->stationB, std::get<1>(std::get<0>(tunnelInfos[i])));
+      CHECK_EQ(tunnels[i]->color, std::get<2>(std::get<1>(tunnelInfos[i])));
+      CHECK_EQ(tunnels[i]->length, std::get<3>(std::get<1>(tunnelInfos[i])));
+    }
+    ANN_END("BatchConstructor")
   }
-  std::cout << "BatchConstructor Test Finished !\n"
-            << std::endl;
+  {
+    ANN_START("BatchConstructor no game graph")
+    std::vector<TunnelInfo> tunnelInfos = {
+        Tunnel::genData(test_stationA, test_stationB, 301, test_owner, RoadColor::GREEN, 5),
+        Tunnel::genData(test_stationB, test_stationA, 302, test_owner, RoadColor::RED, 4),
+    };
+    // check if exception is thrown if no graph is provided
+    CHECK_THROW(mapState::Tunnel::BatchConstructor(tunnelInfos, nullptr), std::invalid_argument);
+    ANN_END("BatchConstructor no game graph") 
+  }
 }
 
-BOOST_AUTO_TEST_CASE(BatchConstructorRequiresGraph)
-{
-  std::vector<TunnelInfo> tunnelInfos = {
-      Tunnel::genData(test_stationA, test_stationB, 401, test_owner, RoadColor::GREEN, 5)};
-  // check if exception is thrown if no graph is provided
-  BOOST_CHECK_THROW(mapState::Tunnel::BatchConstructor(tunnelInfos, nullptr), std::invalid_argument);
+SUITE_START(DataGenerators)
 
-  std::vector<std::shared_ptr<mapState::Tunnel>> tunnels = mapState::Tunnel::BatchConstructor(tunnelInfos, test_graph);
-  BOOST_CHECK_EQUAL(tunnels.size(), 1);
-  BOOST_CHECK_EQUAL(tunnels[0]->id, 401);
-}
-BOOST_AUTO_TEST_SUITE(DataGenerators)
-
-BOOST_AUTO_TEST_CASE(GenData)
+TEST(genData)
 {
-  std::cout << "GenData Test Started ..." << std::endl;
+  ANN_START("genData")
   TunnelInfo info = Tunnel::genData(test_stationA, test_stationB, test_tunnel_id, test_owner, test_color, test_length);
-  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
-  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
-  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
-  BOOST_CHECK_EQUAL(std::get<1>(info.second)->name, test_owner->name);
-  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
-  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
-  std::cout << "GenData Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(info.first.first, test_stationA);
+  CHECK_EQ(info.first.second, test_stationB);
+  CHECK_EQ(std::get<0>(info.second), test_tunnel_id);
+  CHECK_EQ(std::get<1>(info.second)->name, test_owner->name);
+  CHECK_EQ(std::get<2>(info.second), test_color);
+  CHECK_EQ(std::get<3>(info.second), test_length);
+  ANN_END("genData")
 }
-BOOST_AUTO_TEST_CASE(InitData){
-  std::cout << "InitData Test Started ..." << std::endl;
-  TunnelInfo info = Tunnel::initData(test_stationA, test_stationB, test_tunnel_id, test_color, test_length);
-  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
-  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
-  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
-  BOOST_CHECK_EQUAL(std::get<1>(info.second), nullptr);
-  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
-  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
 
-  std::cout << "InitData Test Finished !\n"
-            << std::endl;  
+TEST(initData)
+{
+  ANN_START("initData")
+  TunnelInfo info = Tunnel::initData(test_stationA, test_stationB, test_tunnel_id, test_color, test_length);
+  CHECK_EQ(info.first.first, test_stationA);
+  CHECK_EQ(info.first.second, test_stationB);
+  CHECK_EQ(std::get<0>(info.second), test_tunnel_id);
+  CHECK_EQ(std::get<1>(info.second), nullptr);
+  CHECK_EQ(std::get<2>(info.second), test_color);
+  CHECK_EQ(std::get<3>(info.second), test_length);
+  ANN_END("initData")
 }
-BOOST_AUTO_TEST_CASE(GenDataByName){
-  std::cout << "GenDataByName Test Started ..." << std::endl;
+
+TEST(genDataByName)
+{
+  ANN_START("genDataByName")
   std::vector<std::shared_ptr<Station>> stations = {test_stationA, test_stationB};
   TunnelInfo info = Tunnel::genDataByName(stations, "StationA", "StationB", test_tunnel_id, test_owner, test_color, test_length);
-  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
-  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
-  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
-  BOOST_CHECK_EQUAL(std::get<1>(info.second)->name, test_owner->name);
-  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
-  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
-
-  std::cout << "GenDataByName Test Finished !\n"
-            << std::endl;  
+  CHECK_EQ(info.first.first, test_stationA);
+  CHECK_EQ(info.first.second, test_stationB);
+  CHECK_EQ(std::get<0>(info.second), test_tunnel_id);
+  CHECK_EQ(std::get<1>(info.second)->name, test_owner->name);
+  CHECK_EQ(std::get<2>(info.second), test_color);
+  CHECK_EQ(std::get<3>(info.second), test_length);
+  ANN_END("genDataByName")
 }
-BOOST_AUTO_TEST_CASE(InitDataByNameData){
-  std::cout << "InitDataByName Test Started ..." << std::endl;
+
+TEST(initDataByName)
+{
+  ANN_START("initDataByName")
   std::vector<std::shared_ptr<Station>> stations = {test_stationA, test_stationB};
   TunnelInfo info = Tunnel::initDataByName(stations, "StationA", "StationB", test_tunnel_id, test_color, test_length);
-  BOOST_CHECK_EQUAL(info.first.first, test_stationA);
-  BOOST_CHECK_EQUAL(info.first.second, test_stationB);
-  BOOST_CHECK_EQUAL(std::get<0>(info.second), test_tunnel_id);
-  BOOST_CHECK_EQUAL(std::get<1>(info.second), nullptr);
-  BOOST_CHECK_EQUAL(std::get<2>(info.second), test_color);
-  BOOST_CHECK_EQUAL(std::get<3>(info.second), test_length);
-
-  std::cout << "InitDataByName Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(info.first.first, test_stationA);
+  CHECK_EQ(info.first.second, test_stationB);
+  CHECK_EQ(std::get<0>(info.second), test_tunnel_id);
+  CHECK_EQ(std::get<1>(info.second), nullptr);
+  CHECK_EQ(std::get<2>(info.second), test_color);
+  CHECK_EQ(std::get<3>(info.second), test_length);
+  ANN_END("initDataByName")
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END()
 
+SUITE_END() // Constructors
 
+SUITE_START(GettersAndSetters)
+mapState::Tunnel test_tunnel_getters_and_setters = mapState::Tunnel(test_tunnel_id, test_owner, test_stationA, test_stationB, test_color, test_length, test_edge);
+SUITE_START(Getters)
 
-BOOST_AUTO_TEST_SUITE_END() // Constructors
-
-BOOST_AUTO_TEST_SUITE(GettersAndSetters)
-mapState::Tunnel test_tunnel_getters_and_setters = mapState::Tunnel(test_tunnel_id, test_owner, test_stationA, test_stationB, test_color, test_length,  test_edge);
-BOOST_AUTO_TEST_SUITE(Getters)
-
-BOOST_AUTO_TEST_CASE(GetId)
+TEST(getId)
 {
-  std::cout << "GetId Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.getId(), test_tunnel_id);
-  std::cout << "GetId Test Finished !\n"
-            << std::endl;
+  ANN_START("getId")
+  CHECK_EQ(test_tunnel_getters_and_setters.getId(), test_tunnel_id);
+  ANN_END("getId")
 }
 
-BOOST_AUTO_TEST_CASE(GetStationA)
+TEST(getStationA)
 {
-  std::cout << "GetStationA Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.getStationA()->name, test_stationA->name);
-  std::cout << "GetStationA Test Finished !\n"
-            << std::endl;
+  ANN_START("getStationA")
+  CHECK_EQ(test_tunnel_getters_and_setters.getStationA()->name, test_stationA->name);
+  ANN_END("getStationA")
 }
 
-BOOST_AUTO_TEST_CASE(GetStationB)
+TEST(getStationB)
 {
-  std::cout << "GetStationB Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.getStationB()->name, test_stationB->name);
-  std::cout << "GetStationB Test Finished !\n"
-            << std::endl;
+  ANN_START("getStationB")
+  CHECK_EQ(test_tunnel_getters_and_setters.getStationB()->name, test_stationB->name);
+  ANN_END("getStationB")
 }
 
-BOOST_AUTO_TEST_CASE(GetLength)
+TEST(getLength)
 {
-  std::cout << "GetLength Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.getLength(), test_length);
-  std::cout << "GetLength Test Finished !\n"
-            << std::endl;
+  ANN_START("getLength")
+  CHECK_EQ(test_tunnel_getters_and_setters.getLength(), test_length);
+  ANN_END("getLength")
 }
 
-BOOST_AUTO_TEST_CASE(GetEdge)
+TEST(getEdge)
 {
-  std::cout << "GetEdge Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(*test_tunnel_getters_and_setters.getEdge(), *test_edge);
-  std::cout << "GetEdge Test Finished !\n"
-            << std::endl;
+  ANN_START("getEdge")
+  CHECK_EQ(*test_tunnel_getters_and_setters.getEdge(), *test_edge);
+  ANN_END("getEdge")
 }
 
-BOOST_AUTO_TEST_CASE(GetColor)
+TEST(getColor)
 {
-  std::cout << "GetColor Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.getColor(), test_color);
-  std::cout << "GetColor Test Finished !\n"
-            << std::endl;
+  ANN_START("getColor")
+  CHECK_EQ(test_tunnel_getters_and_setters.getColor(), test_color);
+  ANN_END("getColor")
 }
 
-BOOST_AUTO_TEST_CASE(GetOwner)
+TEST(getOwner)
 {
-  std::cout << "GetOwner Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.getOwner()->name, test_owner->name);
-  std::cout << "GetOwner Test Finished !\n"
-            << std::endl;
+  ANN_START("getOwner")
+  CHECK_EQ(test_tunnel_getters_and_setters.getOwner()->name, test_owner->name);
+  ANN_END("getOwner")
 }
 
-BOOST_AUTO_TEST_CASE(GetVertexA)
+TEST(getVertexA)
 {
-  std::cout << "GetVertexA Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(*test_tunnel_getters_and_setters.getVertexA(), *(test_stationA->vertex));
-  std::cout << "GetVertexA Test Finished !\n"
-            << std::endl;
+  ANN_START("getVertexA")
+  CHECK_EQ(*test_tunnel_getters_and_setters.getVertexA(), *(test_stationA->vertex));
+  ANN_END("getVertexA")
 }
 
-BOOST_AUTO_TEST_CASE(GetVertexB)
+TEST(getVertexB)
 {
-  std::cout << "GetVertexB Test Started ..." << std::endl;
-  BOOST_CHECK_EQUAL(*test_tunnel_getters_and_setters.getVertexB(), *(test_stationB->vertex));
-  std::cout << "GetVertexB Test Finished !\n"
-            << std::endl;
+  ANN_START("getVertexB")
+  CHECK_EQ(*test_tunnel_getters_and_setters.getVertexB(), *(test_stationB->vertex));
+  ANN_END("getVertexB")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Getters
-BOOST_AUTO_TEST_SUITE(Setters)
+SUITE_END() // Getters
+SUITE_START(Setters)
 std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLACK, 0, 50, 5, 7, nullptr);
-BOOST_AUTO_TEST_CASE(SetOwner)
+TEST(setOwner)
 {
-  std::cout << "SetOwner Test Started ..." << std::endl;
+  ANN_START("setOwner")
   test_tunnel_getters_and_setters.setOwner(test_set_owner);
-  BOOST_CHECK_EQUAL(test_tunnel_getters_and_setters.owner->name, test_set_owner->name);
-  std::cout << "SetOwner Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(test_tunnel_getters_and_setters.owner->name, test_set_owner->name);
+  ANN_END("setOwner")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Setters
+SUITE_END() // Setters
 
-BOOST_AUTO_TEST_SUITE_END() // GettersAndSetters
+SUITE_END() // GettersAndSetters
 
-BOOST_AUTO_TEST_SUITE(Operations)
+SUITE_START(Operations)
 
-BOOST_AUTO_TEST_SUITE(Internal)
+SUITE_START(Internal)
 
-BOOST_AUTO_TEST_SUITE_END() // Internal
+SUITE_END() // Internal
 
-BOOST_AUTO_TEST_SUITE(Interactions)
+SUITE_START(Interactions)
 
-BOOST_AUTO_TEST_SUITE_END() // Interactions
+SUITE_END() // Interactions
 
-BOOST_AUTO_TEST_SUITE_END() // Operations
+SUITE_END() // Operations
 
 /* vim: set sw=2 sts=2 et : */

@@ -24,8 +24,8 @@
 #define ANN_END(x) std::cout << x << " test finished!" << std::endl;
 #define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
-#define CHECK_NTHROW(x) BOOST_CHECK_NO_THROW(x)
-#define CHECK_THROW(x) BOOST_CHECK_THROW(x)
+#define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
+#define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::cardsState;
@@ -104,19 +104,19 @@ TEST(Europe)
     ANN_END("Europe Constructor")
 }
 
-SUITE_END()
+SUITE_END() // Constructors
 
 SUITE_START(GettersAndSetters)
 
 SUITE_START(Getters)
 
-SUITE_END()
+SUITE_END() // Getters
 
 SUITE_START(Setters)
 
-SUITE_END()
+SUITE_END() // Setters
 
-SUITE_END()
+SUITE_END() // GettersAndSetters
 
 SUITE_START(Operations)
 

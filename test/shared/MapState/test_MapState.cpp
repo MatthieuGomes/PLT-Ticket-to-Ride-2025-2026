@@ -1,4 +1,3 @@
-
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/mapState/MapState.h"
@@ -18,6 +17,17 @@
 #define DEBUG_PRINT(x)
 #endif
 
+#define TEST(x) BOOST_AUTO_TEST_CASE(x)
+#define SUITE_START(x) BOOST_AUTO_TEST_SUITE(x)
+#define SUITE_END() BOOST_AUTO_TEST_SUITE_END()
+#define ANN_START(x) std::cout << "Starting " << x << " test..." << std::endl;
+#define ANN_END(x) std::cout << x << " test finished!" << std::endl;
+#define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
+#define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
+#define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
+#define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define CHECK(x) BOOST_CHECK(x)
+
 using namespace ::mapState;
 
 using StationInfo = std::tuple<std::shared_ptr<playersState::Player>, std::string>;
@@ -29,30 +39,29 @@ using TunnelInfo = RoadInfo;
 using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, int, int>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
-BOOST_AUTO_TEST_CASE(TestStaticAssert)
+TEST(TestStaticAssert)
 {
   BOOST_CHECK(1);
 }
 
-BOOST_AUTO_TEST_SUITE(Constructors)
+SUITE_START(Constructors)
 
-BOOST_AUTO_TEST_CASE(Empty)
+TEST(Default)
 {
-  std::cout << "Empty Constructor Test Started ..." << std::endl;
+  ANN_START("Default Constructor")
   mapState::MapState map_state = mapState::MapState();
 #ifdef DEBUG
   map_state.display();
 #endif
   BOOST_CHECK(map_state.gameGraph != nullptr);
-  BOOST_CHECK_EQUAL(map_state.stations.size(), 0);
-  BOOST_CHECK_EQUAL(map_state.roads.size(), 0);
-  std::cout << "Empty Constructor Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(map_state.stations.size(), 0);
+  CHECK_EQ(map_state.roads.size(), 0);
+  ANN_END("Default Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(Wrapper)
+TEST(Wrapper)
 {
-  std::cout << "Wrapper Constructor Test Started ..." << std::endl;
+  ANN_START("Wrapper Constructor")
   boost::adjacency_list<> test_graph = boost::adjacency_list<>();
   std::vector<StationInfo> stationsInfos = {
       Station::genData(nullptr, "Station1"),
@@ -71,8 +80,8 @@ BOOST_AUTO_TEST_CASE(Wrapper)
   };
   std::shared_ptr<boost::adjacency_list<>> graph_ptr = std::make_shared<boost::adjacency_list<>>(test_graph);
   mapState::MapState map_state = mapState::MapState(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, graph_ptr);
-  BOOST_CHECK_EQUAL(map_state.stations.size(), 2);
-  BOOST_CHECK_EQUAL(map_state.roads.size(), 3); // 1 road + 1 tunnel + 1 ferry
+  CHECK_EQ(map_state.stations.size(), 2);
+  CHECK_EQ(map_state.roads.size(), 3); // 1 road + 1 tunnel + 1 ferry
   for (int i = 0; i < static_cast<int>(map_state.stations.size()); i++)
   {
     BOOST_CHECK(map_state.stations[i]->name == "Station1" || map_state.stations[i]->name == "Station2");
@@ -84,13 +93,12 @@ BOOST_AUTO_TEST_CASE(Wrapper)
     BOOST_CHECK(stationAName == station1->getName() || stationAName == station2->getName());
     BOOST_CHECK(stationBName == station1->getName() || stationBName == station2->getName());
   }
-  std::cout << "Wrapper Constructor Test Finished !\n"
-            << std::endl;
+  ANN_END("Wrapper Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(Parameterized)
+TEST(Parameterized)
 {
-  std::cout << "Parameterized Constructor Test Started ..." << std::endl;
+  ANN_START("Parameterized Constructor")
   mapState::MapState map_state;
 
   boost::adjacency_list<> test_graph = boost::adjacency_list<>();
@@ -114,53 +122,50 @@ BOOST_AUTO_TEST_CASE(Parameterized)
   };
 
   map_state.fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, map_state.gameGraph);
-  BOOST_CHECK_EQUAL(map_state.stations.size(), 3);
-  BOOST_CHECK_EQUAL(map_state.roads.size(), 4); // 2 roads + 1 tunnel + 1 ferry
-  std::cout << "Parameterized Constructor Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(map_state.stations.size(), 3);
+  CHECK_EQ(map_state.roads.size(), 4); // 2 roads + 1 tunnel + 1 ferry
+  ANN_END("Parameterized Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(NamedMapState)
+TEST(NamedMapState)
 {
-  std::cout << "NamedMapState Constructor Test Started ..." << std::endl;
+  ANN_START("NamedMapState Constructor")
   {
     MapState mapState = MapState::NamedMapState("test");
-    BOOST_CHECK_EQUAL(mapState.stations.size(), 9); 
-    BOOST_CHECK_EQUAL(mapState.roads.size(), 12);
+    CHECK_EQ(mapState.stations.size(), 9); 
+    CHECK_EQ(mapState.roads.size(), 12);
   }
   {
     MapState mapState = MapState::NamedMapState("europe");
-    BOOST_CHECK_EQUAL(mapState.stations.size(), 47); 
-    BOOST_CHECK_EQUAL(mapState.roads.size(), 100);
+    CHECK_EQ(mapState.stations.size(), 47); 
+    CHECK_EQ(mapState.roads.size(), 100);
   }
   {
     MapState mapState = MapState::NamedMapState("empty");
-    BOOST_CHECK_EQUAL(mapState.stations.size(), 0);
-    BOOST_CHECK_EQUAL(mapState.roads.size(), 0);
+    CHECK_EQ(mapState.stations.size(), 0);
+    CHECK_EQ(mapState.roads.size(), 0);
   }
   {
     MapState mapState = MapState::NamedMapState("nonexistent_map");
-    BOOST_CHECK_EQUAL(mapState.stations.size(), 0);
-    BOOST_CHECK_EQUAL(mapState.roads.size(), 0);
+    CHECK_EQ(mapState.stations.size(), 0);
+    CHECK_EQ(mapState.roads.size(), 0);
   }
-  std::cout << "NamedMapState Constructor Test Finished !\n"
-            << std::endl;
+  ANN_END("NamedMapState Constructor")
 }
 
 
-BOOST_AUTO_TEST_CASE(Test)
+TEST(Test)
 {
-  std::cout << "Test Constructor Test Started ..." << std::endl;
+  ANN_START("Test Constructor")
   MapState mapState = MapState::Test();
-  BOOST_CHECK_EQUAL(mapState.stations.size(), 9); 
-  BOOST_CHECK_EQUAL(mapState.roads.size(), 12); 
-  std::cout << "Test Constructor Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(mapState.stations.size(), 9); 
+  CHECK_EQ(mapState.roads.size(), 12); 
+  ANN_END("Test Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(Europe)
+TEST(Europe)
 {
-  std::cout << "Europe Constructor Test Started ..." << std::endl;
+  ANN_START("Europe Constructor")
   std::shared_ptr<boost::adjacency_list<>> gameGraph = std::make_shared<boost::adjacency_list<>>(boost::adjacency_list<>());
     std::vector<std::string> stationNames = {
         "amsterdam",
@@ -346,119 +351,131 @@ BOOST_AUTO_TEST_CASE(Europe)
     MapState europe_map_state = MapState::Europe();
     DEBUG_PRINT("europe_map_state stations size: " << europe_map_state.stations.size());
     DEBUG_PRINT("europe_map_state roads size: " << europe_map_state.roads.size());
-    BOOST_CHECK_EQUAL(europe_map_state.stations.size(), stationNames.size());
-    BOOST_CHECK_EQUAL(europe_map_state.roads.size(), allRoadsPairs.size());
+    CHECK_EQ(europe_map_state.stations.size(), stationNames.size());
+    CHECK_EQ(europe_map_state.roads.size(), allRoadsPairs.size());
+    ANN_END("Europe Constructor")
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Constructors
 
-BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+SUITE_START(GettersAndSetters)
 
-BOOST_AUTO_TEST_SUITE(Getters)
-BOOST_AUTO_TEST_CASE(GetStations)
+SUITE_START(Getters)
+TEST(getStations)
 {
+  ANN_START("getStations")
   mapState::MapState test_map_state = mapState::MapState::Test();
 #ifdef DEBUG
   test_map_state.display();
 #endif
-  std::cout << "GetStations Test Started ..." << std::endl;
   std::vector<std::shared_ptr<mapState::Station>> stations = test_map_state.getStations();
-  BOOST_CHECK_EQUAL(stations.size(), 9); // As per the default constructor in MapState
-  std::cout << "GetStations Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(stations.size(), 9); // As per the default constructor in MapState
+  ANN_END("getStations")
 }
-BOOST_AUTO_TEST_CASE(GetRoads)
+TEST(getRoads)
 {
+  ANN_START("getRoads")
   mapState::MapState test_map_state = mapState::MapState::Test();
 #ifdef DEBUG
   test_map_state.display();
 #endif
-  std::cout << "GetRoads Test Started ..." << std::endl;
   std::vector<std::shared_ptr<mapState::Road>> roads = test_map_state.getRoads();
-  BOOST_CHECK_EQUAL(roads.size(), 12); // As per the default constructor in MapState
-  std::cout << "GetRoads Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(roads.size(), 12); // As per the default constructor in MapState
+  ANN_END("getRoads")
 }
-BOOST_AUTO_TEST_CASE(GetStationByName)
+TEST(getStationByName)
 {
-  std::cout << "GetStationByName Test Started ..." << std::endl;
+  ANN_START("getStationByName")
   {
+    ANN_START("defined case")
     mapState::MapState test_map_state = MapState::Test();
 #ifdef DEBUG
     test_map_state.display();
 #endif
-    std::cout << "\tDefined case started ..." << std::endl;
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("A");
     BOOST_CHECK(station != nullptr);
-    BOOST_CHECK_EQUAL(station->getName(), "A");
-    std::cout << "\tDefined case finished !\n"
-              << std::endl;
+    CHECK_EQ(station->getName(), "A");
+    ANN_END("defined case")
   }
   {
+    ANN_START("undefined case")
     mapState::MapState test_map_state = mapState::MapState();
 #ifdef DEBUG
     test_map_state.display();
 #endif
-    std::cout << "\tUndefined case started ..." << std::endl;
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("nonexistent");
     BOOST_CHECK(station == nullptr);
-    std::cout << "\tUndefined case finished !\n"
-              << std::endl;
+    ANN_END("undefined case")
   }
-  std::cout << "GetStationByName Test Finished !\n"
-            << std::endl;
+  ANN_END("getStationByName")
 }
-BOOST_AUTO_TEST_CASE(GetRoadsBetweenStations)
+
+SUITE_END() // Getters
+
+SUITE_START(Setters)
+
+SUITE_END() // Setters
+
+SUITE_END() // GettersAndSetters
+
+SUITE_START(Operations)
+
+SUITE_START(Internal)
+
+SUITE_END() // Internal
+
+SUITE_START(Interactions)
+
+TEST(getRoadsBetweenStations)
 {
+  ANN_START("getRoadsBetweenStations")
   mapState::MapState test_map_state = MapState::Test();
   std::shared_ptr<mapState::Station> stationA = test_map_state.getStationByName("A");
   std::shared_ptr<mapState::Station> stationB = test_map_state.getStationByName("B");
   std::vector<std::shared_ptr<mapState::Road>> road = test_map_state.getRoadsBetweenStations(stationA, stationB);
-  BOOST_CHECK_NE(road.empty(), true);
+  CHECK_NE(road.empty(), true);
   for (const std::shared_ptr<mapState::Road> &road : road)
   {
-    BOOST_CHECK_EQUAL(road->stationA->name, stationA->name);
-    BOOST_CHECK_EQUAL(road->stationB->name, stationB->name);
+    CHECK_EQ(road->stationA->name, stationA->name);
+    CHECK_EQ(road->stationB->name, stationB->name);
   }
+  ANN_END("getRoadsBetweenStations")
 }
 
-BOOST_AUTO_TEST_CASE(GetAdjacentStations)
+TEST(getAdjacentStations)
 {
-  std::cout << "GetAdjacentStations Test Started ..." << std::endl;
+  ANN_START("getAdjacentStations")
   mapState::MapState test_map_state = MapState::Test();
 #ifdef DEBUG
   test_map_state.display();
 #endif
   {
-    std::cout << "\tDefined case started ..." << std::endl;
+    ANN_START("defined case")
 #ifdef DEBUG
     test_map_state.display();
 #endif
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("B");
     std::vector<std::shared_ptr<mapState::Station>> adjacentStations = test_map_state.getAdjacentStations(station);
-    BOOST_CHECK_EQUAL(adjacentStations.size(), 5); // paris is connected to berlin and madrid
-    std::cout << "\tDefined case finished !\n"
-              << std::endl;
+    CHECK_EQ(adjacentStations.size(), 5); // paris is connected to berlin and madrid
+    ANN_END("defined case")
   }
   {
-    std::cout << "\tUndefined case started ..." << std::endl;
+    ANN_START("undefined case")
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("lol");
     std::vector<std::shared_ptr<mapState::Station>> adjacentStations = test_map_state.getAdjacentStations(station);
-    // BOOST_CHECK_EQUAL(adjacentStations.size(), 0); // lol does not exist = no adjacent stations
-    std::cout << "\tUndefined case finished !\n"
-              << std::endl;
+    // CHECK_EQ(adjacentStations.size(), 0); // lol does not exist = no adjacent stations
+    ANN_END("undefined case")
   }
-  std::cout << "GetAdjacentStations Test Finished !\n"
-            << std::endl;
+  ANN_END("getAdjacentStations")
 }
 // FIXME : make the test WORK @fetohiaras
-BOOST_AUTO_TEST_CASE(FindShortestPath)
+TEST(findShortestPath)
 {
+  ANN_START("findShortestPath")
   mapState::MapState test_map_state = mapState::MapState::Test();
 #ifdef DEBUG
   test_map_state.display();
 #endif
-  std::cout << "FindShortestPath Test Started ..." << std::endl;
   std::shared_ptr<mapState::Station> src = test_map_state.getStationByName("paris");
   std::shared_ptr<mapState::Station> dest = test_map_state.getStationByName("rome");
   Path shortestPath = test_map_state.findShortestPath(src, dest);
@@ -474,16 +491,15 @@ BOOST_AUTO_TEST_CASE(FindShortestPath)
 #endif
 #ifdef DEBUG
   BOOST_CHECK(!shortestPath.STATIONS.empty());
-  BOOST_CHECK_EQUAL(shortestPath.STATIONS.front(), src);
-  BOOST_CHECK_EQUAL(shortestPath.STATIONS.back(), dest);
-  std::cout << "FindShortestPath Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(shortestPath.STATIONS.front(), src);
+  CHECK_EQ(shortestPath.STATIONS.back(), dest);
+  ANN_END("FindShortestPath")
 #endif
 }
 
-BOOST_AUTO_TEST_CASE(GetClaimableRoads)
+TEST(getClaimableRoads)
 {
-  std::cout << "GetClaimableRoads Test Started ..." << std::endl;
+  ANN_START("getClaimableRoads")
   mapState::MapState test_map_state;
   playersState::Player test_player = playersState::Player("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
   StationInfo stationAInfo = Station::initData("StationA");
@@ -498,14 +514,13 @@ BOOST_AUTO_TEST_CASE(GetClaimableRoads)
   std::vector<RoadInfo> roadsInfos = {roadABInfo, roadACInfo, roadADInfo};
   test_map_state.fillMapWithInfos(stationsInfos, roadsInfos, {}, {}, test_map_state.gameGraph);
   std::vector<std::shared_ptr<Road>> claimableRoads = test_map_state.getClaimableRoads(4, std::make_shared<playersState::Player>(test_player));
-  BOOST_CHECK_EQUAL(claimableRoads.size(), 2); // roadAC and roadAD should be claimable
-  std::cout << "GetClaimableRoads Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(claimableRoads.size(), 2); // roadAC and roadAD should be claimable
+  ANN_END("getClaimableRoads")
 }
 
-BOOST_AUTO_TEST_CASE(IsRoadClaimable)
+TEST(isRoadClaimable)
 {
-  std::cout << "IsRoadClaimable Test Started ..." << std::endl;
+  ANN_START("isRoadClaimable")
   mapState::MapState test_map_state;
   playersState::Player test_player = playersState::Player("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
   StationInfo stationAInfo = Station::initData("StationA");
@@ -521,29 +536,14 @@ BOOST_AUTO_TEST_CASE(IsRoadClaimable)
   test_map_state.fillMapWithInfos(stationsInfos, roadsInfos, {}, {}, test_map_state.gameGraph);
   std::shared_ptr<Road> roadAC = test_map_state.getRoadsBetweenStations(stations[0], stations[2])[0];
   bool isClaimable = test_map_state.isRoadClaimable(4, roadAC, std::make_shared<playersState::Player>(test_player));
-  BOOST_CHECK_EQUAL(isClaimable, true); // roadAC should be claimable
-  std::cout << "IsRoadClaimable Test Finished !\n"
-            << std::endl;
+  CHECK_EQ(isClaimable, true); // roadAC should be claimable
+  ANN_END("isRoadClaimable")
 }
 
-BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(Setters)
+SUITE_END() // Interactions 
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Operations
 
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(Operations)
-
-BOOST_AUTO_TEST_SUITE(Internal)
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(Interactions)
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE_END()
 
 /* vim: set sw=2 sts=2 et : */
