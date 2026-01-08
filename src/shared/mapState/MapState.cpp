@@ -53,7 +53,9 @@ namespace mapState
         this->gameGraph = gameGraph;
         this->fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, gameGraph);
 #ifdef DEBUG
+        std::cout << "Final MapState:" << std::endl;
         this->display();
+        std::cout << std::endl;
 #endif
         DEBUG_PRINT("Mapstate creation finished !");
     };
@@ -245,6 +247,7 @@ namespace mapState
 
         };
         mapState.fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, mapState.gameGraph);
+        DEBUG_PRINT("Europe MapState created !");
         return mapState;
     }
     // Test Map
@@ -331,6 +334,9 @@ namespace mapState
 
     std::vector<std::shared_ptr<Station>> MapState::getStations() const
     {
+        DEBUG_PRINT("MapState getStations called");
+        std::vector<std::shared_ptr<Station>> stationsCopy = this->stations;
+        DEBUG_PRINT("MapState getStations returning " << stationsCopy.size() << " stations");
         return this->stations;
     }
 

@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE(TestStaticAssert)
 
 BOOST_AUTO_TEST_SUITE(Constructors)
 
-cardsState::DestinationCard test_constr_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points);
+cardsState::DestinationCard test_constr_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_constr_wagon_card(test_init_wagon_color);
 
-std::vector<std::shared_ptr<cardsState::DestinationCard>> test_constr_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
+std::vector<std::shared_ptr<cardsState::DestinationCard>> test_constr_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points, false)};
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_constr_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_constr_hand = std::make_shared<cardsState::PlayerCards>(test_constr_dest_cards, test_constr_wagon_cards);
 
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(Empty)
     BOOST_CHECK_EQUAL(player.nbStations, -1);
     BOOST_CHECK_EQUAL(player.nbRoads, -1);
     BOOST_CHECK_EQUAL(player.hand, nullptr);
-    BOOST_CHECK_EQUAL(player.color, PlayerColor::RED);
+    BOOST_CHECK_EQUAL(player.color, PlayerColor::UNKNOWN);
     std::cout << "Empty Player Constructor Test Finished !\n"
               << std::endl;
 }
@@ -198,10 +198,10 @@ BOOST_AUTO_TEST_SUITE_END() // Constructors
 
 BOOST_AUTO_TEST_SUITE(GettersAndSetters)
 
-cardsState::DestinationCard test_getset_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points);
+cardsState::DestinationCard test_getset_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_getset_wagon_card(cardsState::ColorCard::RED);
 
-std::vector<std::shared_ptr<cardsState::DestinationCard>> test_getset_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
+std::vector<std::shared_ptr<cardsState::DestinationCard>> test_getset_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points, false)};
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_getset_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_getset_hand = std::make_shared<cardsState::PlayerCards>(test_getset_dest_cards, test_getset_wagon_cards);
 
@@ -291,10 +291,10 @@ BOOST_AUTO_TEST_SUITE_END() // Getters
 
 BOOST_AUTO_TEST_SUITE(Setters)
 
-cardsState::DestinationCard dest(test_init_stationA, test_init_stationB, test_init_destination_points);
+cardsState::DestinationCard dest(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard wagon(cardsState::ColorCard::RED);
 
-std::vector<std::shared_ptr<cardsState::DestinationCard>> test_init_destCards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
+std::vector<std::shared_ptr<cardsState::DestinationCard>> test_init_destCards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
 std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> hand = std::make_shared<cardsState::PlayerCards>(test_init_destCards, wagonCardsVec);
 
@@ -385,7 +385,7 @@ BOOST_AUTO_TEST_CASE(setHand)
 
     int test_new_destination_points = 15;
     cardsState::ColorCard test_new_wagon_color = cardsState::ColorCard::BLUE;
-    std::vector<std::shared_ptr<cardsState::DestinationCard>> test_new_destCards = {std::make_shared<cardsState::DestinationCard>(test_new_stationA, test_new_stationB, test_new_destination_points)};
+    std::vector<std::shared_ptr<cardsState::DestinationCard>> test_new_destCards = {std::make_shared<cardsState::DestinationCard>(test_new_stationA, test_new_stationB, test_new_destination_points,false)};
     std::vector<std::shared_ptr<cardsState::WagonCard>> test_new_wagonCards = {std::make_shared<cardsState::WagonCard>(test_new_wagon_color)};
     std::shared_ptr<cardsState::PlayerCards> test_new_hand = std::make_shared<cardsState::PlayerCards>(test_new_destCards, test_new_wagonCards);
 
@@ -407,9 +407,9 @@ BOOST_AUTO_TEST_SUITE(Operations)
 
 BOOST_AUTO_TEST_SUITE(Internal)
 
-cardsState::DestinationCard test_internal_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points);
+cardsState::DestinationCard test_internal_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_internal_wagon_card(test_init_wagon_color);
-std::vector<std::shared_ptr<cardsState::DestinationCard>> test_internal_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
+std::vector<std::shared_ptr<cardsState::DestinationCard>> test_internal_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_internal_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_internal_hand = std::make_shared<cardsState::PlayerCards>(test_internal_dest_cards, test_internal_wagon_cards);
 
@@ -488,9 +488,9 @@ BOOST_AUTO_TEST_SUITE(Interactions)
 std::string test_interract_stationA_name = "A";
 std::string test_interract_stationB_name = "B";
 std::shared_ptr<mapState::MapState> test_interact_map = std::make_shared<mapState::MapState>(mapState::MapState::Test());
-cardsState::DestinationCard test_interact_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points);
+cardsState::DestinationCard test_interact_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_interact_wagon_card(test_init_wagon_color);
-std::vector<std::shared_ptr<cardsState::DestinationCard>> test_interact_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
+std::vector<std::shared_ptr<cardsState::DestinationCard>> test_interact_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_interact_hand = std::make_shared<cardsState::PlayerCards>(test_interact_dest_cards, test_interact_wagon_cards);
 
@@ -529,8 +529,8 @@ BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
         std::shared_ptr<mapState::Station> d1_stationB = std::make_shared<mapState::Station>("B", nullptr, nullptr);
         std::shared_ptr<mapState::Station> d2_stationA = std::make_shared<mapState::Station>("C", nullptr, nullptr);
         std::shared_ptr<mapState::Station> d2_stationB = std::make_shared<mapState::Station>("D", nullptr, nullptr);
-        std::shared_ptr<cardsState::DestinationCard> d1 = std::make_shared<cardsState::DestinationCard>(d1_stationA, d1_stationB, d1_points);
-        std::shared_ptr<cardsState::DestinationCard> d2 = std::make_shared<cardsState::DestinationCard>(d2_stationA, d2_stationB, d2_points);
+        std::shared_ptr<cardsState::DestinationCard> d1 = std::make_shared<cardsState::DestinationCard>(d1_stationA, d1_stationB, d1_points, false);
+        std::shared_ptr<cardsState::DestinationCard> d2 = std::make_shared<cardsState::DestinationCard>(d2_stationA, d2_stationB, d2_points, false);
         std::vector<std::shared_ptr<cardsState::DestinationCard>> dest_cards = {d1, d2};
         std::vector<std::shared_ptr<cardsState::WagonCard>> wagon_cards = {std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED)};
         std::shared_ptr<cardsState::PlayerCards> test_calculate_hand = std::make_shared<cardsState::PlayerCards>(dest_cards, wagon_cards);
@@ -582,7 +582,7 @@ BOOST_AUTO_TEST_CASE(isRoadBuildable)
 
     {
         std::cout << "\tnot enough wagon cards case started ...  " << std::endl;
-        std::vector<std::shared_ptr<cardsState::DestinationCard>> test_insufficient_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points)};
+        std::vector<std::shared_ptr<cardsState::DestinationCard>> test_insufficient_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
         std::vector<std::shared_ptr<cardsState::WagonCard>> test_insufficient_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
         std::shared_ptr<cardsState::PlayerCards> test_insufficient_hand = std::make_shared<cardsState::PlayerCards>(test_insufficient_dest_cards, test_insufficient_wagon_cards);
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_insufficient_hand);

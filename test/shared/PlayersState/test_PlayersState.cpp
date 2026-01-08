@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(GetPlayers)
 {
   PlayersState ps;
 
-  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12);
+  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
   auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
 
   std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(SetPlayers)
 {
   PlayersState ps;
 
-  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12);
+  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
   auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
 
   std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(Display)
     std::cout << "non-empty case test started ..." << std::endl;
     PlayersState ps;
 
-    auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12);
+    auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
     auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
 
     std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};

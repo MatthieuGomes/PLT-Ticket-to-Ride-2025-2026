@@ -20,21 +20,118 @@ using namespace mapState;
 #define DEBUG_PRINT(x)
 #endif
 
+#define TEST(x) BOOST_AUTO_TEST_CASE(x)
+#define SUITE_START(x) BOOST_AUTO_TEST_SUITE(x)
+#define SUITE_END() BOOST_AUTO_TEST_SUITE_END()
+#define ANN_START(x) std::cout << "Starting " << x << " test..." << std::endl;
+#define ANN_END(x) std::cout << x << " test finished!" << std::endl;
+#define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
+#define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
+#define CHECK_NTHROW(x) BOOST_CHECK_NO_THROW(x)
+#define CHECK_THROW(x) BOOST_CHECK_THROW(x)
+#define CHECK(x) BOOST_CHECK(x)
+
 using namespace ::cardsState;
 
-BOOST_AUTO_TEST_CASE(TestStaticAssert)
+TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+    CHECK(1);
 }
 
-BOOST_AUTO_TEST_SUITE(Constructor)
+SUITE_START(Constructors)
 
-// ADD TESTS FOR CONSTRUCTOR
+TEST(Default)
+{
+    ANN_START("Default Constructor")
+    DestinationCard card;
+    CHECK_EQ(card.stationA, nullptr);
+    CHECK_EQ(card.stationB, nullptr);
+    CHECK_EQ(card.points, 0);
+    CHECK_EQ(card.isLong, false);
+    ANN_END("Default Constructor")
+}
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_START(BatchConstructors)
 
-BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+TEST(BatchConstructor)
+{
+    ANN_START("BatchConstructor")
+    std::shared_ptr<playersState::Player> test_owner =
+        std::make_shared<playersState::Player>("TestPlayer",
+                                               playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
+    std::shared_ptr<boost::adjacency_list<>> graph =
+        std::make_shared<boost::adjacency_list<>>();
+
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexA = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexB = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+
+    std::shared_ptr<Station> stationA =
+        std::make_shared<Station>("StationA", test_owner, vertexA);
+
+    std::shared_ptr<Station> stationB =
+        std::make_shared<Station>("StationB", test_owner, vertexB);
+
+    std::vector<std::tuple<std::shared_ptr<Station>, std::shared_ptr<Station>, int, bool>> infos = {
+        std::make_tuple(stationA, stationB, 10, false),
+        std::make_tuple(stationB, stationA, 15, true)};
+
+    std::vector<std::shared_ptr<DestinationCard>> destinationCards = DestinationCard::BatchConstructor(infos);
+    CHECK_EQ(destinationCards.size(), 2);
+    ANN_END("BatchConstructor")
+}
+
+TEST(BatchConstructorByName)
+{
+    ANN_START("BatchConstructorByName")
+    std::shared_ptr<playersState::Player> test_owner =
+        std::make_shared<playersState::Player>("TestPlayer",
+                                               playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+
+    std::shared_ptr<boost::adjacency_list<>> graph =
+        std::make_shared<boost::adjacency_list<>>();
+
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexA = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+
+    std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexB = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
+        boost::add_vertex(*graph));
+
+    std::shared_ptr<Station> stationA =
+        std::make_shared<Station>("StationA", test_owner, vertexA);
+
+    std::shared_ptr<Station> stationB =
+        std::make_shared<Station>("StationB", test_owner, vertexB);
+
+    std::vector<std::shared_ptr<Station>> stations = {stationA, stationB};
+
+    std::vector<std::tuple<std::string, std::string, int, bool>> infos = {
+        std::make_tuple("StationA", "StationB", 10, false),
+        std::make_tuple("StationB", "StationA", 15, true)};
+
+    std::vector<std::shared_ptr<DestinationCard>> destinationCards = DestinationCard::BatchConstructorByName(infos, stations);
+    CHECK_EQ(destinationCards.size(), 2);
+    ANN_END("BatchConstructorByName")
+}
+
+TEST(Europe)
+{
+    ANN_START("Europe Constructor")
+    mapState::MapState map = mapState::MapState::NamedMapState("europe");
+    std::vector<std::shared_ptr<mapState::Station>> stations = map.getStations();
+    std::vector<std::shared_ptr<DestinationCard>> destinationCards = DestinationCard::Europe(stations);
+    CHECK_EQ(destinationCards.size(), 46);
+    ANN_END("Europe Constructor")
+}
+
+SUITE_END() // BatchConstructors
+
+SUITE_END() // Constructors
+
+SUITE_START(GettersAndSetters)
 
 std::string test_stationA_name = "Paris";
 std::string test_stationB_name = "Rome";
@@ -42,8 +139,7 @@ int test_points = 12;
 
 std::shared_ptr<playersState::Player> test_owner =
     std::make_shared<playersState::Player>("TestPlayer",
-        playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
-
+                                           playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
 
 std::shared_ptr<boost::adjacency_list<>> graph =
     std::make_shared<boost::adjacency_list<>>();
@@ -54,44 +150,87 @@ std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexA = std::make_
 std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexB = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(
     boost::add_vertex(*graph));
 
-
 std::shared_ptr<Station> stationA =
     std::make_shared<Station>(test_stationA_name, test_owner, vertexA);
 
 std::shared_ptr<Station> stationB =
     std::make_shared<Station>(test_stationB_name, test_owner, vertexB);
 
-BOOST_AUTO_TEST_SUITE(Getters)
+SUITE_START(Getters)
 
-BOOST_AUTO_TEST_CASE(GetStationA)
+TEST(getStationA)
 {
-    std::cout << "Get StationA Test Started ..." << std::endl;
+    ANN_START("getStationA")
 
-    DestinationCard card(stationA, stationB, test_points);
-    BOOST_CHECK_EQUAL(card.getstationA()->getName(), test_stationA_name);
+    DestinationCard card(stationA, stationB, test_points, false);
+    CHECK_EQ(card.getstationA()->getName(), test_stationA_name);
 
-    std::cout << "Get StationA Test Finished !\n" << std::endl;
+    ANN_END("getStationA")
 }
 
-BOOST_AUTO_TEST_CASE(GetStationB)
+TEST(getStationB)
 {
-    std::cout << "Get StationB Test Started ..." << std::endl;
+    ANN_START("getStationB")
 
-    DestinationCard card(stationA, stationB, test_points);
-    BOOST_CHECK_EQUAL(card.getstationB()->getName(), test_stationB_name);
+    DestinationCard card(stationA, stationB, test_points, false);
+    CHECK_EQ(card.getstationB()->getName(), test_stationB_name);
 
-    std::cout << "Get StationB Test Finished !\n" << std::endl;
+    ANN_END("getStationB")
 }
 
-BOOST_AUTO_TEST_CASE(GetPoints)
+TEST(getPoints)
 {
-    std::cout << "Get Points Test Started ..." << std::endl;
+    ANN_START("getPoints")
 
-    DestinationCard card(stationA, stationB, test_points);
-    BOOST_CHECK_EQUAL(card.getPoints(), test_points);
+    DestinationCard card(stationA, stationB, test_points, false);
+    CHECK_EQ(card.getPoints(), test_points);
 
-    std::cout << "Get Points Test Finished !\n" << std::endl;
+    ANN_END("getPoints")
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Getters
+
+SUITE_START(Setters)
+
+SUITE_END() // Setters
+
+SUITE_END() // GettersAndSetters
+
+SUITE_START(Operations)
+
+SUITE_START(Internal)
+
+SUITE_END() // Internal
+
+SUITE_START(Interactions)
+// TODO : add display and _display tests
+TEST(Display)
+{
+    ANN_START("display");
+    std::shared_ptr<Station> stationA =
+        std::make_shared<Station>("StationA", nullptr, nullptr);
+    std::shared_ptr<Station> stationB =
+        std::make_shared<Station>("StationB", nullptr, nullptr);
+    int test_points = 10;
+    DestinationCard card(stationA, stationB, test_points, false);
+    CHECK_NTHROW(card.display());
+    CHECK_NTHROW(card.display(1));
+    ANN_END("display");
+}
+TEST(_Display)
+{
+    ANN_START("_display");
+    std::shared_ptr<Station> stationA =
+        std::make_shared<Station>("StationA", nullptr, nullptr);
+    std::shared_ptr<Station> stationB =
+        std::make_shared<Station>("StationB", nullptr, nullptr);
+    int test_points = 10;
+    DestinationCard card(stationA, stationB, test_points, false);
+    CHECK_NTHROW(card._display());
+    CHECK_NTHROW(card._display(1));
+    ANN_END("_display");
+}
+
+SUITE_END() // Interactions
+
+SUITE_END() // Operations

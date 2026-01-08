@@ -17,7 +17,7 @@ namespace client
     {
         std::cout << "Hello, World!" << std::endl;
     }
-
+    // rename to display
     void Client::printState()
     {
         // @Yosra + @Chahrazed + @Theo will call here the printState method from state class
