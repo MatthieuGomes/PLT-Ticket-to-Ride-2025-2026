@@ -6204,19 +6204,19 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O15">
       <dia:attribute name="obj_pos">
-        <dia:point val="48.3431,71.313"/>
+        <dia:point val="46.342,46.7485"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="48.2931,-1.03284;124.279,71.363"/>
+        <dia:rectangle val="46.292,-1.03284;124.279,46.7985"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="48.3431,71.313"/>
-        <dia:point val="107.728,71.313"/>
-        <dia:point val="107.728,-0.58284"/>
-        <dia:point val="123.829,-0.58284"/>
+        <dia:point val="46.342,46.7485"/>
+        <dia:point val="107.728,46.7485"/>
+        <dia:point val="107.728,-0.582842"/>
+        <dia:point val="123.829,-0.582842"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
