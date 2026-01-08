@@ -377,6 +377,78 @@ BOOST_AUTO_TEST_CASE(RendersStationsAndRoutes)
   BOOST_CHECK(containsText(out, "\033[106m"));
 }
 
+// Ensures the placeholder appears when no map state is set
+BOOST_AUTO_TEST_CASE(HandlesMissingMapState)
+{
+  tui::MapView view(1, 1, 40, 5);
+
+  tui::Terminal term("");
+  CoutCapture capture;
+  view.refresh(term);
+  term.flush();
+
+  std::string out = capture.str();
+  BOOST_CHECK(containsText(out, "No map data"));
+}
+
+// Validates highlights, owner tags, and block flags for stations/routes
+BOOST_AUTO_TEST_CASE(HighlightsAndFlags)
+{
+  std::vector<std::shared_ptr<cardsState::DestinationCard>> destinationCards;
+  std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards;
+  cardsState::PlayerCards hand(destinationCards, wagonCards);
+  std::shared_ptr<playersState::Player> owner =
+      std::make_shared<playersState::Player>(1, "Owner", cardsState::ColorCard::RED, 0, 0, 0, 0, &hand);
+
+  std::shared_ptr<boost::adjacency_list<>> graph =
+      std::make_shared<boost::adjacency_list<>>();
+  std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexA =
+      std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*graph));
+  std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> vertexB =
+      std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*graph));
+
+  std::shared_ptr<mapState::Station> stationA =
+      std::make_shared<mapState::Station>("Alpha", owner, true, vertexA);
+  std::shared_ptr<mapState::Station> stationB =
+      std::make_shared<mapState::Station>("Beta", nullptr, false, vertexB);
+
+  std::vector<std::tuple<std::shared_ptr<playersState::Player>, bool, std::string>> stationsInfos;
+  stationsInfos.push_back(mapState::Station::genData(owner, true, "Alpha"));
+  stationsInfos.push_back(mapState::Station::genData(nullptr, false, "Beta"));
+
+  std::vector<std::pair<std::pair<std::shared_ptr<mapState::Station>, std::shared_ptr<mapState::Station>>,
+                        std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>>> roadsInfos;
+  roadsInfos.push_back(
+      mapState::Road::genData(stationA, stationB, 1, owner, cardsState::ColorCard::RED, 4, true));
+
+  std::vector<std::pair<std::pair<std::shared_ptr<mapState::Station>, std::shared_ptr<mapState::Station>>,
+                        std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, bool>>> tunnelsInfos;
+  std::vector<std::pair<std::pair<std::shared_ptr<mapState::Station>, std::shared_ptr<mapState::Station>>,
+                        std::tuple<int, std::shared_ptr<playersState::Player>, cardsState::ColorCard, int, int, bool>>> ferrysInfos;
+
+  mapState::MapState map_state = mapState::MapState::Empty();
+  map_state._MapState(graph, stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos);
+
+  tui::MapView view(1, 1, 80, 8);
+  view.setMapState(&map_state);
+  view.setHighlightNode(0);
+  view.setHighlightActivePlayer(true);
+
+  tui::Terminal term("");
+  CoutCapture capture;
+  view.refresh(term);
+  term.flush();
+
+  std::string out = capture.str();
+  BOOST_CHECK(containsText(out, ">Alpha"));
+  BOOST_CHECK(containsText(out, "Alpha [Owner]"));
+  BOOST_CHECK(containsText(out, "(blocked)"));
+  BOOST_CHECK(containsText(out, "*Alpha-Beta"));
+  BOOST_CHECK(containsText(out, "len:4"));
+  BOOST_CHECK(containsText(out, " [Owner]"));
+  BOOST_CHECK(containsText(out, " !"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 // TUIManager initialization, drawing, and external state wiring
