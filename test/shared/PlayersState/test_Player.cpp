@@ -12,6 +12,17 @@
 #define DEBUG_PRINT(x)
 #endif
 
+#define TEST(x) BOOST_AUTO_TEST_CASE(x)
+#define SUITE_START(x) BOOST_AUTO_TEST_SUITE(x)
+#define SUITE_END() BOOST_AUTO_TEST_SUITE_END()
+#define ANN_START(x) std::cout << "Starting " << x << " test..." << std::endl;
+#define ANN_END(x) std::cout << x << " test finished!" << std::endl;
+#define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
+#define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
+#define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
+#define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define CHECK(x) BOOST_CHECK(x)
+
 using namespace ::playersState;
 
 using playersInfos = std::tuple<std::string, PlayerColor, int, int, int, int, std::shared_ptr<cardsState::PlayerCards>>;
@@ -31,12 +42,12 @@ int test_init_player_nbWagons = 21;
 int test_init_player_nbStations = 10;
 int test_init_player_nbRoads = 5;
 
-BOOST_AUTO_TEST_CASE(TestStaticAssert)
+TEST(TestStaticAssert)
 {
     BOOST_CHECK(1);
 }
 
-BOOST_AUTO_TEST_SUITE(Constructors)
+SUITE_START(Constructors)
 
 cardsState::DestinationCard test_constr_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_constr_wagon_card(test_init_wagon_color);
@@ -45,158 +56,149 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_constr_dest_cards
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_constr_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_constr_hand = std::make_shared<cardsState::PlayerCards>(test_constr_dest_cards, test_constr_wagon_cards);
 
-BOOST_AUTO_TEST_CASE(Basic)
+TEST(Basic)
 {
-    std::cout << "Player Constructor Test Started ..." << std::endl;
+    ANN_START("Basic Constructor")
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
-    BOOST_CHECK_EQUAL(player.name, test_init_player_name);
-    BOOST_CHECK_EQUAL(player.color, test_init_player_color);
-    BOOST_CHECK_EQUAL(player.score, test_init_player_score);
-    BOOST_CHECK_EQUAL(player.nbWagons, test_init_player_nbWagons);
-    BOOST_CHECK_EQUAL(player.nbStations, test_init_player_nbStations);
-    BOOST_CHECK_EQUAL(player.nbRoads, test_init_player_nbRoads);
-    BOOST_CHECK_EQUAL(player.hand, test_constr_hand);
-    std::cout << "Player Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.name, test_init_player_name);
+    CHECK_EQ(player.color, test_init_player_color);
+    CHECK_EQ(player.score, test_init_player_score);
+    CHECK_EQ(player.nbWagons, test_init_player_nbWagons);
+    CHECK_EQ(player.nbStations, test_init_player_nbStations);
+    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.hand, test_constr_hand);
+    ANN_END("Player Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(Empty)
+TEST(Default)
 {
-    std::cout << "Empty Player Constructor Test Started ..." << std::endl;
+    ANN_START("Default Constructor")
     Player player;
     BOOST_CHECK(player.name.empty());
-    BOOST_CHECK_EQUAL(player.score, -1);
-    BOOST_CHECK_EQUAL(player.nbWagons, -1);
-    BOOST_CHECK_EQUAL(player.nbStations, -1);
-    BOOST_CHECK_EQUAL(player.nbRoads, -1);
-    BOOST_CHECK_EQUAL(player.hand, nullptr);
-    BOOST_CHECK_EQUAL(player.color, PlayerColor::UNKNOWN);
-    std::cout << "Empty Player Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.score, -1);
+    CHECK_EQ(player.nbWagons, -1);
+    CHECK_EQ(player.nbStations, -1);
+    CHECK_EQ(player.nbRoads, -1);
+    CHECK_EQ(player.hand, nullptr);
+    CHECK_EQ(player.color, PlayerColor::UNKNOWN);
+    ANN_END("Default Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(Init)
+TEST(Init)
 {
-    std::cout << "Init Player Constructor Test Started ..." << std::endl;
+    ANN_START("Init Constructor")
     Player player = Player::Init(test_init_player_name, test_init_player_color, test_constr_hand);
-    BOOST_CHECK_EQUAL(player.name, test_init_player_name);
-    BOOST_CHECK_EQUAL(player.color, test_init_player_color);
-    BOOST_CHECK_EQUAL(player.score, Player::startScore);
-    BOOST_CHECK_EQUAL(player.nbWagons, Player::startNbWagons);
-    BOOST_CHECK_EQUAL(player.nbStations, Player::startNbStations);
-    BOOST_CHECK_EQUAL(player.nbRoads, 0);
-    BOOST_CHECK_EQUAL(player.hand, test_constr_hand);
-    std::cout << "Init Player Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.name, test_init_player_name);
+    CHECK_EQ(player.color, test_init_player_color);
+    CHECK_EQ(player.score, Player::startScore);
+    CHECK_EQ(player.nbWagons, Player::startNbWagons);
+    CHECK_EQ(player.nbStations, Player::startNbStations);
+    CHECK_EQ(player.nbRoads, 0);
+    CHECK_EQ(player.hand, test_constr_hand);
+    ANN_END("Init Constructor")
 }
 
-BOOST_AUTO_TEST_SUITE(Generators)
+SUITE_START(Generators)
 
-BOOST_AUTO_TEST_CASE(FillFromInfos){
-    std::cout << "FillFromInfos Test Started ..." << std::endl;
+TEST(fillFromInfos){
+    ANN_START("fillFromInfos")
     Player player;
     playersInfos info = playersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
     player.fillFromInfos(info);
-    BOOST_CHECK_EQUAL(player.name, test_init_player_name);
-    BOOST_CHECK_EQUAL(player.color, test_init_player_color);
-    BOOST_CHECK_EQUAL(player.score, test_init_player_score);
-    BOOST_CHECK_EQUAL(player.nbWagons, test_init_player_nbWagons);
-    BOOST_CHECK_EQUAL(player.nbStations, test_init_player_nbStations);
-    BOOST_CHECK_EQUAL(player.nbRoads, test_init_player_nbRoads);
-    BOOST_CHECK_EQUAL(player.hand, test_constr_hand);
-    std::cout << "FillFromInfos Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.name, test_init_player_name);
+    CHECK_EQ(player.color, test_init_player_color);
+    CHECK_EQ(player.score, test_init_player_score);
+    CHECK_EQ(player.nbWagons, test_init_player_nbWagons);
+    CHECK_EQ(player.nbStations, test_init_player_nbStations);
+    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.hand, test_constr_hand);
+    ANN_END("fillFromInfos")
 }
 
-BOOST_AUTO_TEST_CASE(FillFromInitInfos){
-    std::cout << "FillFromInitInfos Test Started ..." << std::endl;
+TEST(fillFromInitInfos){
+    ANN_START("fillFromInitInfos")
     Player player;
     playersInitInfos info = playersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
     player.fillFromInitInfos(info);
-    BOOST_CHECK_EQUAL(player.name, test_init_player_name);
-    BOOST_CHECK_EQUAL(player.color, test_init_player_color);
-    BOOST_CHECK_EQUAL(player.score, Player::startScore);
-    BOOST_CHECK_EQUAL(player.nbWagons, Player::startNbWagons);
-    BOOST_CHECK_EQUAL(player.nbStations, Player::startNbStations);
-    BOOST_CHECK_EQUAL(player.nbRoads, 0);
-    BOOST_CHECK_EQUAL(player.hand, test_constr_hand);
-    std::cout << "FillFromInitInfos Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.name, test_init_player_name);
+    CHECK_EQ(player.color, test_init_player_color);
+    CHECK_EQ(player.score, Player::startScore);
+    CHECK_EQ(player.nbWagons, Player::startNbWagons);
+    CHECK_EQ(player.nbStations, Player::startNbStations);
+    CHECK_EQ(player.nbRoads, 0);
+    CHECK_EQ(player.hand, test_constr_hand);
+    ANN_END("fillFromInitInfos")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Generators
+SUITE_END() // Generators
 
-BOOST_AUTO_TEST_SUITE(Wrappers)
+SUITE_START(Wrappers)
 
-BOOST_AUTO_TEST_CASE(FromInfos)
+TEST(FromInfos)
 {
-    std::cout << "Player FromInfos Constructor Test Started ..." << std::endl;
+    ANN_START("FromInfos Constructor")
     playersInfos info = playersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
     Player player = Player::PlayerFromInfos(info);
-    BOOST_CHECK_EQUAL(player.name, test_init_player_name);
-    BOOST_CHECK_EQUAL(player.color, test_init_player_color);
-    BOOST_CHECK_EQUAL(player.score, test_init_player_score);
-    BOOST_CHECK_EQUAL(player.nbWagons, test_init_player_nbWagons);
-    BOOST_CHECK_EQUAL(player.nbStations, test_init_player_nbStations);
-    BOOST_CHECK_EQUAL(player.nbRoads, test_init_player_nbRoads);
-    BOOST_CHECK_EQUAL(player.hand, test_constr_hand);
-    std::cout << "Player FromInfos Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.name, test_init_player_name);
+    CHECK_EQ(player.color, test_init_player_color);
+    CHECK_EQ(player.score, test_init_player_score);
+    CHECK_EQ(player.nbWagons, test_init_player_nbWagons);
+    CHECK_EQ(player.nbStations, test_init_player_nbStations);
+    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.hand, test_constr_hand);
+    ANN_END("FromInfos Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(FromInitInfos)
+TEST(FromInitInfos)
 {
-    std::cout << "Player FromInitInfos Constructor Test Started ..." << std::endl;
+    ANN_START("FromInitInfos Constructor")
     playersInitInfos info = playersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
     Player player = Player::PlayerFromInitInfos(info);
-    BOOST_CHECK_EQUAL(player.name, test_init_player_name);
-    BOOST_CHECK_EQUAL(player.color, test_init_player_color);
-    BOOST_CHECK_EQUAL(player.score, Player::startScore);
-    BOOST_CHECK_EQUAL(player.nbWagons, Player::startNbWagons);
-    BOOST_CHECK_EQUAL(player.nbStations, Player::startNbStations);
-    BOOST_CHECK_EQUAL(player.nbRoads, 0);
-    BOOST_CHECK_EQUAL(player.hand, test_constr_hand);
-    std::cout << "Player FromInitInfos Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.name, test_init_player_name);
+    CHECK_EQ(player.color, test_init_player_color);
+    CHECK_EQ(player.score, Player::startScore);
+    CHECK_EQ(player.nbWagons, Player::startNbWagons);
+    CHECK_EQ(player.nbStations, Player::startNbStations);
+    CHECK_EQ(player.nbRoads, 0);
+    CHECK_EQ(player.hand, test_constr_hand);
+    ANN_END("FromInitInfos Constructor")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Wrappers
+SUITE_END() // Wrappers
 
-BOOST_AUTO_TEST_SUITE(BatchConstructors)
+SUITE_START(BatchConstructors)
 
-BOOST_AUTO_TEST_CASE(BatchFromInfos)
+TEST(BatchFromInfos)
 {
-    std::cout << "Player BatchFromInfos Constructor Test Started ..." << std::endl;
+    ANN_START("BatchFromInfos Constructor")
     playersInfos info1 = playersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
     playersInfos info2 = playersInfos("sara", PlayerColor::BLUE, 30, 25, 8, 7, test_constr_hand);
     std::vector<playersInfos> infos = {info1, info2};
     std::vector<std::shared_ptr<Player>> players = Player::BatchFromInfos(infos);
-    BOOST_CHECK_EQUAL(players.size(), 2);
-    BOOST_CHECK_EQUAL(players[0]->name, test_init_player_name);
-    BOOST_CHECK_EQUAL(players[1]->name, "sara");
-    std::cout << "Player BatchFromInfos Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(players.size(), 2);
+    CHECK_EQ(players[0]->name, test_init_player_name);
+    CHECK_EQ(players[1]->name, "sara");
+    ANN_END("BatchFromInfos Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(BatchFromInitInfos)
+TEST(BatchFromInitInfos)
 {
-    std::cout << "Player BatchFromInitInfos Constructor Test Started ..." << std::endl;
+    ANN_START("BatchFromInitInfos Constructor")
     playersInitInfos info1 = playersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
     playersInitInfos info2 = playersInitInfos("sara", PlayerColor::BLUE, test_constr_hand);
     std::vector<playersInitInfos> infos = {info1, info2};
     std::vector<std::shared_ptr<Player>> players = Player::BatchFromInitInfos(infos);
-    BOOST_CHECK_EQUAL(players.size(), 2);
-    BOOST_CHECK_EQUAL(players[0]->name, test_init_player_name);
-    BOOST_CHECK_EQUAL(players[1]->name, "sara");
-    std::cout << "Player BatchFromInitInfos Constructor Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(players.size(), 2);
+    CHECK_EQ(players[0]->name, test_init_player_name);
+    CHECK_EQ(players[1]->name, "sara");
+    ANN_END("BatchFromInitInfos Constructor")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // BatchConstructors
+SUITE_END() // BatchConstructors
 
-BOOST_AUTO_TEST_SUITE_END() // Constructors
+SUITE_END() // Constructors
 
-BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+SUITE_START(GettersAndSetters)
 
 cardsState::DestinationCard test_getset_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_getset_wagon_card(cardsState::ColorCard::RED);
@@ -205,91 +207,62 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_getset_dest_cards
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_getset_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_getset_hand = std::make_shared<cardsState::PlayerCards>(test_getset_dest_cards, test_getset_wagon_cards);
 
-BOOST_AUTO_TEST_SUITE(Getters)
+SUITE_START(Getters)
 
 Player test_getter_player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_getset_hand);
 
-BOOST_AUTO_TEST_CASE(getName)
+TEST(getName)
 {
-    {
-        std::cout << "GetName Test Started ..." << std::endl;
-
-        BOOST_CHECK_EQUAL(test_getter_player.getName(), test_init_player_name);
-        std::cout << "GetName Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getName")
+    CHECK_EQ(test_getter_player.getName(), test_init_player_name);
+    ANN_END("getName")
 }
 
-BOOST_AUTO_TEST_CASE(getColor)
+TEST(getColor)
 {
-
-    {
-        std::cout << "GetColor Test Started ..." << std::endl;
-
-        BOOST_CHECK_EQUAL(test_getter_player.getColor(), test_init_player_color);
-        std::cout << "GetColor Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getColor")
+    CHECK_EQ(test_getter_player.getColor(), test_init_player_color);
+    ANN_END("getColor")
 }
 
-BOOST_AUTO_TEST_CASE(getScore)
+TEST(getScore)
 {
-
-    {
-        std::cout << "GetScore Test Started ..." << std::endl;
-        BOOST_CHECK_EQUAL(test_getter_player.getScore(), test_init_player_score);
-        std::cout << "GetScore Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getScore")
+    CHECK_EQ(test_getter_player.getScore(), test_init_player_score);
+    ANN_END("getScore")
 }
 
-BOOST_AUTO_TEST_CASE(getNumTrains)
+TEST(getNbWagons)
 {
-
-    {
-        std::cout << "GetNbWagons Test Started ..." << std::endl;
-        BOOST_CHECK_EQUAL(test_getter_player.getNbWagons(), test_init_player_nbWagons);
-        std::cout << "GetNbWagons Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getNbWagons")
+    CHECK_EQ(test_getter_player.getNbWagons(), test_init_player_nbWagons);
+    ANN_END("getNbWagons")
 }
 
-BOOST_AUTO_TEST_CASE(getNbStations)
+TEST(getNbStations)
 {
-
-    {
-        std::cout << "GetNbStations Test Started ..." << std::endl;
-        BOOST_CHECK_EQUAL(test_getter_player.getNbStations(), test_init_player_nbStations);
-        std::cout << "GetNbStations Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getNbStations")
+    CHECK_EQ(test_getter_player.getNbStations(), test_init_player_nbStations);
+    ANN_END("getNbStations")
 }
 
-BOOST_AUTO_TEST_CASE(getNbRoads)
+TEST(getNbRoads)
 {
-
-    {
-        std::cout << "GetNbRoads Test Started ..." << std::endl;
-        BOOST_CHECK_EQUAL(test_getter_player.getNbRoads(), test_init_player_nbRoads);
-        std::cout << "GetNbRoads Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getNbRoads")
+    CHECK_EQ(test_getter_player.getNbRoads(), test_init_player_nbRoads);
+    ANN_END("getNbRoads")
 }
 
-BOOST_AUTO_TEST_CASE(getHand)
+TEST(getHand)
 {
-
-    {
-        std::cout << "GetHand Test Started ..." << std::endl;
-        BOOST_CHECK_EQUAL(test_getter_player.getHand(), test_getset_hand);
-        std::cout << "GetHand Test Finished !\n"
-                  << std::endl;
-    }
+    ANN_START("getHand")
+    CHECK_EQ(test_getter_player.getHand(), test_getset_hand);
+    ANN_END("getHand")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Getters
+SUITE_END() // Getters
 
-BOOST_AUTO_TEST_SUITE(Setters)
+SUITE_START(Setters)
 
 cardsState::DestinationCard dest(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard wagon(cardsState::ColorCard::RED);
@@ -298,86 +271,69 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_init_destCards = 
 std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> hand = std::make_shared<cardsState::PlayerCards>(test_init_destCards, wagonCardsVec);
 
-BOOST_AUTO_TEST_CASE(setName)
+TEST(setName)
 {
+    ANN_START("setName")
     std::string test_new_name = "sara";
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetName Test Started ..." << std::endl;
-        player.setName(test_new_name);
-        BOOST_CHECK_EQUAL(player.name, test_new_name);
-        std::cout << "SetName Test Finished !\n"
-                  << std::endl;
-    }
+    player.setName(test_new_name);
+    CHECK_EQ(player.name, test_new_name);
+    ANN_END("setName")
 }
 
-BOOST_AUTO_TEST_CASE(setColor)
+TEST(setColor)
 {
+    ANN_START("setColor")
     playersState::PlayerColor test_new_color = playersState::PlayerColor::GREEN;
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetColor Test Started ..." << std::endl;
-        player.setColor(test_new_color);
-        BOOST_CHECK_EQUAL(player.color, test_new_color);
-        std::cout << "SetColor Test Finished !\n"
-                  << std::endl;
-    }
+    player.setColor(test_new_color);
+    CHECK_EQ(player.color, test_new_color);
+    ANN_END("setColor")
 }
 
-BOOST_AUTO_TEST_CASE(setScore)
+TEST(setScore)
 {
+    ANN_START("setScore")
     int test_new_score = 40;
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetScore Test Started ..." << std::endl;
-        player.setScore(test_new_score);
-        BOOST_CHECK_EQUAL(player.score, test_new_score);
-        std::cout << "SetScore Test Finished !\n"
-                  << std::endl;
-    }
+    player.setScore(test_new_score);
+    CHECK_EQ(player.score, test_new_score);
+    ANN_END("setScore")
 }
 
-BOOST_AUTO_TEST_CASE(setNumTrains)
+TEST(setNbWagons)
 {
+    ANN_START("setNbWagons")
     int test_new_nbWagons = 20;
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetNbWagons Test Started ..." << std::endl;
-        player.setNbWagons(test_new_nbWagons);
-        BOOST_CHECK_EQUAL(player.nbWagons, test_new_nbWagons);
-        std::cout << "SetNbWagons Test Finished !\n"
-                  << std::endl;
-    }
+    player.setNbWagons(test_new_nbWagons);
+    CHECK_EQ(player.nbWagons, test_new_nbWagons);
+    ANN_END("setNbWagons")
 }
 
-BOOST_AUTO_TEST_CASE(setNbStations)
+TEST(setNbStations)
 {
+    ANN_START("setNbStations")
     int test_new_nbStations = 9;
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetNbStations Test Started ..." << std::endl;
-        player.setNbStations(test_new_nbStations);
-        BOOST_CHECK_EQUAL(player.nbStations, test_new_nbStations);
-        std::cout << "SetNbStations Test Finished !\n"
-                  << std::endl;
-    }
+    player.setNbStations(test_new_nbStations);
+    CHECK_EQ(player.nbStations, test_new_nbStations);
+    ANN_END("setNbStations")
 }
 
-BOOST_AUTO_TEST_CASE(setNbRoads)
+TEST(setNbRoads)
 {
+    ANN_START("setNbRoads")
     int test_new_nbRoads = 6;
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetNbRoads Test Started ..." << std::endl;
-        player.setNbRoads(test_new_nbRoads);
-        BOOST_CHECK_EQUAL(player.nbRoads, test_new_nbRoads);
-        std::cout << "SetNbRoads Test Finished !\n"
-                  << std::endl;
-    }
+    player.setNbRoads(test_new_nbRoads);
+    CHECK_EQ(player.nbRoads, test_new_nbRoads);
+    ANN_END("setNbRoads")
 }
 
-BOOST_AUTO_TEST_CASE(setHand)
+TEST(setHand)
 {
+    ANN_START("setHand")
     std::string test_new_stationA_name = "berlin";
     std::string test_new_stationB_name = "rome";
     std::shared_ptr<mapState::Station> test_new_stationA = std::make_shared<mapState::Station>(test_new_stationA_name, nullptr, nullptr);
@@ -390,22 +346,18 @@ BOOST_AUTO_TEST_CASE(setHand)
     std::shared_ptr<cardsState::PlayerCards> test_new_hand = std::make_shared<cardsState::PlayerCards>(test_new_destCards, test_new_wagonCards);
 
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    {
-        std::cout << "SetHand Test Started ..." << std::endl;
-        player.setHand(test_new_hand);
-        BOOST_CHECK_EQUAL(player.hand, test_new_hand);
-        std::cout << "SetHand Test Finished !\n"
-                  << std::endl;
-    }
+    player.setHand(test_new_hand);
+    CHECK_EQ(player.hand, test_new_hand);
+    ANN_END("setHand")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Setters
+SUITE_END() // Setters
 
-BOOST_AUTO_TEST_SUITE_END() // GettersAndSetters
+SUITE_END() // GettersAndSetters
 
-BOOST_AUTO_TEST_SUITE(Operations)
+SUITE_START(Operations)
 
-BOOST_AUTO_TEST_SUITE(Internal)
+SUITE_START(Internal)
 
 cardsState::DestinationCard test_internal_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_internal_wagon_card(test_init_wagon_color);
@@ -413,78 +365,72 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_internal_dest_car
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_internal_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_internal_hand = std::make_shared<cardsState::PlayerCards>(test_internal_dest_cards, test_internal_wagon_cards);
 
-BOOST_AUTO_TEST_CASE(addScore)
+TEST(addScore)
 {
+    ANN_START("addScore")
     Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
     int test_new_score_to_add = 10;
-    {
-        std::cout << "AddScore Test Started ..." << std::endl;
-        BOOST_CHECK_EQUAL(player.score, test_init_player_score);
-        player.addScore(test_new_score_to_add);
-        BOOST_CHECK_EQUAL(player.score, test_new_score_to_add + test_init_player_score);
-        std::cout << "AddScore Test Finished !\n"
-                  << std::endl;
-    }
+    CHECK_EQ(player.score, test_init_player_score);
+    player.addScore(test_new_score_to_add);
+    CHECK_EQ(player.score, test_new_score_to_add + test_init_player_score);
+    ANN_END("addScore")
 }
 
-BOOST_AUTO_TEST_CASE(removeTrain)
+TEST(removeTrain)
 {
-
-    std::cout << "RemoveTrain Test Started ..." << std::endl;
+    ANN_START("removeTrain")
     {
-        std::cout << "enough trains case ..." << std::endl;
+        ANN_START("enough trains case")
         Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
         int nb_trains_to_remove = 3;
-        BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons);
+        CHECK_EQ(player.getNbWagons(), test_init_player_nbWagons);
 
         player.removeTrain(nb_trains_to_remove);
-        BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons - nb_trains_to_remove);
-        std::cout << "enough trains case finished !" << std::endl;
+        CHECK_EQ(player.getNbWagons(), test_init_player_nbWagons - nb_trains_to_remove);
+        ANN_END("enough trains case")
     }
     {
-        std::cout << "not enough trains case ..." << std::endl;
+        ANN_START("not enough trains case")
         Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
         int nb_trains_to_remove = 25;
-        BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons);
+        CHECK_EQ(player.getNbWagons(), test_init_player_nbWagons);
 
-        BOOST_CHECK_THROW(player.removeTrain(nb_trains_to_remove), std::invalid_argument);
-        BOOST_CHECK_EQUAL(player.getNbWagons(), test_init_player_nbWagons);
-        std::cout << "not enough trains case finished !" << std::endl;
+        CHECK_THROW(player.removeTrain(nb_trains_to_remove), std::invalid_argument);
+        CHECK_EQ(player.getNbWagons(), test_init_player_nbWagons);
+        ANN_END("not enough trains case")
     }
-    std::cout << "RemoveTrain Test Finished !\n"
-              << std::endl;
+    ANN_END("removeTrain")
 }
 
-BOOST_AUTO_TEST_CASE(RemoveStation)
+TEST(removeStation)
 {
-    std::cout << "RemoveStation Test Started ..." << std::endl;
+    ANN_START("removeStation")
     {
-        std::cout << "enough stations case ..." << std::endl;
+        ANN_START("enough stations case")
         Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
         int nb_stations_to_remove = 2;
-        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations);
+        CHECK_EQ(player.getNbStations(), test_init_player_nbStations);
 
         player.removeStation(nb_stations_to_remove);
-        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations - nb_stations_to_remove);
-        std::cout << "enough stations case finished !" << std::endl;
+        CHECK_EQ(player.getNbStations(), test_init_player_nbStations - nb_stations_to_remove);
+        ANN_END("enough stations case")
     }
     {
-        std::cout << "not enough stations case ..." << std::endl;
+        ANN_START("not enough stations case")
         Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
         int nb_stations_to_remove = 15;
-        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations);
+        CHECK_EQ(player.getNbStations(), test_init_player_nbStations);
 
-        BOOST_CHECK_THROW(player.removeStation(nb_stations_to_remove), std::invalid_argument);
-        BOOST_CHECK_EQUAL(player.getNbStations(), test_init_player_nbStations);
-        std::cout << "not enough stations case finished !" << std::endl;
+        CHECK_THROW(player.removeStation(nb_stations_to_remove), std::invalid_argument);
+        CHECK_EQ(player.getNbStations(), test_init_player_nbStations);
+        ANN_END("not enough stations case")
     }
-    std::cout << "RemoveStation Test Finished !\n"
-              << std::endl;
+    ANN_END("removeStation")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Internal
+SUITE_END() // Internal
 
-BOOST_AUTO_TEST_SUITE(Interactions)
+SUITE_START(Interactions)
 std::string test_interract_stationA_name = "A";
 std::string test_interract_stationB_name = "B";
 std::shared_ptr<mapState::MapState> test_interact_map = std::make_shared<mapState::MapState>(mapState::MapState::Test());
@@ -494,35 +440,33 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_interact_dest_car
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_interact_hand = std::make_shared<cardsState::PlayerCards>(test_interact_dest_cards, test_interact_wagon_cards);
 
-BOOST_AUTO_TEST_CASE(addRoad)
+TEST(addRoad)
 {
-    std::cout << "addRoad Test Started ..." << std::endl;
+    ANN_START("addRoad")
     playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-    BOOST_CHECK_EQUAL(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
     player.addRoad();
-    BOOST_CHECK_EQUAL(player.nbRoads, 6);
-    std::cout << "addRoad Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.nbRoads, 6);
+    ANN_END("addRoad")
 }
 
-BOOST_AUTO_TEST_CASE(addStation)
+TEST(addStation)
 {
-    std::cout << "addStation Test Started ..." << std::endl;
+    ANN_START("addStation")
     playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
 
-    BOOST_CHECK_EQUAL(player.nbStations, test_init_player_nbStations);
+    CHECK_EQ(player.nbStations, test_init_player_nbStations);
 
     player.addStation();
-    BOOST_CHECK_EQUAL(player.nbStations, 11);
-    std::cout << "addStation Test Finished !\n"
-              << std::endl;
+    CHECK_EQ(player.nbStations, 11);
+    ANN_END("addStation")
 }
 
-BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
+TEST(calculateDestinationPoints)
 {
-    std::cout << "calculateDestinationPoints Test Started ..." << std::endl;
+    ANN_START("calculateDestinationPoints")
     {
-        std::cout << "completed destinations not empty case ..." << std::endl;
+        ANN_START("completed destinations not empty case")
         int d1_points = 10;
         int d2_points = 8;
         std::shared_ptr<mapState::Station> d1_stationA = std::make_shared<mapState::Station>("A", nullptr, nullptr);
@@ -536,35 +480,34 @@ BOOST_AUTO_TEST_CASE(calculateDestinationPoints)
         std::shared_ptr<cardsState::PlayerCards> test_calculate_hand = std::make_shared<cardsState::PlayerCards>(dest_cards, wagon_cards);
 
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_calculate_hand);
-        BOOST_CHECK_EQUAL(player.score, test_init_player_score);
+        CHECK_EQ(player.score, test_init_player_score);
 
         player.completedDestinations.clear();
         player.completedDestinations.push_back(std::move(d1));
         player.completedDestinations.push_back(std::move(d2));
 
         int gained = player.calculateDestinationPoints();
-        BOOST_CHECK_EQUAL(gained, 18);
-        std::cout << "completed destinations not empty case finished !" << std::endl;
+        CHECK_EQ(gained, 18);
+        ANN_END("completed destinations not empty case")
     }
     {
-        std::cout << "completed destinations empty case ..." << std::endl;
+        ANN_START("completed destinations empty case")
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-        BOOST_CHECK_EQUAL(player.score, test_init_player_score);
+        CHECK_EQ(player.score, test_init_player_score);
 
         player.completedDestinations.clear();
 
         int gained = player.calculateDestinationPoints();
-        BOOST_CHECK_EQUAL(gained, 0);
-        std::cout << "completed destinations empty case finished !" << std::endl;
+        CHECK_EQ(gained, 0);
+        ANN_END("completed destinations empty case")
     }
-    std::cout << "calculateDestinationPoints Test Finished !\n"
-              << std::endl;
+    ANN_END("calculateDestinationPoints")
 }
 
 // TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
-BOOST_AUTO_TEST_CASE(isRoadBuildable)
+TEST(isRoadBuildable)
 {
-    std::cout << "isRoadBuildable Test Started ..." << std::endl;
+    ANN_START("isRoadBuildable")
     std::shared_ptr<mapState::Station> test_stationA = test_interact_map->getStationByName(test_interract_stationA_name);
     std::shared_ptr<mapState::Station> test_stationB = test_interact_map->getStationByName(test_interract_stationB_name);
     std::vector<std::shared_ptr<mapState::Road>> roads = test_interact_map->getRoadsBetweenStations(test_stationA, test_stationB);
@@ -573,71 +516,63 @@ BOOST_AUTO_TEST_CASE(isRoadBuildable)
     BOOST_REQUIRE(test_stationB);
     int test_nb_wagons_insufficient = 1;
     {
-        std::cout << "\tnot enough trains case started ...  " << std::endl;
+        ANN_START("not enough trains case")
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_nb_wagons_insufficient, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-        BOOST_CHECK_EQUAL(player.isRoadBuildable(test_interact_map, road), false);
-        std::cout << "\tnot enough trains case finished !\n"
-                  << std::endl;
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
+        ANN_END("not enough trains case")
     }
 
     {
-        std::cout << "\tnot enough wagon cards case started ...  " << std::endl;
+        ANN_START("not enough wagon cards case")
         std::vector<std::shared_ptr<cardsState::DestinationCard>> test_insufficient_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
         std::vector<std::shared_ptr<cardsState::WagonCard>> test_insufficient_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
         std::shared_ptr<cardsState::PlayerCards> test_insufficient_hand = std::make_shared<cardsState::PlayerCards>(test_insufficient_dest_cards, test_insufficient_wagon_cards);
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_insufficient_hand);
-        BOOST_CHECK_EQUAL(player.isRoadBuildable(test_interact_map, road), false);
-        std::cout << "\tnot enough wagon cards case finished !\n"
-                  << std::endl;
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
+        ANN_END("not enough wagon cards case")
     }
 
     std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("owner", PlayerColor::GREEN, 0, 10, 0, 0, test_interact_hand);
     {
-        std::cout << "\talready owned case started ...  " << std::endl;
+        ANN_START("already owned case")
         BOOST_REQUIRE(road);
         road->setOwner(test_owner);
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-        BOOST_CHECK_EQUAL(player.isRoadBuildable(test_interact_map, road), false);
-        std::cout << "\talready owned case finished !\n"
-                  << std::endl;
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
+        ANN_END("already owned case")
     }
-    std::cout << "canBuildRoad Test Finished !\n"
-              << std::endl;
+    ANN_END("isRoadBuildable")
 }
 // TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
-BOOST_AUTO_TEST_CASE(getClaimableRoads)
+TEST(getClaimableRoads)
 {
-    std::cout << "getClaimableRoads Test Started ..." << std::endl;
+    ANN_START("getClaimableRoads")
     {
-        std::cout << "sucess case started ...  " << std::endl;
+        
+        ANN_START("success case")
 
-        std::cout << "sucess case finished !\n"
-                  << std::endl;
+        ANN_END("success case")
     }
     {
-        std::cout << "insufficient wagons case started ...  " << std::endl;
+        ANN_START("insufficient wagons case")
 
-        std::cout << "insufficient wagons case finished !\n"
-                  << std::endl;
+        ANN_END("insufficient wagons case")
     }
     {
-        std::cout << "insufficient cards case started ...  " << std::endl;
+        ANN_START("insufficient cards case")
 
-        std::cout << "insufficient cards case finished !\n"
-                  << std::endl;
+        ANN_END("insufficient cards case")
     }
     {
-        std::cout << "blocked or owned case started ...  " << std::endl;
+        ANN_START("blocked or owned case")
 
-        std::cout << "blocked or owned case finished !\n"
-                  << std::endl;
+        ANN_END("blocked or owned case")
     }
-    std::cout << "getClaimableRoads Test Finished !\n"
-              << std::endl;
+    ANN_END("getClaimableRoads")
 }
 
 // TODO : complete tests
-BOOST_AUTO_TEST_CASE(getLongestPathLength)
+TEST(getLongestPathLength)
 {
 #if DEBUG
     std::cout << "getLongestPathLength Test Started ..." << std::endl;
@@ -656,7 +591,7 @@ BOOST_AUTO_TEST_CASE(getLongestPathLength)
 #endif
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Interactions
+SUITE_END() // Interactions
 
-BOOST_AUTO_TEST_SUITE_END() // Operations
+SUITE_END() // Operations
 /* vim: set sw=2 sts=2 et : */

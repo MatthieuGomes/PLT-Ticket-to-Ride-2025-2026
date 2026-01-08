@@ -9,6 +9,17 @@
 #define DEBUG_PRINT(x)
 #endif
 
+#define TEST(x) BOOST_AUTO_TEST_CASE(x)
+#define SUITE_START(x) BOOST_AUTO_TEST_SUITE(x)
+#define SUITE_END() BOOST_AUTO_TEST_SUITE_END()
+#define ANN_START(x) std::cout << "Starting " << x << " test..." << std::endl;
+#define ANN_END(x) std::cout << x << " test finished!" << std::endl;
+#define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
+#define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
+#define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
+#define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define CHECK(x) BOOST_CHECK(x)
+
 using namespace playersState;
 using namespace mapState;
 
@@ -52,28 +63,33 @@ std::shared_ptr<Station> stationA =
 std::shared_ptr<Station> stationB =
     std::make_shared<Station>(test_stationB_name, test_owner, vertexB);
 
-BOOST_AUTO_TEST_CASE(TestStaticAssert)
+TEST(TestStaticAssert)
 {
   BOOST_CHECK(1);
 }
 
-BOOST_AUTO_TEST_SUITE(Constructors)
+SUITE_START(Constructors)
 
-BOOST_AUTO_TEST_CASE(Empty)
+TEST(Default)
 {
+  ANN_START("Default Constructor")
   PlayersState ps;
   BOOST_CHECK(ps.getPlayers().empty());
-  BOOST_CHECK_EQUAL(PlayersState::nbPlayers, 0);
+  CHECK_EQ(PlayersState::nbPlayers, 0);
+  ANN_END("Default Constructor")
 }
-BOOST_AUTO_TEST_CASE(Default)
+TEST(Basic)
 {
+  ANN_START("Basic Constructor")
   PlayersState ps = PlayersState({test_owner});
-  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 1);
-  BOOST_CHECK_EQUAL(ps.getPlayers()[0], test_owner);
+  CHECK_EQ(ps.getPlayers().size(), 1);
+  CHECK_EQ(ps.getPlayers()[0], test_owner);
+  ANN_END("Basic Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(FromInfos)
+TEST(FromInfos)
 {
+  ANN_START("FromInfos Constructor")
   std::vector<playersInfos> infos = {
       std::make_tuple(test_init_player1_name, test_init_player1_color,
                       test_init_player1_score, test_init_player1_nbWagons,
@@ -82,31 +98,35 @@ BOOST_AUTO_TEST_CASE(FromInfos)
                       test_init_player2_score, test_init_player2_nbWagons,
                       test_init_player2_nbStations, test_init_player2_nbRoads, nullptr)};
   PlayersState ps = PlayersState(infos);
-  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
-  BOOST_CHECK_EQUAL(ps.getPlayers()[0]->getName(), test_init_player1_name);
-  BOOST_CHECK_EQUAL(ps.getPlayers()[1]->getName(), test_init_player2_name);
+  CHECK_EQ(ps.getPlayers().size(), 2);
+  CHECK_EQ(ps.getPlayers()[0]->getName(), test_init_player1_name);
+  CHECK_EQ(ps.getPlayers()[1]->getName(), test_init_player2_name);
+  ANN_END("FromInfos Constructor")
 }
 
-BOOST_AUTO_TEST_CASE(FromInitInfos)
+TEST(FromInitInfos)
 {
+
+  ANN_START("FromInitInfos Constructor")
   std::vector<playersInitInfos> infos = {
       std::make_tuple(test_init_player1_name, test_init_player1_color, nullptr),
       std::make_tuple(test_init_player2_name, test_init_player2_color, nullptr)};
   PlayersState ps = PlayersState::InitFromInfos(infos);
-  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
-  BOOST_CHECK_EQUAL(ps.getPlayers()[0]->getName(), test_init_player1_name);
-  BOOST_CHECK_EQUAL(ps.getPlayers()[1]->getName(), test_init_player2_name);
+  CHECK_EQ(ps.getPlayers().size(), 2);
+  CHECK_EQ(ps.getPlayers()[0]->getName(), test_init_player1_name);
+  CHECK_EQ(ps.getPlayers()[1]->getName(), test_init_player2_name);
+  ANN_END("FromInitInfos Constructor")
 }
 
+SUITE_END() // Constructors
 
-BOOST_AUTO_TEST_SUITE_END() // Constructors
+SUITE_START(GettersAndSetters)
 
-BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+SUITE_START(Getters)
 
-BOOST_AUTO_TEST_SUITE(Getters)
-
-BOOST_AUTO_TEST_CASE(GetPlayers)
+TEST(getPlayers)
 {
+  ANN_START("getPlayers")
   PlayersState ps;
 
   auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
@@ -129,17 +149,19 @@ BOOST_AUTO_TEST_CASE(GetPlayers)
   ps.setPlayers(v);
 
   auto result = ps.getPlayers();
-  BOOST_CHECK_EQUAL(result.size(), 2);
+  CHECK_EQ(result.size(), 2);
   BOOST_CHECK(result[0] == p1);
   BOOST_CHECK(result[1] == p2);
+  ANN_END("getPlayers")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Getters
+SUITE_END() // Getters
 
-BOOST_AUTO_TEST_SUITE(Setters)
+SUITE_START(Setters)
 
-BOOST_AUTO_TEST_CASE(SetPlayers)
+TEST(setPlayers)
 {
+  ANN_START("setPlayers")
   PlayersState ps;
 
   auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
@@ -160,84 +182,90 @@ BOOST_AUTO_TEST_CASE(SetPlayers)
 
   ps.setPlayers({p1, p2});
 
-  BOOST_CHECK_EQUAL(ps.getPlayers().size(), 2);
+  CHECK_EQ(ps.getPlayers().size(), 2);
+  ANN_END("setPlayers")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Setters
+SUITE_END() // Setters
 
-BOOST_AUTO_TEST_SUITE_END() // GettersAndSetters
+SUITE_END() // GettersAndSetters
 
-BOOST_AUTO_TEST_SUITE(Operations)
+SUITE_START(Operations)
 
-BOOST_AUTO_TEST_SUITE(Internal)
+SUITE_START(Internal)
 
-BOOST_AUTO_TEST_SUITE(Interactions)
+SUITE_START(Interactions)
 
-BOOST_AUTO_TEST_CASE(IsRoadClaimable)
+// TODO : add tests for isRoadClaimable and getClaimableRoads
+TEST(isRoadClaimable)
 {
+  ANN_START("isRoadClaimable")
+  ANN_END("isRoadClaimable")
 }
-
-BOOST_AUTO_TEST_CASE(Display)
+TEST(getClaimableRoads)
 {
-  std::cout << "Display Test Started ..." << std::endl;
-  {
-    std::cout << "empty case test started ..." << std::endl;
-    PlayersState ps;
-    std::stringstream buffer;
-    std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
-    ps.display();
-    std::cout.rdbuf(old);
-    std::string out = buffer.str();
-    
-    BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
-    BOOST_CHECK(out.find("Aucun joueur dans la partie.\n") != std::string::npos);
-    std::cout << "empty case test finished !" << std::endl;
-  }
-  {
-   
-    std::cout << "non-empty case test started ..." << std::endl;
-    PlayersState ps;
-
-    auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
-    auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
-
-    std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
-    std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {wagon};
-
-    auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
-    auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
-
-    auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
-                                       test_init_player1_score, test_init_player1_nbWagons,
-                                       test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
-    auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
-                                       test_init_player2_score, test_init_player2_nbWagons,
-                                       test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
-
-    ps.setPlayers({p1, p2});
-
-    std::stringstream buffer;
-    std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
-
-    ps.display();
-
-    std::cout.rdbuf(old);
-
-    std::string out = buffer.str();
-
-    BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
-    BOOST_CHECK(out.find("-----------------------------") != std::string::npos);
-    BOOST_CHECK(out.find("Alice") != std::string::npos);
-    BOOST_CHECK(out.find("Bob") != std::string::npos);
-    std::cout << "non-empty case test finished !" << std::endl;
-  }
-  std::cout << "Display Test Finished !\n"
-            << std::endl;
+  ANN_START("getClaimableRoads")
+  ANN_END("getClaimableRoads")
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Interactions
+TEST(display){
+    ANN_START("display"){
+        ANN_START("empty case")
+            PlayersState ps;
+std::stringstream buffer;
+std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+ps.display();
+std::cout.rdbuf(old);
+std::string out = buffer.str();
 
-BOOST_AUTO_TEST_SUITE_END() // Internal
-BOOST_AUTO_TEST_SUITE_END() // Operations
+BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
+BOOST_CHECK(out.find("Aucun joueur dans la partie.\n") != std::string::npos);
+ANN_END("empty case")
+}
+{
+
+  ANN_START("non-empty case")
+  PlayersState ps;
+
+  auto dest = std::make_shared<cardsState::DestinationCard>(stationA, stationB, 12, false);
+  auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED);
+
+  std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
+  std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {wagon};
+
+  auto hand1 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+  auto hand2 = std::make_shared<cardsState::PlayerCards>(destCards, wagonCardsVec);
+
+  auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
+                                     test_init_player1_score, test_init_player1_nbWagons,
+                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+  auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
+                                     test_init_player2_score, test_init_player2_nbWagons,
+                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+
+  ps.setPlayers({p1, p2});
+
+  std::stringstream buffer;
+  std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
+  ps.display();
+
+  std::cout.rdbuf(old);
+
+  std::string out = buffer.str();
+
+  BOOST_CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
+  BOOST_CHECK(out.find("-----------------------------") != std::string::npos);
+  BOOST_CHECK(out.find("Alice") != std::string::npos);
+  BOOST_CHECK(out.find("Bob") != std::string::npos);
+  ANN_END("non-empty case")
+}
+ANN_END("display")
+}
+
+SUITE_END() // Interactions
+
+SUITE_END() // Internal
+SUITE_END() // Operations
 
 /* vim: set sw=2 sts=2 et : */

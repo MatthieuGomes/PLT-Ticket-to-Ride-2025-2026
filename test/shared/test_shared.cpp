@@ -13,39 +13,50 @@
 #define DEBUG_PRINT(x)
 #endif
 
+#define TEST(x) BOOST_AUTO_TEST_CASE(x)
+#define SUITE_START(x) BOOST_AUTO_TEST_SUITE(x)
+#define SUITE_END() BOOST_AUTO_TEST_SUITE_END()
+#define ANN_START(x) std::cout << "Starting " << x << " test..." << std::endl;
+#define ANN_END(x) std::cout << x << " test finished!" << std::endl;
+#define CHECK_EQ(a, b) BOOST_CHECK_EQUAL(a, b)
+#define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
+#define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
+#define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define CHECK(x) BOOST_CHECK(x)
+
 // using namespace ::state; 
 
-BOOST_AUTO_TEST_CASE(TestStaticAssert)
+TEST(TestStaticAssert)
 {
   BOOST_CHECK(1);
 }
 
-BOOST_AUTO_TEST_SUITE(Constructors)
+SUITE_START(Constructors)
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Constructors
 
-BOOST_AUTO_TEST_SUITE(GettersAndSetters)
+SUITE_START(GettersAndSetters)
 
-BOOST_AUTO_TEST_SUITE(Getters)
+SUITE_START(Getters)
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Getters
 
-BOOST_AUTO_TEST_SUITE(Setters)
+SUITE_START(Setters)
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Setters
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // GettersAndSetters
 
-BOOST_AUTO_TEST_SUITE(Operations)
+SUITE_START(Operations)
 
-BOOST_AUTO_TEST_SUITE(Internal)
+SUITE_START(Internal)
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Internal
 
-BOOST_AUTO_TEST_SUITE(Interactions)
+SUITE_START(Interactions)
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Interactions
 
-BOOST_AUTO_TEST_SUITE_END()
+SUITE_END() // Operations
 
 /* vim: set sw=2 sts=2 et : */
