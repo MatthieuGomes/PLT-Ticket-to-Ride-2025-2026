@@ -25,6 +25,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::mapState;
@@ -35,7 +36,7 @@ using TunnelInfo = std::pair<StationPair, TunnelDetail>;
 
 TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+  CHECK(1);
 }
 
 std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
@@ -88,7 +89,7 @@ TEST(Init)
   CHECK_EQ(test_tunnel.stationB, test_stationB);
   CHECK_EQ(test_tunnel.color, test_color);
   CHECK_EQ(test_tunnel.length, test_length);
-  BOOST_CHECK(test_tunnel.edge != nullptr);
+  CHECK(test_tunnel.edge != nullptr);
   ANN_END("Init Constructor")
 }
 

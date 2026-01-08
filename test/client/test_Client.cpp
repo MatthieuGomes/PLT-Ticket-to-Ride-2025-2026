@@ -19,12 +19,13 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 
 TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+  CHECK(1);
 }
 
 TEST(SFML)
@@ -34,7 +35,7 @@ TEST(SFML)
 
 
     ::sf::Texture texture;
-    BOOST_CHECK(texture.getSize() == ::sf::Vector2<unsigned int> {});
+    CHECK(texture.getSize() == ::sf::Vector2<unsigned int> {});
   } */
 }
 

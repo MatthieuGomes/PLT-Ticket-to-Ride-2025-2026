@@ -20,6 +20,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::cardsState;
@@ -137,7 +138,7 @@ TEST(BatchDeck)
 
         for (size_t i = 0; i < 3; i++)
         {
-            BOOST_REQUIRE(deck.cards[i]);
+            REQUIRE(deck.cards[i]);
             CHECK_EQ(deck.cards[i]->color, cardArgs[i]);
         }
         ANN_END("Batch Constructor<WagonCard>")
@@ -170,8 +171,8 @@ TEST(BatchDeck)
 
         CHECK_EQ(deck.countCards(), 2);
 
-        BOOST_REQUIRE(deck.cards[0]);
-        BOOST_REQUIRE(deck.cards[1]);
+        REQUIRE(deck.cards[0]);
+        REQUIRE(deck.cards[1]);
 
         CHECK_EQ(deck.cards[0]->getstationA()->getName(), "StationA");
         CHECK_EQ(deck.cards[0]->getstationB()->getName(), "StationB");

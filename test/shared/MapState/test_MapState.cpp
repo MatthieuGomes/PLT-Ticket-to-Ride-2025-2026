@@ -26,6 +26,7 @@
 #define CHECK_NE(a, b) BOOST_CHECK_NE(a, b)
 #define CHECK_NTHROW(...) BOOST_CHECK_NO_THROW(__VA_ARGS__)
 #define CHECK_THROW(...) BOOST_CHECK_THROW(__VA_ARGS__)
+#define REQUIRE(...) BOOST_REQUIRE(__VA_ARGS__)
 #define CHECK(x) BOOST_CHECK(x)
 
 using namespace ::mapState;
@@ -41,7 +42,7 @@ using FerryInfo = std::pair<StationPair, FerryDetail>;
 
 TEST(TestStaticAssert)
 {
-  BOOST_CHECK(1);
+  CHECK(1);
 }
 
 SUITE_START(Constructors)
@@ -53,7 +54,7 @@ TEST(Default)
 #ifdef DEBUG
   map_state.display();
 #endif
-  BOOST_CHECK(map_state.gameGraph != nullptr);
+  CHECK(map_state.gameGraph != nullptr);
   CHECK_EQ(map_state.stations.size(), 0);
   CHECK_EQ(map_state.roads.size(), 0);
   ANN_END("Default Constructor")
@@ -84,14 +85,14 @@ TEST(Wrapper)
   CHECK_EQ(map_state.roads.size(), 3); // 1 road + 1 tunnel + 1 ferry
   for (int i = 0; i < static_cast<int>(map_state.stations.size()); i++)
   {
-    BOOST_CHECK(map_state.stations[i]->name == "Station1" || map_state.stations[i]->name == "Station2");
+    CHECK(map_state.stations[i]->name == "Station1" || map_state.stations[i]->name == "Station2");
   }
   for (int i = 0; i < static_cast<int>(map_state.roads.size()); i++)
   {
     const std::string &stationAName = map_state.roads[i]->stationA->getName();
     const std::string &stationBName = map_state.roads[i]->stationB->getName();
-    BOOST_CHECK(stationAName == station1->getName() || stationAName == station2->getName());
-    BOOST_CHECK(stationBName == station1->getName() || stationBName == station2->getName());
+    CHECK(stationAName == station1->getName() || stationAName == station2->getName());
+    CHECK(stationBName == station1->getName() || stationBName == station2->getName());
   }
   ANN_END("Wrapper Constructor")
 }
@@ -393,7 +394,7 @@ TEST(getStationByName)
     test_map_state.display();
 #endif
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("A");
-    BOOST_CHECK(station != nullptr);
+    CHECK(station != nullptr);
     CHECK_EQ(station->getName(), "A");
     ANN_END("defined case")
   }
@@ -404,7 +405,7 @@ TEST(getStationByName)
     test_map_state.display();
 #endif
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("nonexistent");
-    BOOST_CHECK(station == nullptr);
+    CHECK(station == nullptr);
     ANN_END("undefined case")
   }
   ANN_END("getStationByName")
@@ -490,7 +491,7 @@ TEST(findShortestPath)
   std::cout << "Number of Edges: " << shortestPath.NUMEDGES << "\n";
 #endif
 #ifdef DEBUG
-  BOOST_CHECK(!shortestPath.STATIONS.empty());
+  CHECK(!shortestPath.STATIONS.empty());
   CHECK_EQ(shortestPath.STATIONS.front(), src);
   CHECK_EQ(shortestPath.STATIONS.back(), dest);
   ANN_END("FindShortestPath")
