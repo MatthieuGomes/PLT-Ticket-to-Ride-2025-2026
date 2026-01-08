@@ -21,6 +21,6 @@ namespace client
     void Client::printState()
     {
         // @Yosra + @Chahrazed + @Theo will call here the printState method from state class
-        this->currentGameState->printState();
+        this->currentGameState->display();
     }
 }

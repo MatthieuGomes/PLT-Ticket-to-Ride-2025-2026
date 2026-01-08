@@ -11,7 +11,7 @@ namespace state
         // Initialize state variables here
     }
     // rename to display
-    void State::printState()
+    void State::display()
     {
         std::string indentation = std::string(0, '\t');
         std::cout << "¤¤¤¤¤ STATE ¤¤¤¤¤" << std::endl;
