@@ -45,6 +45,18 @@ namespace cardsState
         {ColorCard::WHITE, "WHITE"},
         {ColorCard::LOCOMOTIVE, "LOCOMOTIVE"}};
 
+    ColorCardCount wagonCardsCompo[9] = {
+        {ColorCard::RED, WagonCard::otherInitCardsCount},
+        {ColorCard::BLUE, WagonCard::otherInitCardsCount},
+        {ColorCard::GREEN, WagonCard::otherInitCardsCount},
+        {ColorCard::BLACK, WagonCard::otherInitCardsCount},
+        {ColorCard::YELLOW, WagonCard::otherInitCardsCount},
+        {ColorCard::ORANGE, WagonCard::otherInitCardsCount},
+        {ColorCard::PINK, WagonCard::otherInitCardsCount},
+        {ColorCard::WHITE, WagonCard::otherInitCardsCount},
+        {ColorCard::LOCOMOTIVE, WagonCard::locomotiveInitCardsCount},
+    };
+
     WagonCard::WagonCard()
     {
         this->color = ColorCard::UNKNOWN;
@@ -81,18 +93,7 @@ namespace cardsState
     
     std::vector<std::shared_ptr<WagonCard>> WagonCard::StartCards()
     {
-        std::pair<ColorCard, int> infos[9] = {
-            {ColorCard::RED, WagonCard::otherInitCardsCount},
-            {ColorCard::BLUE, WagonCard::otherInitCardsCount},
-            {ColorCard::GREEN, WagonCard::otherInitCardsCount},
-            {ColorCard::BLACK, WagonCard::otherInitCardsCount},
-            {ColorCard::YELLOW, WagonCard::otherInitCardsCount},
-            {ColorCard::ORANGE, WagonCard::otherInitCardsCount},
-            {ColorCard::PINK, WagonCard::otherInitCardsCount},
-            {ColorCard::WHITE, WagonCard::otherInitCardsCount},
-            {ColorCard::LOCOMOTIVE, WagonCard::locomotiveInitCardsCount},
-        };
-        std::vector<std::shared_ptr<WagonCard>> wagonCards = WagonCard::OrderedBatch(infos);
+        std::vector<std::shared_ptr<WagonCard>> wagonCards = WagonCard::OrderedBatch(wagonCardsCompo);
         std::vector<std::shared_ptr<WagonCard>> shuffledWagonCards = Deck<WagonCard>::shuffle(wagonCards);
         return shuffledWagonCards;
     }

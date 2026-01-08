@@ -45,20 +45,24 @@ namespace mapState
         DEBUG_PRINT("\tFerry " << this->id << " Destroyed !");
     }
 
-    void Ferry::display()
+    void Ferry::display(int indent)
     {
-        DEBUG_PRINT("\tFerry Details:");
-        Ferry::_display();
+        std::string indentation(indent, '\t');
+        std::cout << indentation << "-----FERRY-----" << std::endl;
+        Ferry::_display(indent);
+        std::cout << indentation << "----------------" << std::endl;
+    }
+    void Ferry::_display(int indent)
+    {
+        Road::_display(indent);
+        std::string indentation(indent, '\t');
+        std::cout << indentation << "Locomotives: " << this->locomotives << std::endl;
     }
     int Ferry::getLocomotives()
     {
         return this->locomotives;
     }
-    void Ferry::_display()
-    {
-        Road::_display();
-        cout << "\tNumber of Locomotives: " << this->locomotives << "\n";
-    }
+    
     std::vector<std::shared_ptr<Ferry>> Ferry::BatchConstructor(std::vector<FerryInfo> tunnelsInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
         DEBUG_PRINT("Ferry BatchConstructor started ...");

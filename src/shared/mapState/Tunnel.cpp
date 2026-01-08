@@ -43,15 +43,17 @@ namespace mapState
         DEBUG_PRINT("\tTunnel " << this->id << " Destroyed !");
     }
 
-    void Tunnel::display()
+    void Tunnel::display(int indent)
     {
-        cout << "\tTunnel Details:\n";
-        Tunnel::_display();
+        std::string indentation(indent, '\t');
+        std::cout << indentation << "-----TUNNEL-----"<<std::endl;
+        Tunnel::_display(indent);
+        std::cout << indentation << "----------------"<<std::endl;
     }
 
-    void Tunnel::_display()
+    void Tunnel::_display(int indent)
     {
-        Road::_display();
+        Road::_display(indent);
     }
     std::vector<std::shared_ptr<Tunnel>> Tunnel::BatchConstructor(std::vector<TunnelInfo> tunnelsInfos, std::shared_ptr<boost::adjacency_list<>> gameGraph)
     {
