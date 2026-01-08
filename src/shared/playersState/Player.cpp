@@ -42,13 +42,13 @@ namespace playersState
                                             PlayerColor::YELLOW,
                                             PlayerColor::UNKNOWN};
 
-   // std::unordered_map<PlayerColor, std::string> Player::ColorsNames = {
-   //       {PlayerColor::RED, "RED"},
-   //       {PlayerColor::BLUE, "BLUE"},
-   //       {PlayerColor::GREEN, "GREEN"},
-   //       {PlayerColor::BLACK, "BLACK"},
-   //       {PlayerColor::YELLOW, "YELLOW"},
-   //       {PlayerColor::UNKNOWN, "UNKNOWN"}};
+   std::unordered_map<PlayerColor, std::string> Player::ColorsNames = {
+         {PlayerColor::RED, "RED"},
+         {PlayerColor::BLUE, "BLUE"},
+         {PlayerColor::GREEN, "GREEN"},
+         {PlayerColor::BLACK, "BLACK"},
+         {PlayerColor::YELLOW, "YELLOW"},
+         {PlayerColor::UNKNOWN, "UNKNOWN"}};
 
    Player::Player()
    {

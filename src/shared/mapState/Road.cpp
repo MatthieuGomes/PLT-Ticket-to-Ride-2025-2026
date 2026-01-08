@@ -33,18 +33,18 @@ namespace mapState
         RoadColor::NONE
     };
 
-    // std::unordered_map<RoadColor, std::string> Road::ColorsNames = {
-    //     {RoadColor::UNKNOWN, "UNKNOWN"},
-    //     {RoadColor::RED, "RED"},
-    //     {RoadColor::BLUE, "BLUE"},
-    //     {RoadColor::GREEN, "GREEN"},
-    //     {RoadColor::BLACK, "BLACK"},
-    //     {RoadColor::YELLOW, "YELLOW"},
-    //     {RoadColor::ORANGE, "ORANGE"},
-    //     {RoadColor::PINK, "PINK"},
-    //     {RoadColor::WHITE, "WHITE"},
-    //     {RoadColor::NONE, "NONE"}
-    // };
+    std::unordered_map<RoadColor, std::string> Road::ColorsNames = {
+        {RoadColor::UNKNOWN, "UNKNOWN"},
+        {RoadColor::RED, "RED"},
+        {RoadColor::BLUE, "BLUE"},
+        {RoadColor::GREEN, "GREEN"},
+        {RoadColor::BLACK, "BLACK"},
+        {RoadColor::YELLOW, "YELLOW"},
+        {RoadColor::ORANGE, "ORANGE"},
+        {RoadColor::PINK, "PINK"},
+        {RoadColor::WHITE, "WHITE"},
+        {RoadColor::NONE, "NONE"}
+    };
 
 
     Road::Road() {
