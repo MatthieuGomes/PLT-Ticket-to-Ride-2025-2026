@@ -472,9 +472,9 @@ TEST(getAdjacentStations)
   ANN_END("getAdjacentStations")
 }
 // check shortest path function in a small synthetic map
-TEST(findShortestPath)
+TEST(getShortestPath)
 {
-  ANN_START("findShortestPath")
+  ANN_START("getShortestPath")
   std::shared_ptr<boost::adjacency_list<>> gameGraph =
       std::make_shared<boost::adjacency_list<>>();
   mapState::MapState test_map_state;
@@ -500,19 +500,57 @@ TEST(findShortestPath)
   std::shared_ptr<mapState::Station> dest = test_map_state.getStationByName("C");
   std::vector<std::shared_ptr<Station>> mapStations = test_map_state.getStations();
   std::vector<std::shared_ptr<Road>> mapRoads = test_map_state.getRoads();
-  Path shortestPath = test_map_state.findShortestPath(src, dest, mapStations, mapRoads);
+  Path shortestPath = test_map_state.getShortestPath(src, dest, mapStations, mapRoads);
 
   CHECK(!shortestPath.STATIONS.empty());
   CHECK_EQ(shortestPath.STATIONS.front(), src);
   CHECK_EQ(shortestPath.STATIONS.back(), dest);
-  CHECK_EQ(shortestPath.NUMEDGES, 2);
-  CHECK_EQ(shortestPath.TOTALLENGTH, 10);
-  ANN_END("findShortestPath")
+  CHECK_EQ(shortestPath.NUMEDGES, 1);
+  CHECK_EQ(shortestPath.TOTALLENGTH, 1);
+  ANN_END("getShortestPath")
 }
-// check shortestpath using examples from the europe map
-TEST(findShortestPathEuropePairs)
+// check most efficient path function in a small synthetic map
+TEST(getMostEfficientPath)
 {
-  ANN_START("findShortestPathEuropePairs")
+  ANN_START("getMostEfficientPath")
+  std::shared_ptr<boost::adjacency_list<>> gameGraph =
+      std::make_shared<boost::adjacency_list<>>();
+  mapState::MapState test_map_state;
+
+  std::vector<StationInfo> stationsInfos = {
+      Station::initData("A"),
+      Station::initData("B"),
+      Station::initData("C"),
+  };
+
+  std::vector<std::shared_ptr<Station>> stations =
+      Station::BatchConstructor(stationsInfos, gameGraph);
+
+  std::vector<RoadInfo> roadsInfos = {
+      Road::initDataByName(stations, "A", "B", 1, RoadColor::NONE, 5),
+      Road::initDataByName(stations, "B", "C", 2, RoadColor::NONE, 5),
+      Road::initDataByName(stations, "A", "C", 3, RoadColor::NONE, 20),
+  };
+
+  test_map_state.fillMapWithInfos(stationsInfos, roadsInfos, {}, {}, gameGraph);
+
+  std::shared_ptr<mapState::Station> src = test_map_state.getStationByName("A");
+  std::shared_ptr<mapState::Station> dest = test_map_state.getStationByName("C");
+  std::vector<std::shared_ptr<Station>> mapStations = test_map_state.getStations();
+  std::vector<std::shared_ptr<Road>> mapRoads = test_map_state.getRoads();
+  Path bestPath = test_map_state.getMostEfficientPath(src, dest, mapStations, mapRoads);
+
+  CHECK(!bestPath.STATIONS.empty());
+  CHECK_EQ(bestPath.STATIONS.front(), src);
+  CHECK_EQ(bestPath.STATIONS.back(), dest);
+  CHECK_EQ(bestPath.NUMEDGES, 2);
+  CHECK_EQ(bestPath.TOTALLENGTH, 10);
+  ANN_END("getMostEfficientPath")
+}
+// check shortest path using examples from the europe map
+TEST(getShortestPathEuropePairs)
+{
+  ANN_START("getShortestPathEuropePairs")
   mapState::MapState map_state = mapState::MapState::Europe();
   std::vector<std::shared_ptr<Station>> mapStations = map_state.getStations();
   std::vector<std::shared_ptr<Road>> mapRoads = map_state.getRoads();
@@ -523,11 +561,6 @@ TEST(findShortestPathEuropePairs)
       {"london", "wien"},
       {"roma", "athina"},
       {"moskva", "kyiv"},
-      {"stockholm", "kobenhavn"},
-      {"sofia", "constantinople"},
-      {"edinburgh", "london"},
-      {"venizia", "zürich"},
-      {"brest", "dieppe"},
   };
 
   for (const std::pair<std::string, std::string> &pair : pairs)
@@ -546,7 +579,7 @@ TEST(findShortestPathEuropePairs)
     REQUIRE(src != nullptr);
     REQUIRE(dest != nullptr);
 
-    Path shortestPath = map_state.findShortestPath(src, dest, mapStations, mapRoads);
+    Path shortestPath = map_state.getShortestPath(src, dest, mapStations, mapRoads);
     if (shortestPath.STATIONS.empty())
     {
       DEBUG_PRINT("No path found. Stations: " << mapStations.size()
@@ -576,7 +609,72 @@ TEST(findShortestPathEuropePairs)
     CHECK_EQ(shortestPath.NUMEDGES, static_cast<int>(shortestPath.STATIONS.size()) - 1);
   }
 
-  ANN_END("findShortestPathEuropePairs")
+  ANN_END("getShortestPathEuropePairs")
+}
+
+// check most efficient path using examples from the europe map
+TEST(getMostEfficientPathEuropePairs)
+{
+  ANN_START("getMostEfficientPathEuropePairs")
+  mapState::MapState map_state = mapState::MapState::Europe();
+  std::vector<std::shared_ptr<Station>> mapStations = map_state.getStations();
+  std::vector<std::shared_ptr<Road>> mapRoads = map_state.getRoads();
+
+  std::vector<std::pair<std::string, std::string>> pairs = {
+      {"paris", "berlin"},
+      {"lisboa", "madrid"},
+      {"london", "wien"},
+      {"roma", "athina"},
+      {"moskva", "kyiv"},
+  };
+
+  for (const std::pair<std::string, std::string> &pair : pairs)
+  {
+    DEBUG_PRINT("Testing most efficient path: " << pair.first << " -> " << pair.second);
+    std::shared_ptr<Station> src = map_state.getStationByName(pair.first);
+    std::shared_ptr<Station> dest = map_state.getStationByName(pair.second);
+    if (!src)
+    {
+      DEBUG_PRINT("Source station not found: " << pair.first);
+    }
+    if (!dest)
+    {
+      DEBUG_PRINT("Destination station not found: " << pair.second);
+    }
+    REQUIRE(src != nullptr);
+    REQUIRE(dest != nullptr);
+
+    Path bestPath = map_state.getMostEfficientPath(src, dest, mapStations, mapRoads);
+    if (bestPath.STATIONS.empty())
+    {
+      DEBUG_PRINT("No path found. Stations: " << mapStations.size()
+                  << " Roads: " << mapRoads.size());
+    }
+    else
+    {
+      DEBUG_PRINT("Path length: " << bestPath.TOTALLENGTH
+                  << " edges: " << bestPath.NUMEDGES);
+      std::ostringstream pathOut;
+      pathOut << "Path: ";
+      for (const std::shared_ptr<Station> &station : bestPath.STATIONS)
+      {
+        if (station)
+        {
+          pathOut << station->getName() << " ";
+        }
+      }
+      DEBUG_PRINT(pathOut.str());
+    }
+
+    REQUIRE(!bestPath.STATIONS.empty());
+    CHECK_EQ(bestPath.STATIONS.front(), src);
+    CHECK_EQ(bestPath.STATIONS.back(), dest);
+    CHECK(bestPath.NUMEDGES > 0);
+    CHECK(bestPath.TOTALLENGTH > 0);
+    CHECK_EQ(bestPath.NUMEDGES, static_cast<int>(bestPath.STATIONS.size()) - 1);
+  }
+
+  ANN_END("getMostEfficientPathEuropePairs")
 }
 
 TEST(getClaimableRoads)

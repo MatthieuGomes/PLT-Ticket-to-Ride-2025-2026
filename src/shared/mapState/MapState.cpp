@@ -380,12 +380,13 @@ namespace mapState
         return Road::getClaimableRoads(this->roads, nbPlayers, player);
     }
 
-    // Finds the shortest path using Dijkstra 
-    Path MapState::findShortestPath(
+    // shared helper for pathfinding with Dijkstra algorithm
+    Path MapState::buildPathWithDijkstra(
         std::shared_ptr<Station> src,
         std::shared_ptr<Station> dest,
-        std::vector<std::shared_ptr<Station>> stations,
-        std::vector<std::shared_ptr<Road>> roads)
+        const std::vector<std::shared_ptr<Station>> &stations,
+        const std::vector<std::shared_ptr<Road>> &roads,
+        bool useRoadLength)
     {
         Path path;
         path.TOTALLENGTH = 0;
@@ -450,7 +451,14 @@ namespace mapState
                 boost::add_edge(aIt->second, bIt->second, graph);
             if (edgeResult.second)
             {
-                edgeWeights[edgeResult.first] = road->getLength();
+                if (useRoadLength)
+                {
+                    edgeWeights[edgeResult.first] = road->getLength();
+                }
+                else
+                {
+                    edgeWeights[edgeResult.first] = 1;
+                }
             }
         }
 
@@ -519,6 +527,26 @@ namespace mapState
             path.TOTALLENGTH = distances[destIndex];
         }
         return path;
+    }
+
+    // get shortest path by number of roads (sets edge weight = 1)
+    Path MapState::getShortestPath(
+        std::shared_ptr<Station> src,
+        std::shared_ptr<Station> dest,
+        std::vector<std::shared_ptr<Station>> stations,
+        std::vector<std::shared_ptr<Road>> roads)
+    {
+        return this->buildPathWithDijkstra(src, dest, stations, roads, false);
+    }
+
+    // gets most efficient path by road length (edge weight = road length)
+    Path MapState::getMostEfficientPath(
+        std::shared_ptr<Station> src,
+        std::shared_ptr<Station> dest,
+        std::vector<std::shared_ptr<Station>> stations,
+        std::vector<std::shared_ptr<Road>> roads)
+    {
+        return this->buildPathWithDijkstra(src, dest, stations, roads, true);
     }
 
     std::vector<std::shared_ptr<Station>> MapState::getAdjacentStations(std::shared_ptr<Station> station)
