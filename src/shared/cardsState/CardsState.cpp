@@ -27,13 +27,13 @@ namespace cardsState
   {
   }
 
-  CardsState CardsState::Europe(std::vector<std::shared_ptr<mapState::Station>> stations)
+  CardsState CardsState::Europe(std::vector<std::shared_ptr<mapState::Station>> stations, int nbPlayers)
   {
     CardsState cardsState;
     cardsState.outOfGameCards = std::make_shared<OutOfGame<DestinationCard>>();
     cardsState.gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>(SharedDeck<DestinationCard>::Europe(stations));
     cardsState.gameWagonCards = std::make_shared<SharedDeck<WagonCard>>(SharedDeck<WagonCard>::Init());
-    cardsState.playersCards = PlayerCards::BatchStartHand(cardsState.gameDestinationCards, cardsState.gameWagonCards);
+    cardsState.playersCards = PlayerCards::BatchStartHand(cardsState.gameDestinationCards, cardsState.gameWagonCards, nbPlayers);
     cardsState.gameDestinationCards->Setup(cardsState.outOfGameCards);
     cardsState.gameWagonCards->Setup();
     return cardsState;
