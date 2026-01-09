@@ -404,6 +404,12 @@ TEST(getClaimableRoads)
   }
   ANN_END("getClaimableRoads")
 }
+TEST(getRoadsOwnedByPlayer){
+
+}
+TEST(getRoadsUsableByPlayer){
+  
+}
 // TODO : Add tests for display and _display methods
 TEST(_display){
     ANN_START("_display")

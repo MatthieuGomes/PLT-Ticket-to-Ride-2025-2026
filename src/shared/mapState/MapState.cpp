@@ -460,8 +460,36 @@ namespace mapState
         return station->getAdjacentStations(this->roads);
     }
     // TODO: add method to  get  all  roads owned  by player
+    std::vector<std::shared_ptr<Road>> MapState::getRoadsOwnedByPlayer(std::shared_ptr<playersState::Player> player)
+    {
+        return Road::getRoadsOwnedByPlayer(player,this->roads);
+    }
     // TODO: add method to get  all usable roads
+    std::vector<std::shared_ptr<Road>> MapState::getRoadsUsableByPlayer(std::shared_ptr<playersState::Player> player)
+    {
+        return Road::getRoadsUsableByPlayer(player,this->roads);
+    }
     // TODO: add method is destination reached
+    bool MapState::isDestinationReached(std::vector<std::shared_ptr<Road>> playerRoads, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
+    {      
+        // @fetohiaras needs your expertise here :)
+        return true;
+    }
+    
+    bool MapState::isDestinationReached(std::shared_ptr<playersState::Player> player, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
+    {
+        std::vector<std::shared_ptr<Road>> playerRoads = this->getRoadsOwnedByPlayer(player); // TODO: replace with usable roads when the function will be available
+        
+        // @fetohiaras needs your expertise here :)
+        return MapState::isDestinationReached(playerRoads, stationA, stationB);
+    }
+    bool MapState::isDestinationReached(std::shared_ptr<playersState::Player> player, std::shared_ptr<cardsState::DestinationCard> destinationCard)
+    {
+        std::shared_ptr<Station> stationA = destinationCard->getstationA();
+        std::shared_ptr<Station> stationB = destinationCard->getstationB();
+        // @fetohiaras needs your expertise here :)
+        return MapState::isDestinationReached(player, stationA, stationB);
+    }
     std::string MapState::toString() const
     {
         std::ostringstream out;
