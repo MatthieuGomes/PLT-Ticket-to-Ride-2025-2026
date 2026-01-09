@@ -211,14 +211,22 @@ SUITE_START(Interactions)
 TEST(Display)
 {
     ANN_START("display");
+
+    std::stringstream buffer;
+    std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
     std::shared_ptr<Station> stationA =
         std::make_shared<Station>("StationA", nullptr, nullptr);
     std::shared_ptr<Station> stationB =
         std::make_shared<Station>("StationB", nullptr, nullptr);
     int test_points = 10;
     DestinationCard card(stationA, stationB, test_points, false);
-    CHECK_NTHROW(card.display());
-    CHECK_NTHROW(card.display(1));
+    card.display();
+    std::cout.rdbuf(old);
+    std::string out = buffer.str();
+    CHECK(out.find("----- DESTINATION CARD -----" )!= std::string::npos);
+    CHECK(out.find("-------------------------" )!= std::string::npos);
+
     ANN_END("display");
 }
 TEST(_Display)
@@ -230,9 +238,19 @@ TEST(_Display)
         std::make_shared<Station>("StationB", nullptr, nullptr);
     int test_points = 10;
     DestinationCard card(stationA, stationB, test_points, false);
-    CHECK_NTHROW(card._display());
-    CHECK_NTHROW(card._display(1));
-    ANN_END("_display");
+
+    std::stringstream buffer;
+    std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
+    card.display();
+    std::cout.rdbuf(old);
+
+    std::string out = buffer.str();
+    CHECK(out.find("Station A: StationA") != std::string::npos);
+    CHECK(out.find("Station B: StationB") != std::string::npos);
+    CHECK(out.find("Points: 10") != std::string::npos);
+    CHECK(out.find("Is Long: No") != std::string::npos);
+
 }
 
 SUITE_END() // Interactions
