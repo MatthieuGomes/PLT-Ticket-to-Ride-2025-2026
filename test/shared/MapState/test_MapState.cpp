@@ -6,6 +6,7 @@
 #include "../../src/shared/playersState/Player.h"
 #include "../../src/shared/mapState/Tunnel.h"
 #include "../../src/shared/mapState/Ferry.h"
+#include "../../src/shared/cardsState/DestinationCard.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <memory>
 
@@ -558,7 +559,7 @@ TEST(getShortestPathEuropePairs)
   std::vector<std::pair<std::string, std::string>> pairs = {
       {"paris", "berlin"},
       {"lisboa", "madrid"},
-      {"london", "wien"},
+      {"frankfurt", "wien"},
       {"roma", "athina"},
       {"moskva", "kyiv"},
   };
@@ -623,7 +624,7 @@ TEST(getMostEfficientPathEuropePairs)
   std::vector<std::pair<std::string, std::string>> pairs = {
       {"paris", "berlin"},
       {"lisboa", "madrid"},
-      {"london", "wien"},
+      {"frankfurt", "wien"},
       {"roma", "athina"},
       {"moskva", "kyiv"},
   };
@@ -675,6 +676,77 @@ TEST(getMostEfficientPathEuropePairs)
   }
 
   ANN_END("getMostEfficientPathEuropePairs")
+}
+
+// check isDestinationReached functions
+TEST(isDestinationReachedStatic)
+{
+  ANN_START("isDestinationReachedStatic")
+  mapState::MapState map_state = mapState::MapState::Europe();
+  std::shared_ptr<Station> lisboa = map_state.getStationByName("lisboa");
+  std::shared_ptr<Station> madrid = map_state.getStationByName("madrid");
+  std::shared_ptr<Station> paris = map_state.getStationByName("paris");
+  REQUIRE(lisboa != nullptr);
+  REQUIRE(madrid != nullptr);
+  REQUIRE(paris != nullptr);
+
+  std::vector<std::shared_ptr<Road>> lisboaMadrid = map_state.getRoadsBetweenStations(lisboa, madrid);
+  REQUIRE(!lisboaMadrid.empty());
+
+  CHECK(MapState::isDestinationReached(lisboaMadrid, lisboa, madrid));
+  CHECK(!MapState::isDestinationReached(lisboaMadrid, lisboa, paris));
+  ANN_END("isDestinationReachedStatic")
+}
+
+// check isDestinationReached calls via player
+TEST(isDestinationReachedPlayer)
+{
+  ANN_START("isDestinationReachedPlayer")
+  mapState::MapState map_state = mapState::MapState::Europe();
+  std::shared_ptr<Station> lisboa = map_state.getStationByName("lisboa");
+  std::shared_ptr<Station> madrid = map_state.getStationByName("madrid");
+  std::shared_ptr<Station> paris = map_state.getStationByName("paris");
+  REQUIRE(lisboa != nullptr);
+  REQUIRE(madrid != nullptr);
+  REQUIRE(paris != nullptr);
+
+  std::vector<std::shared_ptr<Road>> lisboaMadrid = map_state.getRoadsBetweenStations(lisboa, madrid);
+  REQUIRE(!lisboaMadrid.empty());
+
+  std::shared_ptr<playersState::Player> player =
+      std::make_shared<playersState::Player>("Tester", playersState::PlayerColor::RED, 0, 0, 0, lisboaMadrid, nullptr);
+
+  CHECK(map_state.isDestinationReached(player, lisboa, madrid));
+  CHECK(!map_state.isDestinationReached(player, lisboa, paris));
+  ANN_END("isDestinationReachedPlayer")
+}
+
+// check isDestinationReached calls via destination card
+TEST(isDestinationReachedDestinationCard)
+{
+  ANN_START("isDestinationReachedDestinationCard")
+  mapState::MapState map_state = mapState::MapState::Europe();
+  std::shared_ptr<Station> lisboa = map_state.getStationByName("lisboa");
+  std::shared_ptr<Station> madrid = map_state.getStationByName("madrid");
+  std::shared_ptr<Station> paris = map_state.getStationByName("paris");
+  REQUIRE(lisboa != nullptr);
+  REQUIRE(madrid != nullptr);
+  REQUIRE(paris != nullptr);
+
+  std::vector<std::shared_ptr<Road>> lisboaMadrid = map_state.getRoadsBetweenStations(lisboa, madrid);
+  REQUIRE(!lisboaMadrid.empty());
+
+  std::shared_ptr<playersState::Player> player =
+      std::make_shared<playersState::Player>("Tester", playersState::PlayerColor::RED, 0, 0, 0, lisboaMadrid, nullptr);
+
+  std::shared_ptr<cardsState::DestinationCard> reachableCard =
+      std::make_shared<cardsState::DestinationCard>(lisboa, madrid, 0, false);
+  std::shared_ptr<cardsState::DestinationCard> unreachableCard =
+      std::make_shared<cardsState::DestinationCard>(lisboa, paris, 0, false);
+
+  CHECK(map_state.isDestinationReached(player, reachableCard));
+  CHECK(!map_state.isDestinationReached(player, unreachableCard));
+  ANN_END("isDestinationReachedDestinationCard")
 }
 
 TEST(getClaimableRoads)
