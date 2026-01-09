@@ -542,7 +542,21 @@ TEST(isRoadClaimable)
   CHECK_EQ(isClaimable, true); // roadAC should be claimable
   ANN_END("isRoadClaimable")
 }
+TEST(getRoadsOwnedByPlayer){
 
+}
+TEST(getRoadsUsableByPlayer){
+  
+}
+TEST(isDestinationReachableStatic){
+  
+}
+TEST(isDestinationReachableIntern){
+  
+}
+TEST(isDestinationReachable){
+  
+}
 
 SUITE_END() // Interactions 
 
