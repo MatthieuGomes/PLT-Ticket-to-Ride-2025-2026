@@ -194,43 +194,55 @@ SUITE_START(Interactions)
 // TODO : _takeCard and takeCard
 
 // TODO : add tests for display
-TEST(Display)
+TEST(Display_PlayerCards)
 {
-    {
-        ANN_START("Display PlayerCards")
-        std::shared_ptr<boost::adjacency_list<>> gameGraph = std::make_shared<boost::adjacency_list<>>(boost::adjacency_list<>());
-        std::string test_stationNameA = "paris";
-        std::string test_stationNameB = "lyon";
-        std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>(mapState::Station::Init(test_stationNameA, gameGraph));
-        std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>(mapState::Station::Init(test_stationNameB, gameGraph));
-        int test_points = 5;
-        cardsState::ColorCard test_color = cardsState::ColorCard::BLUE;
-        std::vector<std::shared_ptr<DestinationCard>> destinationCards;
-        std::vector<std::shared_ptr<WagonCard>> wagonCards;
+    ANN_START("Display PlayerCards");
 
-        auto d1 = std::make_shared<DestinationCard>(test_stationA, test_stationB, test_points, false);
-        auto w1 = std::make_shared<WagonCard>(test_color);
 
-        destinationCards.push_back(d1);
-        wagonCards.push_back(w1);
+    std::shared_ptr<boost::adjacency_list<>> gameGraph =
+        std::make_shared<boost::adjacency_list<>>(boost::adjacency_list<>());
 
-        PlayerCards player(destinationCards, wagonCards);
+    auto stationA = std::make_shared<mapState::Station>(
+        mapState::Station::Init("paris", gameGraph));
+    auto stationB = std::make_shared<mapState::Station>(
+        mapState::Station::Init("lyon", gameGraph));
 
-        CHECK_NTHROW(player.display());
-        CHECK_NTHROW(player.display(1));
 
-        ANN_END("Display PlayerCards")
-    }
-    {
-        ANN_START("Display PlayerCards with empty decks")
-        PlayerCards player;
+    std::vector<std::shared_ptr<DestinationCard>> destinationCards;
+    destinationCards.push_back(
+        std::make_shared<DestinationCard>(stationA, stationB, 5, false)
+    );
 
-        CHECK_NTHROW(player.display());
-        CHECK_NTHROW(player.display(1));
+    std::vector<std::shared_ptr<WagonCard>> wagonCards;
+    wagonCards.push_back(
+        std::make_shared<WagonCard>(cardsState::ColorCard::GREEN)
+    );
 
-        ANN_END("Display PlayerCards with empty decks")
-    }
+    cardsState::PlayerCards playerCards(destinationCards, wagonCards);
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    playerCards.display(0);
+
+    std::cout.rdbuf(old);
+
+    std::string out = buffer.str();
+
+    CHECK(out.find("##### PLAYER CARDS #####") != std::string::npos);
+
+    CHECK(out.find("===== DESTINATION CARDS =====") != std::string::npos);
+    CHECK(out.find("Station A: paris") != std::string::npos);
+    CHECK(out.find("Station B: lyon") != std::string::npos);
+
+    CHECK(out.find("===== WAGON CARDS =====") != std::string::npos);
+    CHECK(out.find("Color: GREEN") != std::string::npos);
+
+    CHECK(out.find("########################") != std::string::npos);
 }
+
+
+
 
 SUITE_END() // Interactions
 
