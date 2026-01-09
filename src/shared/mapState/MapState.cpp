@@ -459,17 +459,14 @@ namespace mapState
         }
         return station->getAdjacentStations(this->roads);
     }
-    // TODO: add method to  get  all  roads owned  by player
     std::vector<std::shared_ptr<Road>> MapState::getRoadsOwnedByPlayer(std::shared_ptr<playersState::Player> player)
     {
         return Road::getRoadsOwnedByPlayer(player,this->roads);
     }
-    // TODO: add method to get  all usable roads
     std::vector<std::shared_ptr<Road>> MapState::getRoadsUsableByPlayer(std::shared_ptr<playersState::Player> player)
     {
         return Road::getRoadsUsableByPlayer(player,this->roads);
     }
-    // TODO: add method is destination reached
     bool MapState::isDestinationReached(std::vector<std::shared_ptr<Road>> playerRoads, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {      
         // @fetohiaras needs your expertise here :)
