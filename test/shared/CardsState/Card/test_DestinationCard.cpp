@@ -250,8 +250,34 @@ TEST(_Display)
     CHECK(out.find("Station B: StationB") != std::string::npos);
     CHECK(out.find("Points: 10") != std::string::npos);
     CHECK(out.find("Is Long: No") != std::string::npos);
+    ANN_END("_display");
 
 }
+TEST(_Display_None)
+{
+    ANN_START("_display with None stations");
+
+    std::shared_ptr<Station> stationA = nullptr;
+    std::shared_ptr<Station> stationB = nullptr;
+
+    int test_points = 5;
+    DestinationCard card(stationA, stationB, test_points, true);
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    card.display();
+    std::cout.rdbuf(old);
+
+    std::string out = buffer.str();
+
+    CHECK(out.find("Station A: None") != std::string::npos);
+    CHECK(out.find("Station B: None") != std::string::npos);
+    CHECK(out.find("Points: 5") != std::string::npos);
+    CHECK(out.find("Is Long: Yes") != std::string::npos);
+    ANN_END("_display_None");
+}
+
 
 SUITE_END() // Interactions
 

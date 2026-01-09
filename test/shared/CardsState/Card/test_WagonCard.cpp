@@ -160,22 +160,40 @@ SUITE_START(Internal)
 SUITE_END() // Internal
 
 SUITE_START(Interactions)
-// TODO: Add tests for display and _display
-TEST(display)
+
+TEST(Display)
 {
   ANN_START("display");
+
   WagonCard card(ColorCard::GREEN);
-  CHECK_NTHROW(card.display());
-  CHECK_NTHROW(card.display(1));
-  ANN_END("display");
+
+  std::stringstream buffer;
+  std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+  card.display(0);
+  std::cout.rdbuf(old);
+
+  std::string out = buffer.str();
+
+  CHECK(out.find("----- WAGON CARD -----") != std::string::npos);
+  CHECK(out.find("Color: GREEN") != std::string::npos);
+  CHECK(out.find("---------------------") != std::string::npos);
 }
+
 TEST(_Display)
 {
   ANN_START("_display");
-  WagonCard card(ColorCard::YELLOW);
-  CHECK_NTHROW(card._display());
-  CHECK_NTHROW(card._display(1));
-  ANN_END("_display");
+
+  WagonCard card(ColorCard::GREEN);
+
+  std::stringstream buffer;
+  std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+  card._display(0);
+  std::cout.rdbuf(old);
+  std::string out = buffer.str();
+
+  CHECK(out.find("Color: GREEN") != std::string::npos);
 }
 
 SUITE_END() // Interactions
