@@ -34,9 +34,9 @@ TEST(TestStaticAssert)
 {
   CHECK(1);
 }
-
+std::vector<std::shared_ptr<Road>> borrowedRoads;
 std::string test_station_name = "TestStation";
-std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, borrowedRoads, nullptr);
 std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
 std::shared_ptr<boost::adjacency_list<>::vertex_descriptor> test_vertex = std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph));
 
@@ -67,9 +67,9 @@ TEST(BatchConstructor)
   {
     ANN_START("BatchConstructor")
     std::string test_station_name1 = "BatchStation1";
-    std::shared_ptr<playersState::Player> test_owner1 = std::make_shared<playersState::Player>("BatchPlayer1", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+    std::shared_ptr<playersState::Player> test_owner1 = std::make_shared<playersState::Player>("BatchPlayer1", playersState::PlayerColor::RED, 0, 45, 3, borrowedRoads, nullptr);
     std::string test_station_name2 = "BatchStation2";
-    std::shared_ptr<playersState::Player> test_owner2 = std::make_shared<playersState::Player>("BatchPlayer2", playersState::PlayerColor::BLUE, 0, 42, 1, 3, nullptr);
+    std::shared_ptr<playersState::Player> test_owner2 = std::make_shared<playersState::Player>("BatchPlayer2", playersState::PlayerColor::BLUE, 0, 42, 1, borrowedRoads, nullptr);
 
     std::vector<StationInfo> stationInfos = {
         Station::genData(test_owner1, test_station_name1),
@@ -86,7 +86,7 @@ TEST(BatchConstructor)
   {
     ANN_START("BatchConstructor with no gameGraph")
     std::string test_station_name1 = "BatchStation1_NoGraph";
-    std::shared_ptr<playersState::Player> test_owner1 = std::make_shared<playersState::Player>("BatchPlayer1_NoGraph", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+    std::shared_ptr<playersState::Player> test_owner1 = std::make_shared<playersState::Player>("BatchPlayer1_NoGraph", playersState::PlayerColor::RED, 0, 45, 3, borrowedRoads, nullptr);
     std::vector<StationInfo> stationInfos = {
         Station::genData(test_owner1, test_station_name1),
     };
@@ -206,7 +206,7 @@ TEST(getAdjacentStations)
 SUITE_END() // Getters
 SUITE_START(Setters)
 
-std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr);
+std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLUE, 0, 45, 3, borrowedRoads, nullptr);
 TEST(setOwner)
 {
   ANN_START("setOwner")
@@ -258,7 +258,7 @@ ANN_END("null owner case")
 }
 {
   ANN_START("with owner case")
-  std::shared_ptr<playersState::Player> display_owner = std::make_shared<playersState::Player>("DisplayOwner", playersState::PlayerColor::GREEN, 0, 50, 4, 6, nullptr);
+  std::shared_ptr<playersState::Player> display_owner = std::make_shared<playersState::Player>("DisplayOwner", playersState::PlayerColor::GREEN, 0, 50, 4, borrowedRoads, nullptr);
   Station station("DisplayStation", display_owner, test_vertex);
   std::stringstream buffer;
   std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
@@ -303,7 +303,7 @@ std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
 station.display();
 std::cout.rdbuf(old);
 std::string out = buffer.str();
-CHECK(out.find("Station Details:") != std::string::npos);
+CHECK(out.find("-----STATION-----") != std::string::npos);
 CHECK(out.find("Name : DisplayTestStation") != std::string::npos);
 CHECK(out.find("Owner : TestPlayer") != std::string::npos);
 ANN_END("normal case")
@@ -316,7 +316,7 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("-----STATION-----") != std::string::npos);
   CHECK(out.find("Name : DisplayTestStationNoOwner") != std::string::npos);
   CHECK(out.find("Owner : None") != std::string::npos);
   ANN_END("empty owner case")
@@ -329,7 +329,7 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("-----STATION-----") != std::string::npos);
   CHECK(out.find("Name : DisplayTestStationNoOwnerNotBlocked") != std::string::npos);
   CHECK(out.find("Owner : None") != std::string::npos);
   ANN_END("empty owner & not blocked case")
@@ -342,7 +342,7 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("-----STATION-----") != std::string::npos);
   CHECK(out.find("Name : DisplayTestStationWithOwnerBlocked") != std::string::npos);
   CHECK(out.find("Owner : TestPlayer") != std::string::npos);
   ANN_END("with owner & blocked case")
@@ -355,7 +355,7 @@ ANN_END("normal case")
   station.display();
   std::cout.rdbuf(old);
   std::string out = buffer.str();
-  CHECK(out.find("Station Details:") != std::string::npos);
+  CHECK(out.find("-----STATION-----") != std::string::npos);
   CHECK(out.find("Name : DisplayTestStationWithOwnerNotBlocked") != std::string::npos);
   CHECK(out.find("Owner : TestPlayer") != std::string::npos);
   ANN_END("with owner & not blocked case")

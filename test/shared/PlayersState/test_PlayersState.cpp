@@ -24,8 +24,8 @@
 using namespace playersState;
 using namespace mapState;
 
-using playersInfos = std::tuple<std::string, PlayerColor, int, int, int, int, std::shared_ptr<cardsState::PlayerCards>>;
-using playersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
+using PlayersInfos = std::tuple<std::string, PlayerColor, int, int, int, std::vector<std::shared_ptr<mapState::Road>>, std::shared_ptr<cardsState::PlayerCards>>;
+using PlayersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
 
 std::string test_init_player1_name = "Alice";
 playersState::PlayerColor test_init_player1_color = playersState::PlayerColor::RED;
@@ -44,10 +44,10 @@ int test_init_player2_nbRoads = 6;
 std::string test_stationA_name = "Paris";
 std::string test_stationB_name = "Rome";
 int test_points = 12;
-
+std::vector<std::shared_ptr<mapState::Road>> test_borrowed_roads;
 std::shared_ptr<playersState::Player> test_owner =
     std::make_shared<playersState::Player>("TestPlayer",
-                                           playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+                                           playersState::PlayerColor::RED, 0, 45, 3, test_borrowed_roads , nullptr);
 
 std::shared_ptr<boost::adjacency_list<>> graph =
     std::make_shared<boost::adjacency_list<>>();
@@ -91,13 +91,13 @@ TEST(Basic)
 TEST(FromInfos)
 {
   ANN_START("FromInfos Constructor")
-  std::vector<playersInfos> infos = {
+  std::vector<PlayersInfos> infos = {
       std::make_tuple(test_init_player1_name, test_init_player1_color,
                       test_init_player1_score, test_init_player1_nbWagons,
-                      test_init_player1_nbStations, test_init_player1_nbRoads, nullptr),
+                      test_init_player1_nbStations, test_borrowed_roads, nullptr),
       std::make_tuple(test_init_player2_name, test_init_player2_color,
                       test_init_player2_score, test_init_player2_nbWagons,
-                      test_init_player2_nbStations, test_init_player2_nbRoads, nullptr)};
+                      test_init_player2_nbStations, test_borrowed_roads, nullptr)};
   PlayersState ps = PlayersState(infos);
   CHECK_EQ(ps.getPlayers().size(), 2);
   CHECK_EQ(ps.getPlayers()[0]->getName(), test_init_player1_name);
@@ -109,7 +109,7 @@ TEST(FromInitInfos)
 {
 
   ANN_START("FromInitInfos Constructor")
-  std::vector<playersInitInfos> infos = {
+  std::vector<PlayersInitInfos> infos = {
       std::make_tuple(test_init_player1_name, test_init_player1_color, nullptr),
       std::make_tuple(test_init_player2_name, test_init_player2_color, nullptr)};
   PlayersState ps = PlayersState::InitFromInfos(infos);
@@ -141,10 +141,10 @@ TEST(getPlayers)
 
   auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
                                      test_init_player1_score, test_init_player1_nbWagons,
-                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+                                     test_init_player1_nbStations, test_borrowed_roads, hand1);
   auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
                                      test_init_player2_score, test_init_player2_nbWagons,
-                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+                                     test_init_player2_nbStations, test_borrowed_roads, hand2);
 
   std::vector<std::shared_ptr<Player>> v = {p1, p2};
   ps.setPlayers(v);
@@ -176,10 +176,10 @@ TEST(setPlayers)
 
   auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
                                      test_init_player1_score, test_init_player1_nbWagons,
-                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+                                     test_init_player1_nbStations, test_borrowed_roads, hand1);
   auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
                                      test_init_player2_score, test_init_player2_nbWagons,
-                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+                                     test_init_player2_nbStations, test_borrowed_roads, hand2);
 
   ps.setPlayers({p1, p2});
 
@@ -219,8 +219,8 @@ ps.display();
 std::cout.rdbuf(old);
 std::string out = buffer.str();
 
-CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
-CHECK(out.find("Aucun joueur dans la partie.\n") != std::string::npos);
+CHECK(out.find("~~~~~~ PLAYERS STATE ~~~~~~") != std::string::npos);
+CHECK(out.find("No players in the game.") != std::string::npos);
 ANN_END("empty case")
 }
 {
@@ -239,10 +239,10 @@ ANN_END("empty case")
 
   auto p1 = std::make_shared<Player>(test_init_player1_name, test_init_player1_color,
                                      test_init_player1_score, test_init_player1_nbWagons,
-                                     test_init_player1_nbStations, test_init_player1_nbRoads, hand1);
+                                     test_init_player1_nbStations, test_borrowed_roads, hand1);
   auto p2 = std::make_shared<Player>(test_init_player2_name, test_init_player2_color,
                                      test_init_player2_score, test_init_player2_nbWagons,
-                                     test_init_player2_nbStations, test_init_player2_nbRoads, hand2);
+                                     test_init_player2_nbStations, test_borrowed_roads, hand2);
 
   ps.setPlayers({p1, p2});
 
@@ -255,8 +255,8 @@ ANN_END("empty case")
 
   std::string out = buffer.str();
 
-  CHECK(out.find("ÉTAT DES JOUEURS") != std::string::npos);
-  CHECK(out.find("-----------------------------") != std::string::npos);
+  CHECK(out.find("~~~~~~ PLAYERS STATE ~~~~~~") != std::string::npos);
+  CHECK(out.find("##### PLAYERS #####") != std::string::npos);
   CHECK(out.find("Alice") != std::string::npos);
   CHECK(out.find("Bob") != std::string::npos);
   ANN_END("non-empty case")

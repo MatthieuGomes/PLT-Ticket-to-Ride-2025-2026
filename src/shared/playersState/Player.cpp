@@ -28,8 +28,8 @@ using namespace mapState;
 
 namespace playersState
 {
-   using playersInfos = std::tuple<std::string, PlayerColor, int, int, int, int, std::shared_ptr<cardsState::PlayerCards>>;
-   using playersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
+   using PlayersInfos = std::tuple<std::string, PlayerColor, int, int, int, std::vector<std::shared_ptr<mapState::Road>>, std::shared_ptr<cardsState::PlayerCards>>;
+   using PlayersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
 
    int Player::startScore = 0;
    int Player::startNbWagons = 45;
@@ -55,31 +55,30 @@ namespace playersState
       this->score = -1;
       this->nbWagons = -1;
       this->nbStations = -1;
-      this->nbRoads = -1;
       this->color = PlayerColor::UNKNOWN;
    }
 
-   Player::Player(std::string name, PlayerColor color, int score, int nbWagons, int nbStations, int nbRoads, std::shared_ptr<cardsState::PlayerCards> hand) : name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), nbRoads(nbRoads), hand(hand)
+   Player::Player(std::string name, PlayerColor color, int score, int nbWagons, int nbStations, std::vector<std::shared_ptr<mapState::Road>> borrowedRoads, std::shared_ptr<cardsState::PlayerCards> hand) : name(name), color(color), score(score), nbWagons(nbWagons), nbStations(nbStations), borrowedRoads(borrowedRoads), hand(hand)
    {
    }
 
    Player Player::Init(std::string name, PlayerColor color, std::shared_ptr<cardsState::PlayerCards> hand)
    {
-      return Player(name, color, Player::startScore, Player::startNbWagons, Player::startNbStations, 0, hand);
+      return Player(name, color, Player::startScore, Player::startNbWagons, Player::startNbStations, {}, hand);
    }
 
-   void Player::fillFromInfos(playersInfos info)
+   void Player::fillFromInfos (PlayersInfos info)
    {
       this->name = std::get<0>(info);
       this->color = std::get<1>(info);
       this->score = std::get<2>(info);
       this->nbWagons = std::get<3>(info);
       this->nbStations = std::get<4>(info);
-      this->nbRoads = std::get<5>(info);
+      this->borrowedRoads = std::get<5>(info);
       this->hand = std::get<6>(info);
    }
 
-   void Player::fillFromInitInfos(playersInitInfos info)
+   void Player::fillFromInitInfos(PlayersInitInfos info)
    {
       this->name = std::get<0>(info);
       this->color = std::get<1>(info);
@@ -87,36 +86,35 @@ namespace playersState
       this->score = Player::startScore;
       this->nbWagons = Player::startNbWagons;
       this->nbStations = Player::startNbStations;
-      this->nbRoads = 0;
    }
 
-   Player Player::PlayerFromInfos(playersInfos info)
+   Player Player::PlayerFromInfos(PlayersInfos info)
    {
       Player player;
       player.fillFromInfos(info);
       return player;
    }
 
-   Player Player::PlayerFromInitInfos(playersInitInfos info)
+   Player Player::PlayerFromInitInfos(PlayersInitInfos info)
    {
       Player player;
       player.fillFromInitInfos(info);
       return player;
    }
 
-   std::vector<std::shared_ptr<Player>> Player::BatchFromInfos(std::vector<playersInfos> infos)
+   std::vector<std::shared_ptr<Player>> Player::BatchFromInfos(std::vector<PlayersInfos> infos)
    {
       std::vector<std::shared_ptr<Player>> players;
-      for (playersInfos info : infos)
+      for (PlayersInfos info : infos)
       {
          players.push_back(std::make_shared<Player>(Player::PlayerFromInfos(info)));
       }
       return players;
    }
-   std::vector<std::shared_ptr<Player>> Player::BatchFromInitInfos(std::vector<playersInitInfos> infos)
+   std::vector<std::shared_ptr<Player>> Player::BatchFromInitInfos(std::vector<PlayersInitInfos> infos)
    {
       std::vector<std::shared_ptr<Player>> players;
-      for (playersInitInfos info : infos)
+      for (PlayersInitInfos info : infos)
       {
          players.push_back(std::make_shared<Player>(Player::PlayerFromInitInfos(info)));
       }
@@ -153,9 +151,9 @@ namespace playersState
    }
 
    // FIXME ? What is nbroads useful for ?    delete  on va   changer avec BorrowedRoads     shared  pointer
-   int Player::getNbRoads()
+   std::vector<std::shared_ptr<mapState::Road>> Player::getBorrowedRoads()
    {
-      return nbRoads;
+      return borrowedRoads;
    }
 
    PlayerColor Player::getColor()
@@ -194,7 +192,7 @@ namespace playersState
    }
 
    // Missing a lot of logic here   change  with  calculatePoints   ca  va  etre  en  fonction  de la map
-   int Player::calculateDestinationPoints()
+   int Player::calculatePoints()
    {
       int total = 0;
       for (std::shared_ptr<cardsState::DestinationCard> dest : completedDestinations)
@@ -335,66 +333,7 @@ namespace playersState
          }
       }
    }
-   // TODO : Why is it here ?   delete
-   int Player::getLongestPathLength(std::shared_ptr<mapState::MapState> map)
-   {
-      if (!map)
-         return 0;
 
-      std::unordered_map<std::shared_ptr<mapState::Station>, std::vector<std::pair<std::shared_ptr<mapState::Station>, int>>> adj;
-      for (std::shared_ptr<mapState::Road> road : map->roads)
-      {
-         if (!road)
-            continue;
-         if (road->getOwner() != std::make_shared<Player>(*this))
-            continue;
-         std::shared_ptr<mapState::Station> a = road->getStationA();
-         std::shared_ptr<mapState::Station> b = road->getStationB();
-         if (!a || !b)
-            continue;
-         adj[a].push_back({b, road->getLength()});
-         adj[b].push_back({a, road->getLength()});
-      }
-
-      if (adj.empty())
-         return 0;
-
-      std::function<int(std::shared_ptr<mapState::Station>, std::unordered_set<std::shared_ptr<mapState::Station>> &)> dfs;
-      dfs = [&](std::shared_ptr<mapState::Station> current, std::unordered_set<std::shared_ptr<mapState::Station>> &visited) -> int
-      {
-         int best = 0;
-         auto it = adj.find(current);
-         if (it == adj.end())
-            return 0;
-         for (std::pair<std::shared_ptr<mapState::Station>, int> p : it->second)
-         {
-            std::shared_ptr<mapState::Station> nbr = p.first;
-            int w = p.second;
-            if (visited.find(nbr) != visited.end())
-               continue;
-            visited.insert(nbr);
-            int cand = w + dfs(nbr, visited);
-            if (cand > best)
-               best = cand;
-            visited.erase(nbr);
-         }
-         return best;
-      };
-
-      int longest = 0;
-
-      for (std::pair<std::shared_ptr<mapState::Station>, std::vector<std::pair<std::shared_ptr<mapState::Station>, int>>> kv : adj)
-      {
-         std::shared_ptr<mapState::Station> start = kv.first;
-         std::unordered_set<std::shared_ptr<mapState::Station>> visited;
-         visited.insert(start);
-         int len = dfs(start, visited);
-         if (len > longest)
-            longest = len;
-      }
-
-      return longest;
-   }
    std::vector<std::shared_ptr<mapState::Road>> Player::getClaimableRoads(std::shared_ptr<mapState::MapState> map)
    {
       return playersState::PlayersState::getClaimableRoads(map, std::make_shared<Player>(*this));
@@ -409,7 +348,19 @@ namespace playersState
       std::cout << indentation <<"Score: " << score << std::endl;
       std::cout << indentation <<"NbWagons: " << nbWagons << std::endl;
       std::cout << indentation <<"NbStations: " << nbStations << std::endl;
-      std::cout << indentation <<"NbRoads: " << nbRoads << std::endl;
+      std::cout << indentation << "===== BORROWED ROADS ======" << std::endl;
+      if (!this->borrowedRoads.empty())
+      {
+         for (std::shared_ptr<mapState::Road> road : this->borrowedRoads)
+         {
+            road->display(indent+1);
+         }
+      }
+      else
+      {
+         std::cout << indentation << "\t"<< "no roads borrowed yet" << std::endl;
+      }
+      std::cout << indentation << "#####################" << std::endl;
       if (hand)
       {
          hand->display(indent+1);
@@ -421,8 +372,7 @@ namespace playersState
       std::cout << indentation << "#####################" << std::endl;
    }
 
-
-   // TODO:  fixme to  test logic
+   // TODO:  FIXME to check logic
    template <class CardType>
    void Player::drawCard(std::shared_ptr<cardsState::CardsState> cardsState, std::shared_ptr<CardType> card, int number)
    {

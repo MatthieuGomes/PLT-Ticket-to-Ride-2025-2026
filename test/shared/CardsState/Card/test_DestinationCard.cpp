@@ -57,9 +57,10 @@ SUITE_START(BatchConstructors)
 TEST(BatchConstructor)
 {
     ANN_START("BatchConstructor")
+    std::vector<std::shared_ptr<Road>> borrowedRoads;
     std::shared_ptr<playersState::Player> test_owner =
         std::make_shared<playersState::Player>("TestPlayer",
-                                               playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+                                               playersState::PlayerColor::RED, 0, 45, 3,borrowedRoads , nullptr);
 
     std::shared_ptr<boost::adjacency_list<>> graph =
         std::make_shared<boost::adjacency_list<>>();
@@ -88,9 +89,10 @@ TEST(BatchConstructor)
 TEST(BatchConstructorByName)
 {
     ANN_START("BatchConstructorByName")
+    std::vector<std::shared_ptr<Road>> borrowedRoads;
     std::shared_ptr<playersState::Player> test_owner =
         std::make_shared<playersState::Player>("TestPlayer",
-                                               playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+                                               playersState::PlayerColor::RED, 0, 45, 3, borrowedRoads, nullptr);
 
     std::shared_ptr<boost::adjacency_list<>> graph =
         std::make_shared<boost::adjacency_list<>>();
@@ -137,10 +139,11 @@ SUITE_START(GettersAndSetters)
 std::string test_stationA_name = "Paris";
 std::string test_stationB_name = "Rome";
 int test_points = 12;
+std::vector<std::shared_ptr<Road>> borrowedRoads;
 
 std::shared_ptr<playersState::Player> test_owner =
     std::make_shared<playersState::Player>("TestPlayer",
-                                           playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+                                           playersState::PlayerColor::RED, 0, 45, 3, borrowedRoads, nullptr);
 
 std::shared_ptr<boost::adjacency_list<>> graph =
     std::make_shared<boost::adjacency_list<>>();
