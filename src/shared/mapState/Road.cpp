@@ -235,10 +235,22 @@ namespace mapState
         }
         return ownedRoads;
     }
-    // Needs borrowed roads of player @YosraGuesmi
     std::vector<std::shared_ptr<Road>> Road::getRoadsUsableByPlayer(std::shared_ptr<playersState::Player> player, std::vector<std::shared_ptr<Road>> roads)
     {
-        return {};
+        std::vector<std::shared_ptr<Road>> ownedRoads = Road::getRoadsOwnedByPlayer(player, roads);
+        std::vector<std::shared_ptr<Road>> usableRoads = {};
+        for (const std::shared_ptr<Road> &road : ownedRoads)
+        {
+            if (road->getOwner() != nullptr && road->getOwner()->getName() == player->getName())
+            {
+                usableRoads.push_back(road);
+            }
+        }
+        for (const std::shared_ptr<Road> &road : player->getBorrowedRoads())
+        {
+            usableRoads.push_back(road);
+        }
+        return usableRoads;
     }
 
     void Road::display(int indent)
