@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <type_traits>
 #include <memory>
+#include <map>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -379,75 +380,144 @@ namespace mapState
         return Road::getClaimableRoads(this->roads, nbPlayers, player);
     }
 
-    // FIXME : Make the algorithm more clear + make the test WORK
-    Path MapState::findShortestPath(std::shared_ptr<Station> src, std::shared_ptr<Station> dest)
+    // Finds the shortest path using Dijkstra 
+    Path MapState::findShortestPath(
+        std::shared_ptr<Station> src,
+        std::shared_ptr<Station> dest,
+        std::vector<std::shared_ptr<Station>> stations,
+        std::vector<std::shared_ptr<Road>> roads)
     {
         Path path;
+        path.TOTALLENGTH = 0;
+        path.NUMEDGES = 0;
 
-        if (!src || !dest || !this->gameGraph)
+        if (!src || !dest)
             return path;
 
-        boost::adjacency_list<> &g = *this->gameGraph;
-        using vertex_descriptor =
-            boost::graph_traits<boost::adjacency_list<>>::vertex_descriptor;
-        using edge_descriptor =
-            boost::graph_traits<boost::adjacency_list<>>::edge_descriptor;
+        // build a temporary undirected graph from provided stations and roads
+        typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TempGraph;
+        TempGraph graph;
+        typedef boost::graph_traits<TempGraph>::vertex_descriptor vertex_descriptor;
+        typedef boost::graph_traits<TempGraph>::edge_descriptor edge_descriptor;
 
-        std::size_t n = boost::num_vertices(g);
+        // make vertices for each station and keep a name->vertex map
+        std::unordered_map<std::string, vertex_descriptor> vertexByName;
+        std::vector<std::shared_ptr<Station>> vertexStations;
+        for (const std::shared_ptr<Station> &station : stations)
+        {
+            if (!station)
+            {
+                continue;
+            }
+            vertex_descriptor v = boost::add_vertex(graph);
+            vertexByName[station->getName()] = v;
+            std::size_t index = static_cast<std::size_t>(v);
+            if (vertexStations.size() <= index)
+            {
+                vertexStations.resize(index + 1);
+            }
+            vertexStations[index] = station;
+        }
+
+        std::unordered_map<std::string, vertex_descriptor>::const_iterator srcIt =
+            vertexByName.find(src->getName());
+        std::unordered_map<std::string, vertex_descriptor>::const_iterator destIt =
+            vertexByName.find(dest->getName());
+        if (srcIt == vertexByName.end() || destIt == vertexByName.end())
+        {
+            return path;
+        }
+
+        // build edges and weights for temp graph from the provided road list
+        std::map<edge_descriptor, int> edgeWeights;
+        for (const std::shared_ptr<Road> &road : roads)
+        {
+            if (!road || !road->getStationA() || !road->getStationB())
+            {
+                continue;
+            }
+            const std::string &nameA = road->getStationA()->getName();
+            const std::string &nameB = road->getStationB()->getName();
+            std::unordered_map<std::string, vertex_descriptor>::const_iterator aIt =
+                vertexByName.find(nameA);
+            std::unordered_map<std::string, vertex_descriptor>::const_iterator bIt =
+                vertexByName.find(nameB);
+            if (aIt == vertexByName.end() || bIt == vertexByName.end())
+            {
+                continue;
+            }
+            std::pair<edge_descriptor, bool> edgeResult =
+                boost::add_edge(aIt->second, bIt->second, graph);
+            if (edgeResult.second)
+            {
+                edgeWeights[edgeResult.first] = road->getLength();
+            }
+        }
+
+        boost::associative_property_map<std::map<edge_descriptor, int>> weightMap(edgeWeights);
+
+        std::size_t n = boost::num_vertices(graph);
+        if (n == 0)
+        {
+            return path;
+        }
 
         std::vector<int> distances(n, std::numeric_limits<int>::max());
         std::vector<vertex_descriptor> predecessors(n);
 
-        auto weightMap =
-            boost::make_static_property_map<edge_descriptor>(1);
-
         boost::dijkstra_shortest_paths(
-            g,
-            *(src->vertex.get()),
+            graph,
+            srcIt->second,
             boost::predecessor_map(
                 boost::make_iterator_property_map(
                     predecessors.begin(),
-                    boost::get(boost::vertex_index, g)))
+                    boost::get(boost::vertex_index, graph)))
                 .distance_map(
                     boost::make_iterator_property_map(
                         distances.begin(),
-                        boost::get(boost::vertex_index, g)))
+                        boost::get(boost::vertex_index, graph)))
                 .weight_map(weightMap));
 
-        auto vertexToStation =
-            [this](vertex_descriptor v) -> std::shared_ptr<Station>
+        vertex_descriptor current = destIt->second;
+        std::size_t destIndex = static_cast<std::size_t>(current);
+        if (destIndex >= distances.size())
         {
-            for (const std::shared_ptr<Station> &s : this->stations)
-            {
-                if (*(s->vertex.get()) == v)
-                    return s;
-            }
-            return nullptr;
-        };
-
-        vertex_descriptor current = *(dest->vertex.get());
-        if (distances[current] == std::numeric_limits<int>::max())
             return path;
+        }
+        if (distances[destIndex] == std::numeric_limits<int>::max())
+        {
+            return path;
+        }
 
+        // reconstruct path using the predecessor chain (roads already traversed)
         while (true)
         {
-            std::shared_ptr<Station> s = vertexToStation(current);
-            if (s)
-                path.STATIONS.push_back(s);
+            std::size_t currentIndex = static_cast<std::size_t>(current);
+            if (currentIndex < vertexStations.size() && vertexStations[currentIndex])
+            {
+                path.STATIONS.push_back(vertexStations[currentIndex]);
+            }
 
-            if (current == *(src->vertex.get()))
+            if (current == srcIt->second)
+            {
                 break;
+            }
 
-            vertex_descriptor pred = predecessors[current];
+            vertex_descriptor pred = predecessors[currentIndex];
             if (pred == current)
+            {
                 break;
+            }
 
             current = pred;
         }
 
         std::reverse(path.STATIONS.begin(), path.STATIONS.end());
-        path.NUMEDGES = int(path.STATIONS.size()) - 1;
-        path.TOTALLENGTH = path.NUMEDGES;
+        if (!path.STATIONS.empty())
+        {
+            path.NUMEDGES = int(path.STATIONS.size()) - 1;
+            path.TOTALLENGTH = distances[destIndex];
+        }
         return path;
     }
 
