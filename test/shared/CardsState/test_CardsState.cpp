@@ -58,7 +58,7 @@ TEST(Europe)
   mapState::MapState mapState = mapState::MapState::Europe();
   mapState.display();
   const std::vector<std::shared_ptr<mapState::Station>> stations = mapState.getStations();
-  CardsState newState = CardsState::Europe(stations);
+  CardsState newState = CardsState::Europe(stations, static_cast<int>(playersInfos.size()));
 
   CHECK(newState.gameDestinationCards);
   CHECK(!newState.gameDestinationCards->faceDownCards->cards.empty());
@@ -124,7 +124,7 @@ TEST(display)
 
     mapState::MapState mapState = mapState::MapState::Europe();
     const std::vector<std::shared_ptr<mapState::Station>> stations = mapState.getStations();
-    CardsState newState = CardsState::Europe(stations);
+    CardsState newState = CardsState::Europe(stations, static_cast<int>(playersInfos.size()));
 
     CHECK_NTHROW(newState.display());
     CHECK_NTHROW(newState.display(1));

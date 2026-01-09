@@ -260,7 +260,7 @@ TEST(Setup)
         auto expectedCards = DestinationCard::Europe(stations);
         SharedDeck<DestinationCard> sharedDestinations = SharedDeck<DestinationCard>::Europe(stations);
         SharedDeck<WagonCard> wagonDeck = SharedDeck<WagonCard>::Init();
-        std::vector<std::shared_ptr<PlayerCards>> playersCards = cardsState::PlayerCards::BatchStartHand(std::make_shared<SharedDeck<DestinationCard>>(sharedDestinations), std::make_shared<SharedDeck<WagonCard>>(wagonDeck));
+        std::vector<std::shared_ptr<PlayerCards>> playersCards = cardsState::PlayerCards::BatchStartHand(std::make_shared<SharedDeck<DestinationCard>>(sharedDestinations), std::make_shared<SharedDeck<WagonCard>>(wagonDeck), players.getPlayers().size());
         std::shared_ptr<OutOfGame<DestinationCard>> outOfGameDestinations = std::make_shared<OutOfGame<DestinationCard>>();
         sharedDestinations.Setup(outOfGameDestinations);
 

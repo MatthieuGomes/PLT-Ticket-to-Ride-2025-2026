@@ -68,10 +68,10 @@ namespace cardsState
     return PlayerCards(startingDestinationCards, startingWagonCards);
   }
 
-  std::vector<std::shared_ptr<PlayerCards>> PlayerCards::BatchStartHand(std::shared_ptr<SharedDeck<DestinationCard>> sharedDestinationDecks, std::shared_ptr<SharedDeck<WagonCard>> sharedWagonDecks)
+  std::vector<std::shared_ptr<PlayerCards>> PlayerCards::BatchStartHand(std::shared_ptr<SharedDeck<DestinationCard>> sharedDestinationDecks, std::shared_ptr<SharedDeck<WagonCard>> sharedWagonDecks, int nbPLayers)
   {
     std::vector<std::shared_ptr<PlayerCards>> playersHands;
-    for (int i = 0; i < playersState::PlayersState::nbPlayers; ++i)
+    for (int i = 0; i < nbPLayers; ++i)
     {
       PlayerCards playerHand = PlayerCards::StartHand(sharedDestinationDecks, sharedWagonDecks);
       playersHands.push_back(std::make_shared<PlayerCards>(playerHand));

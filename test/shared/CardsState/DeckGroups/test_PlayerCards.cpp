@@ -161,7 +161,7 @@ TEST(BatchStartHand)
     auto sharedDestinationDeck = std::make_shared<SharedDeck<DestinationCard>>(destinationCards);
     auto sharedWagonDeck = std::make_shared<SharedDeck<WagonCard>>(wagonCards);
 
-    auto players = PlayerCards::BatchStartHand(sharedDestinationDeck, sharedWagonDeck);
+    auto players = PlayerCards::BatchStartHand(sharedDestinationDeck, sharedWagonDeck, playersState.getPlayers().size());
 
     CHECK_EQ(players.size(), 2);
     for (const auto &player : players)

@@ -3,6 +3,7 @@
 
 namespace state
 {
+    using playersInitInfos = std::tuple<std::string, playersState::PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
     State::State()
     {
         map = mapState::MapState();
@@ -10,6 +11,11 @@ namespace state
         players = playersState::PlayersState();
         
         // Initialize state variables here
+    }
+    State::State(std::vector<playersInitInfos> playersInfos){
+        this->map = mapState::MapState();
+        this->cards = cardsState::CardsState::Europe(map.getStations(), static_cast<int>(playersInfos.size()));
+        this->players = playersState::PlayersState(playersInfos, cards.playersCards);
     }
     // rename to display
     void State::display(int indent)
