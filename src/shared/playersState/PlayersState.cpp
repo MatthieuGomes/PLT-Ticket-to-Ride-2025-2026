@@ -52,6 +52,14 @@ namespace playersState
         PlayersState::nbPlayers = static_cast<int>(players.size());
     }
 
+    void PlayersState::setupPlayersHand(std::vector<std::shared_ptr<cardsState::PlayerCards>> hands)
+    {
+        for (size_t i = 0; i < this->players.size(); i++)
+        {
+            this->players[i]->setHand(hands[i]);
+        }
+    }
+
     std::vector<std::shared_ptr<mapState::Road>> PlayersState::getClaimableRoads(std::shared_ptr<mapState::MapState> map, std::shared_ptr<Player> player)
     {
         return map->getClaimableRoads(PlayersState::nbPlayers, player); 
