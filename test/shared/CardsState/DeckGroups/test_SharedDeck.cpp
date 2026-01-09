@@ -341,29 +341,51 @@ TEST(DrawCardFaceDownCorrectBehavior)
 TEST(Display)
 {
     {
-        ANN_START("Display SharedDeck")
+        ANN_START("Display SharedDeck with cards")
         std::vector<std::shared_ptr<WagonCard>> trashV;
         std::vector<std::shared_ptr<WagonCard>> faceUpV;
         std::vector<std::shared_ptr<WagonCard>> faceDownV;
 
+        trashV.emplace_back(std::make_shared<WagonCard>(ColorCard::GREEN));
         faceUpV.emplace_back(std::make_shared<WagonCard>(ColorCard::RED));
         faceDownV.emplace_back(std::make_shared<WagonCard>(ColorCard::BLUE));
 
         SharedDeck<WagonCard> deck(trashV, faceUpV, faceDownV);
 
-        CHECK_NTHROW(deck.display());
-        CHECK_NTHROW(deck.display(1));
-        ANN_END("Display SharedDeck")
+        // Capture de cout
+        std::stringstream buffer;
+        std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+        deck.display(0);
+
+        std::cout.rdbuf(old);
+        std::string out = buffer.str();
+
+        // Vérifications
+        CHECK(out.find("Color: GREEN") != std::string::npos);
+        CHECK(out.find("Color: RED") != std::string::npos);
+        CHECK(out.find("Color: BLUE") != std::string::npos);
+        ANN_END("Display SharedDeck with cards")
     }
+
     {
         ANN_START("Display Empty SharedDeck")
         SharedDeck<WagonCard> deck;
 
-        CHECK_NTHROW(deck.display());
-        CHECK_NTHROW(deck.display(1));
+        std::stringstream buffer;
+        std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+        deck.display(0);
+
+        std::cout.rdbuf(old);
+        std::string out = buffer.str();
+
+        CHECK(out.find("###### SHARED DECK ######") != std::string::npos);
+        CHECK(out.find("########################") != std::string::npos);
         ANN_END("Display Empty SharedDeck")
     }
 }
+
 
 SUITE_END() // Interactions
 
