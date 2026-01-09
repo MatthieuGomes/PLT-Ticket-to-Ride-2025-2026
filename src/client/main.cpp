@@ -88,7 +88,7 @@ int main(int argc,char* argv[])
 
         tui::Terminal term;
         std::shared_ptr<mapState::MapState> map_state =
-            std::make_shared<mapState::MapState>();
+            std::make_shared<mapState::MapState>(mapState::MapState::Test());
         std::shared_ptr<playersState::PlayersState> players_state =
             std::make_shared<playersState::PlayersState>();
         std::shared_ptr<cardsState::CardsState> cards_state =
