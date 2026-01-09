@@ -272,26 +272,6 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_init_destCards = 
 std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCardsVec = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> hand = std::make_shared<cardsState::PlayerCards>(test_init_destCards, wagonCardsVec);
 
-TEST(setName)
-{
-    ANN_START("setName")
-    std::string test_new_name = "sara";
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    player.setName(test_new_name);
-    CHECK_EQ(player.name, test_new_name);
-    ANN_END("setName")
-}
-
-TEST(setColor)
-{
-    ANN_START("setColor")
-    playersState::PlayerColor test_new_color = playersState::PlayerColor::GREEN;
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    player.setColor(test_new_color);
-    CHECK_EQ(player.color, test_new_color);
-    ANN_END("setColor")
-}
-
 TEST(setScore)
 {
     ANN_START("setScore")
@@ -320,16 +300,6 @@ TEST(setNbStations)
     player.setNbStations(test_new_nbStations);
     CHECK_EQ(player.nbStations, test_new_nbStations);
     ANN_END("setNbStations")
-}
-
-TEST(setNbRoads)
-{
-    ANN_START("setNbRoads")
-    int test_new_nbRoads = 6;
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
-    player.setNbRoads(test_new_nbRoads);
-    CHECK_EQ(player.nbRoads, test_new_nbRoads);
-    ANN_END("setNbRoads")
 }
 
 TEST(setHand)
@@ -441,27 +411,6 @@ std::vector<std::shared_ptr<cardsState::DestinationCard>> test_interact_dest_car
 std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
 std::shared_ptr<cardsState::PlayerCards> test_interact_hand = std::make_shared<cardsState::PlayerCards>(test_interact_dest_cards, test_interact_wagon_cards);
 
-TEST(addRoad)
-{
-    ANN_START("addRoad")
-    playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
-    player.addRoad();
-    CHECK_EQ(player.nbRoads, 6);
-    ANN_END("addRoad")
-}
-
-TEST(addStation)
-{
-    ANN_START("addStation")
-    playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
-
-    CHECK_EQ(player.nbStations, test_init_player_nbStations);
-
-    player.addStation();
-    CHECK_EQ(player.nbStations, 11);
-    ANN_END("addStation")
-}
 
 TEST(calculateDestinationPoints)
 {

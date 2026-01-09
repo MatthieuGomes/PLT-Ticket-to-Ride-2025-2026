@@ -458,7 +458,9 @@ namespace mapState
         }
         return station->getAdjacentStations(this->roads);
     }
-
+    // TODO: add method to  get  all  roads owned  by player
+    // TODO: add method to get  all usable roads
+    // TODO: add method is destination reached
     std::string MapState::toString() const
     {
         std::ostringstream out;
