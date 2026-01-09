@@ -127,11 +127,6 @@ namespace playersState
    {
       return name;
    }
-   // FIXME ? Might not be usefull
-   void Player::setName(std::string name)
-   {
-      this->name = name;
-   }
    int Player::getScore()
    {
       return score;
@@ -157,24 +152,15 @@ namespace playersState
       this->nbStations = nbStations;
    }
 
-   // FIXME ? What is nbroads useful for ?
+   // FIXME ? What is nbroads useful for ?    delete  on va   changer avec BorrowedRoads     shared  pointer
    int Player::getNbRoads()
    {
       return nbRoads;
-   }
-   void Player::setNbRoads(int nbRoads)
-   {
-      this->nbRoads = nbRoads;
    }
 
    PlayerColor Player::getColor()
    {
       return color;
-   }
-   // FIXME ? Might not be usefull
-   void Player::setColor(PlayerColor color)
-   {
-      this->color = color;
    }
 
    std::shared_ptr<cardsState::PlayerCards> Player::getHand()
@@ -182,20 +168,10 @@ namespace playersState
       return hand;
    }
 
-   // FIXME ? Might not be usefull
+   // FIXME ? Might not be usefull delete
    void Player::setHand(std::shared_ptr<cardsState::PlayerCards> hand)
    {
       this->hand = hand;
-   }
-   // FIXME ? Might not be usefull
-   void Player::addRoad()
-   {
-      nbRoads++;
-   }
-   // what ?
-   void Player::addStation()
-   {
-      nbStations++;
    }
 
    void Player::removeTrain(int num)
@@ -217,7 +193,7 @@ namespace playersState
       this->score += points;
    }
 
-   // Missing a lot of logic here
+   // Missing a lot of logic here   change  with  calculatePoints   ca  va  etre  en  fonction  de la map
    int Player::calculateDestinationPoints()
    {
       int total = 0;
@@ -228,6 +204,7 @@ namespace playersState
       addScore(total);
       return total;
    }
+   // TODO:  add method to calculate final points
 
    bool Player::isRoadBuildable(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Road> road)
    {
@@ -358,7 +335,7 @@ namespace playersState
          }
       }
    }
-   // TODO : Why is it here ?
+   // TODO : Why is it here ?   delete
    int Player::getLongestPathLength(std::shared_ptr<mapState::MapState> map)
    {
       if (!map)
@@ -444,6 +421,8 @@ namespace playersState
       std::cout << indentation << "#####################" << std::endl;
    }
 
+
+   // TODO:  fixme to  test logic
    template <class CardType>
    void Player::drawCard(std::shared_ptr<cardsState::CardsState> cardsState, std::shared_ptr<CardType> card, int number)
    {
