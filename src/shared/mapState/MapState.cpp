@@ -9,9 +9,11 @@
 #include <algorithm>
 #include <iomanip>
 #include <unordered_map>
+#include <unordered_set>
 #include <type_traits>
 #include <memory>
 #include <map>
+#include <queue>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -567,15 +569,75 @@ namespace mapState
     }
     bool MapState::isDestinationReached(std::vector<std::shared_ptr<Road>> playerRoads, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {      
-        // @fetohiaras needs your expertise here :)
-        return true;
+        if (!stationA || !stationB)
+        {
+            return false;
+        }
+        if (stationA->getName() == stationB->getName())
+        {
+            return true;
+        }
+
+        // build an undirected graph from the provided roads
+        std::unordered_map<std::string, std::vector<std::string>> adjacency;
+        for (const std::shared_ptr<Road> &road : playerRoads)
+        {
+            if (!road || !road->getStationA() || !road->getStationB())
+            {
+                continue;
+            }
+            std::string nameA = road->getStationA()->getName();
+            std::string nameB = road->getStationB()->getName();
+            adjacency[nameA].push_back(nameB);
+            adjacency[nameB].push_back(nameA);
+        }
+
+        const std::string startName = stationA->getName();
+        const std::string targetName = stationB->getName();
+        if (adjacency.find(startName) == adjacency.end() || adjacency.find(targetName) == adjacency.end())
+        {
+            return false;
+        }
+
+        // BFS to check connectivity between the two stations
+        // not using boost bfs to avoid need to rebuild graph
+        std::queue<std::string> toVisit;
+        std::unordered_set<std::string> visited;
+        toVisit.push(startName);
+        visited.insert(startName);
+
+        while (!toVisit.empty())
+        {
+            std::string current = toVisit.front();
+            toVisit.pop();
+            if (current == targetName)
+            {
+                return true;
+            }
+            std::unordered_map<std::string, std::vector<std::string>>::const_iterator it = adjacency.find(current);
+            if (it == adjacency.end())
+            {
+                continue;
+            }
+            const std::vector<std::string> &neighbors = it->second;
+            for (std::vector<std::string>::const_iterator neighIt = neighbors.begin();
+                 neighIt != neighbors.end();
+                 ++neighIt)
+            {
+                const std::string &neighbor = *neighIt;
+                if (visited.insert(neighbor).second)
+                {
+                    toVisit.push(neighbor);
+                }
+            }
+        }
+        return false;
     }
     
     bool MapState::isDestinationReached(std::shared_ptr<playersState::Player> player, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {
-        std::vector<std::shared_ptr<Road>> playerRoads = this->getRoadsOwnedByPlayer(player); // TODO: replace with usable roads when the function will be available
+        std::vector<std::shared_ptr<Road>> playerRoads = this->getRoadsUsableByPlayer(player);
         
-        // @fetohiaras needs your expertise here :)
         return MapState::isDestinationReached(playerRoads, stationA, stationB);
     }
     bool MapState::isDestinationReached(std::shared_ptr<playersState::Player> player, std::shared_ptr<cardsState::DestinationCard> destinationCard)
@@ -583,6 +645,7 @@ namespace mapState
         std::shared_ptr<Station> stationA = destinationCard->getstationA();
         std::shared_ptr<Station> stationB = destinationCard->getstationB();
         // @fetohiaras needs your expertise here :)
+        // let's see if it works :^)
         return MapState::isDestinationReached(player, stationA, stationB);
     }
     std::string MapState::toString() const
