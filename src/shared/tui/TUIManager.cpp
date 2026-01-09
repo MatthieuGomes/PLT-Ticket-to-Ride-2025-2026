@@ -110,7 +110,8 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       cardstate(nullptr),
       ownsMapState(true),
       ownsPlayerState(true),
-      ownsCardState(true) {}
+      ownsCardState(true),
+      parser() {}
       
 // Parametrized constructor to accept external game states
 TUIManager::TUIManager(
@@ -133,7 +134,8 @@ TUIManager::TUIManager(
       cardstate(cardState),
       ownsMapState(mapState == nullptr),
       ownsPlayerState(playerState == nullptr),
-      ownsCardState(cardState == nullptr) {}
+      ownsCardState(cardState == nullptr),
+      parser() {}
 
 void TUIManager::init() {
   cols = clampPositive(cols, kMinDimension);
@@ -267,11 +269,23 @@ void TUIManager::handleInput(const std::string& input) {
   if (!infopanel || !commandinput) {
     return;
   }
-  // For now, echo input into the info panel and clear the prompt.
   commandinput->setInput(input);
   std::ostringstream line;
   line << "> " << input;
   infopanel->addMessage(line.str());
+
+  engine::ParseResult result = parser.parse(input);
+  if (!result.ok) {
+    if (!result.error.empty()) {
+      infopanel->addMessage(result.error);
+    }
+  } else if (result.command.type == engine::CommandType::EXIT) {
+    infopanel->addMessage("Exiting...");
+    running = false;
+  } else if (result.command.type == engine::CommandType::HELP) {
+    infopanel->addMessage("Available commands: exit");
+  }
+
   commandinput->clearInput();
   infopanel->requestRedraw();
   commandinput->requestRedraw();
