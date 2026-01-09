@@ -13,8 +13,8 @@ using namespace std;
 
 namespace playersState
 {
-    using playersInfos = std::tuple<std::string, PlayerColor, int, int, int,int, std::shared_ptr<cardsState::PlayerCards>>;
-    using playersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
+    using PlayersInfos = std::tuple<std::string, PlayerColor, int, int, int,std::vector<std::shared_ptr<mapState::Road>>, std::shared_ptr<cardsState::PlayerCards>>;
+    using PlayersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
 
     int PlayersState::nbPlayers = 0;
 
@@ -28,13 +28,13 @@ namespace playersState
         PlayersState::nbPlayers = static_cast<int>(players.size());   
     }
 
-    PlayersState::PlayersState(std::vector<playersInfos> infos)
+    PlayersState::PlayersState(std::vector<PlayersInfos> infos)
     {
         this->players = Player::BatchFromInfos(infos);
         PlayersState::nbPlayers = static_cast<int>(this->players.size());   
     }
 
-    PlayersState PlayersState::InitFromInfos(std::vector<playersInitInfos> infos)
+    PlayersState PlayersState::InitFromInfos(std::vector<PlayersInitInfos> infos)
     {
         PlayersState state;
         state.players = Player::BatchFromInitInfos(infos);
@@ -42,7 +42,7 @@ namespace playersState
         return state;
     }
 
-    PlayersState::PlayersState(std::vector<playersInitInfos> infos, std::vector<std::shared_ptr<cardsState::PlayerCards>> hands)
+    PlayersState::PlayersState(std::vector<PlayersInitInfos> infos, std::vector<std::shared_ptr<cardsState::PlayerCards>> hands)
     {
         this->players = Player::BatchFromInitInfos(infos);
         PlayersState::nbPlayers = static_cast<int>(this->players.size());  

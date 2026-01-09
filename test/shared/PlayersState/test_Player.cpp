@@ -26,8 +26,8 @@
 
 using namespace ::playersState;
 
-using playersInfos = std::tuple<std::string, PlayerColor, int, int, int, int, std::shared_ptr<cardsState::PlayerCards>>;
-using playersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
+using PlayersInfos = std::tuple<std::string, PlayerColor, int, int, int, std::vector<std::shared_ptr<mapState::Road>>, std::shared_ptr<cardsState::PlayerCards>>;
+using PlayersInitInfos = std::tuple<std::string, PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
 
 std::string test_init_stationA_name = "paris";
 std::string test_init_stationB_name = "rome";
@@ -41,7 +41,6 @@ PlayerColor test_init_player_color = PlayerColor::RED;
 int test_init_player_score = 23;
 int test_init_player_nbWagons = 21;
 int test_init_player_nbStations = 10;
-int test_init_player_nbRoads = 5;
 
 TEST(TestStaticAssert)
 {
@@ -60,13 +59,13 @@ std::shared_ptr<cardsState::PlayerCards> test_constr_hand = std::make_shared<car
 TEST(Basic)
 {
     ANN_START("Basic Constructor")
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
+    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_constr_hand);
     CHECK_EQ(player.name, test_init_player_name);
     CHECK_EQ(player.color, test_init_player_color);
     CHECK_EQ(player.score, test_init_player_score);
     CHECK_EQ(player.nbWagons, test_init_player_nbWagons);
     CHECK_EQ(player.nbStations, test_init_player_nbStations);
-    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, test_constr_hand);
     ANN_END("Player Constructor")
 }
@@ -79,7 +78,7 @@ TEST(Default)
     CHECK_EQ(player.score, -1);
     CHECK_EQ(player.nbWagons, -1);
     CHECK_EQ(player.nbStations, -1);
-    CHECK_EQ(player.nbRoads, -1);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, nullptr);
     CHECK_EQ(player.color, PlayerColor::UNKNOWN);
     ANN_END("Default Constructor")
@@ -94,7 +93,7 @@ TEST(Init)
     CHECK_EQ(player.score, Player::startScore);
     CHECK_EQ(player.nbWagons, Player::startNbWagons);
     CHECK_EQ(player.nbStations, Player::startNbStations);
-    CHECK_EQ(player.nbRoads, 0);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, test_constr_hand);
     ANN_END("Init Constructor")
 }
@@ -104,14 +103,14 @@ SUITE_START(Generators)
 TEST(fillFromInfos){
     ANN_START("fillFromInfos")
     Player player;
-    playersInfos info = playersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
+    PlayersInfos info = PlayersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_constr_hand);
     player.fillFromInfos(info);
     CHECK_EQ(player.name, test_init_player_name);
     CHECK_EQ(player.color, test_init_player_color);
     CHECK_EQ(player.score, test_init_player_score);
     CHECK_EQ(player.nbWagons, test_init_player_nbWagons);
     CHECK_EQ(player.nbStations, test_init_player_nbStations);
-    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, test_constr_hand);
     ANN_END("fillFromInfos")
 }
@@ -119,14 +118,14 @@ TEST(fillFromInfos){
 TEST(fillFromInitInfos){
     ANN_START("fillFromInitInfos")
     Player player;
-    playersInitInfos info = playersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
+    PlayersInitInfos info = PlayersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
     player.fillFromInitInfos(info);
     CHECK_EQ(player.name, test_init_player_name);
     CHECK_EQ(player.color, test_init_player_color);
     CHECK_EQ(player.score, Player::startScore);
     CHECK_EQ(player.nbWagons, Player::startNbWagons);
     CHECK_EQ(player.nbStations, Player::startNbStations);
-    CHECK_EQ(player.nbRoads, 0);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, test_constr_hand);
     ANN_END("fillFromInitInfos")
 }
@@ -138,14 +137,14 @@ SUITE_START(Wrappers)
 TEST(FromInfos)
 {
     ANN_START("FromInfos Constructor")
-    playersInfos info = playersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
+    PlayersInfos info = PlayersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_constr_hand);
     Player player = Player::PlayerFromInfos(info);
     CHECK_EQ(player.name, test_init_player_name);
     CHECK_EQ(player.color, test_init_player_color);
     CHECK_EQ(player.score, test_init_player_score);
     CHECK_EQ(player.nbWagons, test_init_player_nbWagons);
     CHECK_EQ(player.nbStations, test_init_player_nbStations);
-    CHECK_EQ(player.nbRoads, test_init_player_nbRoads);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, test_constr_hand);
     ANN_END("FromInfos Constructor")
 }
@@ -153,14 +152,14 @@ TEST(FromInfos)
 TEST(FromInitInfos)
 {
     ANN_START("FromInitInfos Constructor")
-    playersInitInfos info = playersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
+    PlayersInitInfos info = PlayersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
     Player player = Player::PlayerFromInitInfos(info);
     CHECK_EQ(player.name, test_init_player_name);
     CHECK_EQ(player.color, test_init_player_color);
     CHECK_EQ(player.score, Player::startScore);
     CHECK_EQ(player.nbWagons, Player::startNbWagons);
     CHECK_EQ(player.nbStations, Player::startNbStations);
-    CHECK_EQ(player.nbRoads, 0);
+    CHECK_EQ(player.borrowedRoads.size(), 0);
     CHECK_EQ(player.hand, test_constr_hand);
     ANN_END("FromInitInfos Constructor")
 }
@@ -172,9 +171,9 @@ SUITE_START(BatchConstructors)
 TEST(BatchFromInfos)
 {
     ANN_START("BatchFromInfos Constructor")
-    playersInfos info1 = playersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_constr_hand);
-    playersInfos info2 = playersInfos("sara", PlayerColor::BLUE, 30, 25, 8, 7, test_constr_hand);
-    std::vector<playersInfos> infos = {info1, info2};
+    PlayersInfos info1 = PlayersInfos(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_constr_hand);
+    PlayersInfos info2 = PlayersInfos("sara", PlayerColor::BLUE, 30, 25, 8, 7, test_constr_hand);
+    std::vector<PlayersInfos> infos = {info1, info2};
     std::vector<std::shared_ptr<Player>> players = Player::BatchFromInfos(infos);
     CHECK_EQ(players.size(), 2);
     CHECK_EQ(players[0]->name, test_init_player_name);
@@ -185,9 +184,9 @@ TEST(BatchFromInfos)
 TEST(BatchFromInitInfos)
 {
     ANN_START("BatchFromInitInfos Constructor")
-    playersInitInfos info1 = playersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
-    playersInitInfos info2 = playersInitInfos("sara", PlayerColor::BLUE, test_constr_hand);
-    std::vector<playersInitInfos> infos = {info1, info2};
+    PlayersInitInfos info1 = PlayersInitInfos(test_init_player_name, test_init_player_color, test_constr_hand);
+    PlayersInitInfos info2 = PlayersInitInfos("sara", PlayerColor::BLUE, test_constr_hand);
+    std::vector<PlayersInitInfos> infos = {info1, info2};
     std::vector<std::shared_ptr<Player>> players = Player::BatchFromInitInfos(infos);
     CHECK_EQ(players.size(), 2);
     CHECK_EQ(players[0]->name, test_init_player_name);
@@ -210,7 +209,7 @@ std::shared_ptr<cardsState::PlayerCards> test_getset_hand = std::make_shared<car
 
 SUITE_START(Getters)
 
-Player test_getter_player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_getset_hand);
+Player test_getter_player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_getset_hand);
 
 TEST(getName)
 {
@@ -247,11 +246,11 @@ TEST(getNbStations)
     ANN_END("getNbStations")
 }
 
-TEST(getNbRoads)
+TEST(getborrowedRoads)
 {
-    ANN_START("getNbRoads")
-    CHECK_EQ(test_getter_player.getNbRoads(), test_init_player_nbRoads);
-    ANN_END("getNbRoads")
+    ANN_START("getborrowedRoads")
+    CHECK_EQ(test_getter_player.getBorrowedRoads().size(), 0);
+    ANN_END("getborrowedRoads")
 }
 
 TEST(getHand)
@@ -276,7 +275,7 @@ TEST(setScore)
 {
     ANN_START("setScore")
     int test_new_score = 40;
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
+    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, hand);
     player.setScore(test_new_score);
     CHECK_EQ(player.score, test_new_score);
     ANN_END("setScore")
@@ -286,7 +285,7 @@ TEST(setNbWagons)
 {
     ANN_START("setNbWagons")
     int test_new_nbWagons = 20;
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
+    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, hand);
     player.setNbWagons(test_new_nbWagons);
     CHECK_EQ(player.nbWagons, test_new_nbWagons);
     ANN_END("setNbWagons")
@@ -296,7 +295,7 @@ TEST(setNbStations)
 {
     ANN_START("setNbStations")
     int test_new_nbStations = 9;
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
+    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, hand);
     player.setNbStations(test_new_nbStations);
     CHECK_EQ(player.nbStations, test_new_nbStations);
     ANN_END("setNbStations")
@@ -316,7 +315,7 @@ TEST(setHand)
     std::vector<std::shared_ptr<cardsState::WagonCard>> test_new_wagonCards = {std::make_shared<cardsState::WagonCard>(test_new_wagon_color)};
     std::shared_ptr<cardsState::PlayerCards> test_new_hand = std::make_shared<cardsState::PlayerCards>(test_new_destCards, test_new_wagonCards);
 
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, hand);
+    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, hand);
     player.setHand(test_new_hand);
     CHECK_EQ(player.hand, test_new_hand);
     ANN_END("setHand")
@@ -339,7 +338,7 @@ std::shared_ptr<cardsState::PlayerCards> test_internal_hand = std::make_shared<c
 TEST(addScore)
 {
     ANN_START("addScore")
-    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+    Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_internal_hand);
     int test_new_score_to_add = 10;
     CHECK_EQ(player.score, test_init_player_score);
     player.addScore(test_new_score_to_add);
@@ -352,7 +351,7 @@ TEST(removeTrain)
     ANN_START("removeTrain")
     {
         ANN_START("enough trains case")
-        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_internal_hand);
         int nb_trains_to_remove = 3;
         CHECK_EQ(player.getNbWagons(), test_init_player_nbWagons);
 
@@ -362,7 +361,7 @@ TEST(removeTrain)
     }
     {
         ANN_START("not enough trains case")
-        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_internal_hand);
         int nb_trains_to_remove = 25;
         CHECK_EQ(player.getNbWagons(), test_init_player_nbWagons);
 
@@ -378,7 +377,7 @@ TEST(removeStation)
     ANN_START("removeStation")
     {
         ANN_START("enough stations case")
-        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_internal_hand);
         int nb_stations_to_remove = 2;
         CHECK_EQ(player.getNbStations(), test_init_player_nbStations);
 
@@ -388,7 +387,7 @@ TEST(removeStation)
     }
     {
         ANN_START("not enough stations case")
-        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_internal_hand);
+        Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_internal_hand);
         int nb_stations_to_remove = 15;
         CHECK_EQ(player.getNbStations(), test_init_player_nbStations);
 
@@ -412,7 +411,7 @@ std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = 
 std::shared_ptr<cardsState::PlayerCards> test_interact_hand = std::make_shared<cardsState::PlayerCards>(test_interact_dest_cards, test_interact_wagon_cards);
 
 
-TEST(calculateDestinationPoints)
+TEST(calculatePoints)
 {
     ANN_START("calculateDestinationPoints")
     {
@@ -429,25 +428,25 @@ TEST(calculateDestinationPoints)
         std::vector<std::shared_ptr<cardsState::WagonCard>> wagon_cards = {std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::RED)};
         std::shared_ptr<cardsState::PlayerCards> test_calculate_hand = std::make_shared<cardsState::PlayerCards>(dest_cards, wagon_cards);
 
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_calculate_hand);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_calculate_hand);
         CHECK_EQ(player.score, test_init_player_score);
 
         player.completedDestinations.clear();
         player.completedDestinations.push_back(std::move(d1));
         player.completedDestinations.push_back(std::move(d2));
 
-        int gained = player.calculateDestinationPoints();
+        int gained = player.calculatePoints();
         CHECK_EQ(gained, 18);
         ANN_END("completed destinations not empty case")
     }
     {
         ANN_START("completed destinations empty case")
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_interact_hand);
         CHECK_EQ(player.score, test_init_player_score);
 
         player.completedDestinations.clear();
 
-        int gained = player.calculateDestinationPoints();
+        int gained = player.calculatePoints();
         CHECK_EQ(gained, 0);
         ANN_END("completed destinations empty case")
     }
@@ -467,7 +466,7 @@ TEST(isRoadBuildable)
     int test_nb_wagons_insufficient = 1;
     {
         ANN_START("not enough trains case")
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_nb_wagons_insufficient, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_nb_wagons_insufficient, test_init_player_nbStations, {}, test_interact_hand);
         CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
         ANN_END("not enough trains case")
     }
@@ -477,17 +476,17 @@ TEST(isRoadBuildable)
         std::vector<std::shared_ptr<cardsState::DestinationCard>> test_insufficient_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
         std::vector<std::shared_ptr<cardsState::WagonCard>> test_insufficient_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
         std::shared_ptr<cardsState::PlayerCards> test_insufficient_hand = std::make_shared<cardsState::PlayerCards>(test_insufficient_dest_cards, test_insufficient_wagon_cards);
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_insufficient_hand);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_insufficient_hand);
         CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
         ANN_END("not enough wagon cards case")
     }
 
-    std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("owner", PlayerColor::GREEN, 0, 10, 0, 0, test_interact_hand);
+    std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("test_owner",playersState::PlayerColor::GREEN,10,0,3,std::vector<std::shared_ptr<mapState::Road>>(),test_interact_hand);
     {
         ANN_START("already owned case")
         REQUIRE(road);
         road->setOwner(test_owner);
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, {}, test_interact_hand);
         CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
         ANN_END("already owned case")
     }
@@ -521,25 +520,7 @@ TEST(getClaimableRoads)
     ANN_END("getClaimableRoads")
 }
 
-// TODO : complete tests
-TEST(getLongestPathLength)
-{
-#if DEBUG
-    std::cout << "getLongestPathLength Test Started ..." << std::endl;
-    {
-        std::cout << "normal case started ...  " << std::endl;
-        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_init_player_nbWagons, test_init_player_nbStations, test_init_player_nbRoads, test_interact_hand);
 
-        int length = player.getLongestPathLength(test_interact_map);
-        std::cout << "calculated length: " << length << std::endl;
-
-        std::cout << "normal case finished !\n"
-                  << std::endl;
-    }
-    std::cout << "getLongestPathLength Test Finished !\n"
-              << std::endl;
-#endif
-}
 
 SUITE_END() // Interactions
 

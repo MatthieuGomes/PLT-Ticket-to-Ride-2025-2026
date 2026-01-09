@@ -25,6 +25,7 @@
 
 using namespace ::cardsState;
 
+std::vector<std::shared_ptr<mapState::Road>> borrowedRoads;
 
 using WagonCardInfos = cardsState::ColorCard;
 using DestinationCardInfos = std::tuple<std::shared_ptr<mapState::Station>, std::shared_ptr<mapState::Station>, int, bool>;
@@ -156,7 +157,7 @@ TEST(BatchDeck)
             boost::add_vertex(*graph));
 
         // ---- Owner ----
-        auto owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, 5, nullptr);
+        auto owner = std::make_shared<playersState::Player>("TestPlayer", playersState::PlayerColor::RED, 0, 45, 3, borrowedRoads, nullptr);
 
         // ---- Stations ----
         auto stationA = std::make_shared<Station>("StationA", owner, v1);

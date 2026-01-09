@@ -255,11 +255,12 @@ namespace mapState
     {
         DEBUG_PRINT("Test MapState creation started ...");
         MapState mapState;
-        std::shared_ptr<playersState::Player> stationOwnerE = std::make_shared<playersState::Player>("PlayerE", playersState::PlayerColor::BLUE, 1, 0, 0, 0, nullptr);
-        std::shared_ptr<playersState::Player> stationOwnerH = std::make_shared<playersState::Player>("PlayerH", playersState::PlayerColor::BLACK, 1, 0, 0, 0, nullptr);
-        std::shared_ptr<playersState::Player> roadOwnerAB_1 = std::make_shared<playersState::Player>("PlayerAB_1", playersState::PlayerColor::RED, 1, 0, 0, 0, nullptr);
-        std::shared_ptr<playersState::Player> roadOwnerBC_1_n_FI = std::make_shared<playersState::Player>("PlayerBC_1", playersState::PlayerColor::GREEN, 1, 0, 0, 0, nullptr);
-        std::shared_ptr<playersState::Player> roadOwnerFG = std::make_shared<playersState::Player>("PlayerFG", playersState::PlayerColor::YELLOW, 1, 0, 0, 0, nullptr);
+        std::vector<std::shared_ptr<Road>> borrowedRoads;
+        std::shared_ptr<playersState::Player> stationOwnerE = std::make_shared<playersState::Player>("PlayerE", playersState::PlayerColor::BLUE, 1, 0, 0, borrowedRoads, nullptr);
+        std::shared_ptr<playersState::Player> stationOwnerH = std::make_shared<playersState::Player>("PlayerH", playersState::PlayerColor::BLACK, 1, 0, 0, borrowedRoads, nullptr);
+        std::shared_ptr<playersState::Player> roadOwnerAB_1 = std::make_shared<playersState::Player>("PlayerAB_1", playersState::PlayerColor::RED, 1, 0, 0, borrowedRoads, nullptr);
+        std::shared_ptr<playersState::Player> roadOwnerBC_1_n_FI = std::make_shared<playersState::Player>("PlayerBC_1", playersState::PlayerColor::GREEN, 1, 0, 0, borrowedRoads, nullptr);
+        std::shared_ptr<playersState::Player> roadOwnerFG = std::make_shared<playersState::Player>("PlayerFG", playersState::PlayerColor::YELLOW, 1, 0, 0, borrowedRoads, nullptr);
         std::vector<StationInfo> stationsInfos = {
             Station::initData("A"),
             Station::initData("B"),

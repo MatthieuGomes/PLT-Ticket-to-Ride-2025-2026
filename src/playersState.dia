@@ -100,16 +100,16 @@
   <dia:layer name="Arrière-plan" visible="true" connectable="true" active="true">
     <dia:object type="UML - LargePackage" version="0" id="O0">
       <dia:attribute name="obj_pos">
-        <dia:point val="4.03921,7.89379"/>
+        <dia:point val="1.93921,3.24379"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="3.98921,6.84379;121.029,71.6979"/>
+        <dia:rectangle val="1.88921,2.19379;118.929,67.0479"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="4.03921,7.89379"/>
+        <dia:point val="1.93921,3.24379"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="116.93984374999992"/>
@@ -144,19 +144,19 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O1">
       <dia:attribute name="obj_pos">
-        <dia:point val="10.4315,21.5654"/>
+        <dia:point val="8.3315,16.9154"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10.3815,21.5154;47.9415,41.0154"/>
+        <dia:rectangle val="8.2815,16.8654;45.8415,37.1654"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="10.4315,21.5654"/>
+        <dia:point val="8.3315,16.9154"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="37.460000000000001"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="19.400000000000006"/>
+        <dia:real val="20.200000000000006"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#PlayersState#</dia:string>
@@ -411,7 +411,7 @@ constructor#</dia:string>
                 <dia:string>#infos#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#std::vector&lt;std::tuple&lt;std::string, PlayerColor, int, int, int,int, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;&gt;#</dia:string>
+                <dia:string>#std::vector&lt;std::tuple&lt;std::string, PlayerColor, int, int, int,std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -872,7 +872,7 @@ Method - print the players state #</dia:string>
         <dia:point val="56.9627,14.4296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="56.9127,14.3796;101.788,63.4796"/>
+        <dia:rectangle val="56.9127,14.3796;101.788,65.8796"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="56.9627,14.4296"/>
@@ -881,7 +881,7 @@ Method - print the players state #</dia:string>
         <dia:real val="44.774999999999999"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="49"/>
+        <dia:real val="51.399999999999991"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#Player#</dia:string>
@@ -1214,10 +1214,10 @@ Method - print the players state #</dia:string>
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#nbRoads#</dia:string>
+            <dia:string>#borrowedRoads#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#int#</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -1438,10 +1438,10 @@ constructor
             </dia:composite>
             <dia:composite type="umlparameter">
               <dia:attribute name="name">
-                <dia:string>#nbRoads#</dia:string>
+                <dia:string>#BorrowedRoads#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#int#</dia:string>
+                <dia:string>#std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1733,13 +1733,13 @@ Method - getter nbStations
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#getNbRoads#</dia:string>
+            <dia:string>#getBorrowedRoads#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#int#</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -2172,7 +2172,7 @@ Method - mark the trains
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#calculateDestinationPoints#</dia:string>
+            <dia:string>#calculatePoints#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -2282,57 +2282,6 @@ Method - calculate player destinations points
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="abstract">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="inheritance_type">
-            <dia:enum val="2"/>
-          </dia:attribute>
-          <dia:attribute name="query">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="class_scope">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="parameters">
-            <dia:composite type="umlparameter">
-              <dia:attribute name="name">
-                <dia:string>#map#</dia:string>
-              </dia:attribute>
-              <dia:attribute name="type">
-                <dia:string>#std::shared_ptr&lt;mapState::MapState&gt;#</dia:string>
-              </dia:attribute>
-              <dia:attribute name="value">
-                <dia:string>##</dia:string>
-              </dia:attribute>
-              <dia:attribute name="comment">
-                <dia:string>##</dia:string>
-              </dia:attribute>
-              <dia:attribute name="kind">
-                <dia:enum val="0"/>
-              </dia:attribute>
-            </dia:composite>
-          </dia:attribute>
-        </dia:composite>
-        <dia:composite type="umloperation">
-          <dia:attribute name="name">
-            <dia:string>#getLongestPathLength#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="stereotype">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="type">
-            <dia:string>#int#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="visibility">
-            <dia:enum val="0"/>
-          </dia:attribute>
-          <dia:attribute name="comment">
-            <dia:string>#getLongestPathLength
-Method - calculate the longet path  of a player 
-@return int longest path
-#</dia:string>
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
@@ -2562,7 +2511,7 @@ Method - display the cards in of  a player
                 <dia:string>#info#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#std::tuple&lt;std::string, PlayerColor, int, int, int, int, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;#</dia:string>
+                <dia:string>#std::tuple&lt;std::string, PlayerColor, int, int,int,std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2658,7 +2607,7 @@ Method - display the cards in of  a player
                 <dia:string>#info#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#std::tuple&lt;std::string, PlayerColor, int, int, int, int, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;#</dia:string>
+                <dia:string>#std::tuple&lt;std::string, PlayerColor, int, int, int, std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2754,7 +2703,7 @@ Method - display the cards in of  a player
                 <dia:string>#infos#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#std::vector&lt;std::tuple&lt;std::string, PlayerColor, int, int, int, int, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;&gt;#</dia:string>
+                <dia:string>#std::vector&lt;std::tuple&lt;std::string, PlayerColor, int, int, int, std::vector&lt;std::shared_ptr&lt;mapState::Road&gt;&gt;, std::shared_ptr&lt;cardsState::PlayerCards&gt;&gt;&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2824,19 +2773,19 @@ Method - display the cards in of  a player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O3">
       <dia:attribute name="obj_pos">
-        <dia:point val="47.8915,29.2654"/>
+        <dia:point val="45.7915,25.4154"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="47.1415,28.5054;56.9634,39.7696"/>
+        <dia:rectangle val="45.0415,24.6554;56.9634,40.9696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="47.8915,29.2654"/>
-        <dia:point val="51.6535,29.2654"/>
-        <dia:point val="51.6535,38.9296"/>
-        <dia:point val="56.9134,38.9296"/>
+        <dia:point val="45.7915,25.4154"/>
+        <dia:point val="51.6535,25.4154"/>
+        <dia:point val="51.6535,40.1296"/>
+        <dia:point val="56.9134,40.1296"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2899,7 +2848,7 @@ Method - display the cards in of  a player
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O1" connection="19"/>
-        <dia:connection handle="1" to="O2" connection="96"/>
+        <dia:connection handle="1" to="O2" connection="94"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - LargePackage" version="0" id="O4">
@@ -2948,16 +2897,16 @@ Method - display the cards in of  a player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O5">
       <dia:attribute name="obj_pos">
-        <dia:point val="79.3502,14.3801"/>
+        <dia:point val="79.3502,14.3794"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="26.1212,-14.3021;80.1002,15.1801"/>
+        <dia:rectangle val="26.1212,-14.3021;80.1002,15.1794"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="79.3502,14.3801"/>
+        <dia:point val="79.3502,14.3794"/>
         <dia:point val="79.3502,-2.83226"/>
         <dia:point val="26.1712,-2.83226"/>
         <dia:point val="26.1712,-14.2521"/>
@@ -3022,7 +2971,7 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O6" connection="8"/>
       </dia:connections>
     </dia:object>
@@ -3380,8 +3329,8 @@ Method - display the cards in of  a player
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="79.3502,14.3792"/>
-        <dia:point val="79.3502,-5.22355"/>
-        <dia:point val="99.0033,-5.22355"/>
+        <dia:point val="79.3502,-5.22356"/>
+        <dia:point val="99.0033,-5.22356"/>
         <dia:point val="99.0033,-24.1263"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -3444,23 +3393,23 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O7" connection="8"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O10">
       <dia:attribute name="obj_pos">
-        <dia:point val="101.788,38.9296"/>
+        <dia:point val="101.788,40.1296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="101.038,-20.4244;108.387,39.7696"/>
+        <dia:rectangle val="101.038,-20.4244;108.387,40.9696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="101.788,38.9296"/>
-        <dia:point val="105.412,38.9296"/>
+        <dia:point val="101.788,40.1296"/>
+        <dia:point val="105.412,40.1296"/>
         <dia:point val="105.412,-19.6644"/>
         <dia:point val="108.337,-19.6644"/>
       </dia:attribute>
@@ -3524,7 +3473,7 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O8" connection="8"/>
       </dia:connections>
     </dia:object>
@@ -3762,7 +3711,7 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O12" connection="8"/>
       </dia:connections>
     </dia:object>
@@ -4199,17 +4148,17 @@ Method - display the cards in of  a player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O18">
       <dia:attribute name="obj_pos">
-        <dia:point val="56.9124,38.9296"/>
+        <dia:point val="56.9124,40.1296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="54.788,-22.1531;57.6624,39.7696"/>
+        <dia:rectangle val="54.788,-22.1531;57.6624,40.9696"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="56.9124,38.9296"/>
-        <dia:point val="55.5252,38.9296"/>
+        <dia:point val="56.9124,40.1296"/>
+        <dia:point val="55.5252,40.1296"/>
         <dia:point val="55.5252,-21.3931"/>
         <dia:point val="54.838,-21.3931"/>
       </dia:attribute>
@@ -4273,7 +4222,7 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O16" connection="8"/>
       </dia:connections>
     </dia:object>
@@ -4289,8 +4238,8 @@ Method - display the cards in of  a player
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="79.3502,14.3792"/>
-        <dia:point val="79.3502,-4.0385"/>
-        <dia:point val="68.9305,-4.0385"/>
+        <dia:point val="79.3502,-4.03851"/>
+        <dia:point val="68.9305,-4.03851"/>
         <dia:point val="68.9305,-21.7562"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -4353,7 +4302,7 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O17" connection="8"/>
       </dia:connections>
     </dia:object>
@@ -4492,8 +4441,8 @@ Method - display the cards in of  a player
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="79.3502,14.3792"/>
-        <dia:point val="79.3502,-2.51045"/>
-        <dia:point val="77.7202,-2.51045"/>
+        <dia:point val="79.3502,-2.51046"/>
+        <dia:point val="77.7202,-2.51046"/>
         <dia:point val="77.7202,-18.7001"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -4556,19 +4505,19 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O20" connection="8"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O22">
       <dia:attribute name="obj_pos">
-        <dia:point val="31.8599,45.617"/>
+        <dia:point val="29.7599,40.967"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.8099,45.567;37.7999,53.267"/>
+        <dia:rectangle val="29.7099,40.917;35.6999,48.617"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="31.8599,45.617"/>
+        <dia:point val="29.7599,40.967"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="5.8899999999999997"/>
@@ -4815,19 +4764,19 @@ Method - display the cards in of  a player
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O23">
       <dia:attribute name="obj_pos">
-        <dia:point val="56.9134,38.9296"/>
+        <dia:point val="56.9136,40.1296"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="37.75,38.1696;57.6634,50.257"/>
+        <dia:rectangle val="35.65,39.3696;57.6636,45.607"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="56.9134,38.9296"/>
-        <dia:point val="51.6535,38.9296"/>
-        <dia:point val="51.6535,49.417"/>
-        <dia:point val="37.8,49.417"/>
+        <dia:point val="56.9136,40.1296"/>
+        <dia:point val="49.5535,40.1296"/>
+        <dia:point val="49.5535,44.767"/>
+        <dia:point val="35.7,44.767"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -4889,7 +4838,7 @@ Method - display the cards in of  a player
         <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O2" connection="96"/>
+        <dia:connection handle="0" to="O2" connection="94"/>
         <dia:connection handle="1" to="O22" connection="20"/>
       </dia:connections>
       <dia:childnode parent="O0"/>

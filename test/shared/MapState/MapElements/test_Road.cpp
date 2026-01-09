@@ -37,14 +37,14 @@ TEST(TestStaticAssert)
 {
   CHECK(1);
 }
-
+std::vector<std::shared_ptr<Road>> borrowedRoads;
 std::shared_ptr<boost::adjacency_list<>> test_graph = std::make_shared<boost::adjacency_list<>>();
-std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", std::make_shared<playersState::Player>("OwnerA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr), std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", std::make_shared<playersState::Player>("OwnerB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr), std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+std::shared_ptr<mapState::Station> test_stationA = std::make_shared<mapState::Station>("StationA", std::make_shared<playersState::Player>("OwnerA", playersState::PlayerColor::RED, 0, 30, 2, borrowedRoads, nullptr), std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
+std::shared_ptr<mapState::Station> test_stationB = std::make_shared<mapState::Station>("StationB", std::make_shared<playersState::Player>("OwnerB", playersState::PlayerColor::BLUE, 0, 45, 3, borrowedRoads, nullptr), std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
 int test_road_id = 101;
 RoadColor test_color = RoadColor::GREEN;
 int test_length = 5;
-std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
+std::shared_ptr<playersState::Player> test_owner = std::make_shared<playersState::Player>("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, borrowedRoads, nullptr);
 std::shared_ptr<boost::adjacency_list<>::edge_descriptor> test_edge = std::make_shared<boost::adjacency_list<>::edge_descriptor>(
     boost::add_edge(*(test_stationA->getVertex().get()), *(test_stationB->getVertex().get()), *test_graph).first);
 
@@ -100,15 +100,15 @@ TEST(BatchConstructor)
     std::string stationA_name = "BatchStationA";
     std::string stationB_name = "BatchStationB";
     std::string stationC_name = "BatchStationC";
-    std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>("BatchOwnerStationA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr);
-    std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>("BatchOwnerStationB", playersState::PlayerColor::BLUE, 0, 45, 3, 5, nullptr);
-    std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>("BatchOwnerStationC", playersState::PlayerColor::GREEN, 0, 50, 4, 6, nullptr);
+    std::shared_ptr<playersState::Player> stationA_owner = std::make_shared<playersState::Player>("BatchOwnerStationA", playersState::PlayerColor::RED, 0, 30, 2, borrowedRoads, nullptr);
+    std::shared_ptr<playersState::Player> stationB_owner = std::make_shared<playersState::Player>("BatchOwnerStationB", playersState::PlayerColor::BLUE, 0, 45, 3, borrowedRoads, nullptr);
+    std::shared_ptr<playersState::Player> stationC_owner = std::make_shared<playersState::Player>("BatchOwnerStationC", playersState::PlayerColor::GREEN, 0, 50, 4, borrowedRoads, nullptr);
     std::shared_ptr<mapState::Station> batch_stationA = std::make_shared<mapState::Station>(stationA_name, stationA_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
     std::shared_ptr<mapState::Station> batch_stationB = std::make_shared<mapState::Station>(stationB_name, stationB_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
     std::shared_ptr<mapState::Station> batch_stationC = std::make_shared<mapState::Station>(stationC_name, stationC_owner, std::make_shared<boost::adjacency_list<>::vertex_descriptor>(boost::add_vertex(*test_graph)));
-    std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>("BatchOwnerRoad1", playersState::PlayerColor::RED, 0, 50, 5, 7, nullptr);
-    std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>("BatchOwnerRoad2", playersState::PlayerColor::BLACK, 0, 55, 6, 8, nullptr);
-    std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>("BatchOwnerRoad3", playersState::PlayerColor::YELLOW, 0, 60, 7, 9, nullptr);
+    std::shared_ptr<playersState::Player> batch_owner1 = std::make_shared<playersState::Player>("BatchOwnerRoad1", playersState::PlayerColor::RED, 0, 50, 5, borrowedRoads, nullptr);
+    std::shared_ptr<playersState::Player> batch_owner2 = std::make_shared<playersState::Player>("BatchOwnerRoad2", playersState::PlayerColor::BLACK, 0, 55, 6, borrowedRoads, nullptr);
+    std::shared_ptr<playersState::Player> batch_owner3 = std::make_shared<playersState::Player>("BatchOwnerRoad3", playersState::PlayerColor::YELLOW, 0, 60, 7, borrowedRoads, nullptr);
     std::vector<RoadInfo> roadInfos = {
         Road::genData(
             batch_stationA,
@@ -281,7 +281,7 @@ TEST(getVertexB)
 
 SUITE_END()
 SUITE_START(Setters)
-std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLACK, 0, 50, 5, 7, nullptr);
+std::shared_ptr<playersState::Player> test_set_owner = std::make_shared<playersState::Player>("NewOwner", playersState::PlayerColor::BLACK, 0, 50, 5, borrowedRoads, nullptr);
 TEST(setOwner)
 {
   ANN_START("setOwner")
@@ -344,7 +344,7 @@ ANN_END("owned by himself case")
 {
     ANN_START("owned by another case"){
         ANN_START("small party size case")
-            Road ownedRoad = Road(test_road_id, std::make_shared<playersState::Player>("AnotherOwner", playersState::PlayerColor::GREEN, 0, 35, 2, 4, nullptr), test_stationA, test_stationB, test_color, test_length, test_edge);
+            Road ownedRoad = Road(test_road_id, std::make_shared<playersState::Player>("AnotherOwner", playersState::PlayerColor::GREEN, 0, 35, 2, borrowedRoads, nullptr), test_stationA, test_stationB, test_color, test_length, test_edge);
 Road otherRoad = Road(test_road_id + 1, nullptr, test_stationA, test_stationB, test_color, test_length, test_edge);
 std::vector<std::shared_ptr<Road>> roads = {std::make_shared<Road>(ownedRoad), std::make_shared<Road>(otherRoad)};
 CHECK_EQ(otherRoad.isClaimable(roads, smallPartySize, test_owner), false);
@@ -353,7 +353,7 @@ ANN_END("small party size case")
 {
   ANN_START("large party size case")
 
-  Road ownedRoad = Road(test_road_id, std::make_shared<playersState::Player>("AnotherOwner", playersState::PlayerColor::GREEN, 0, 35, 2, 4, nullptr), test_stationA, test_stationB, test_color, test_length, test_edge);
+  Road ownedRoad = Road(test_road_id, std::make_shared<playersState::Player>("AnotherOwner", playersState::PlayerColor::GREEN, 0, 35, 2, borrowedRoads, nullptr), test_stationA, test_stationB, test_color, test_length, test_edge);
   Road otherRoad = Road(test_road_id + 1, nullptr, test_stationA, test_stationB, test_color, test_length, test_edge);
   std::vector<std::shared_ptr<Road>> roads = {std::make_shared<Road>(ownedRoad), std::make_shared<Road>(otherRoad)};
   CHECK_EQ(otherRoad.isClaimable(roads, largePartySize, test_owner), true);
@@ -372,11 +372,11 @@ TEST(getClaimableRoads)
   int smallPartySize = 3;
   int largePartySize = 4;
 
-  std::shared_ptr<playersState::Player> another_player = std::make_shared<playersState::Player>("AnotherPlayer", playersState::PlayerColor::GREEN, 0, 35, 2, 4, nullptr);
+  std::shared_ptr<playersState::Player> another_player = std::make_shared<playersState::Player>("AnotherPlayer", playersState::PlayerColor::GREEN, 0, 35, 2, borrowedRoads, nullptr);
   std::vector<std::shared_ptr<mapState::Station>> test_stations = mapState::Station::BatchConstructor({
-                                                                                                          Station::genData(std::make_shared<playersState::Player>("StationOwnerA", playersState::PlayerColor::RED, 0, 30, 2, 4, nullptr), "StationA"),
+                                                                                                          Station::genData(std::make_shared<playersState::Player>("StationOwnerA", playersState::PlayerColor::RED, 0, 30, 2, borrowedRoads, nullptr), "StationA"),
                                                                                                           Station::genData(nullptr, "StationB"),
-                                                                                                          Station::genData(std::make_shared<playersState::Player>("StationOwnerC", playersState::PlayerColor::GREEN, 0, 50, 4, 6, nullptr), "StationC"),
+                                                                                                          Station::genData(std::make_shared<playersState::Player>("StationOwnerC", playersState::PlayerColor::GREEN, 0, 50, 4, borrowedRoads, nullptr), "StationC"),
                                                                                                           Station::genData(nullptr, "StationD"),
                                                                                                       },
                                                                                                       test_graph);

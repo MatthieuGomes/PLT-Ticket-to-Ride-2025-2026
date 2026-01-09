@@ -40,6 +40,8 @@ using TunnelInfo = RoadInfo;
 using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, int, int>;
 using FerryInfo = std::pair<StationPair, FerryDetail>;
 
+std::vector<std::shared_ptr<Road>> borrowedRoads;
+
 TEST(TestStaticAssert)
 {
   CHECK(1);
@@ -502,7 +504,7 @@ TEST(getClaimableRoads)
 {
   ANN_START("getClaimableRoads")
   mapState::MapState test_map_state;
-  playersState::Player test_player = playersState::Player("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
+  playersState::Player test_player = playersState::Player("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, borrowedRoads, nullptr);
   StationInfo stationAInfo = Station::initData("StationA");
   StationInfo stationBInfo = Station::initData("StationB");
   StationInfo stationCInfo = Station::initData("StationC");
@@ -523,7 +525,7 @@ TEST(isRoadClaimable)
 {
   ANN_START("isRoadClaimable")
   mapState::MapState test_map_state;
-  playersState::Player test_player = playersState::Player("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, 6, nullptr);
+  playersState::Player test_player = playersState::Player("TestOwner", playersState::PlayerColor::YELLOW, 0, 40, 4, borrowedRoads, nullptr);
   StationInfo stationAInfo = Station::initData("StationA");
   StationInfo stationBInfo = Station::initData("StationB");
   StationInfo stationCInfo = Station::initData("StationC");
