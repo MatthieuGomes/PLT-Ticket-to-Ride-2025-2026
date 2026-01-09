@@ -5,6 +5,8 @@
 #include "client/Client.h"  
 #include <cstring>
 #include <memory>
+#include <cstdlib>
+#include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -23,6 +25,11 @@ namespace {
 
 const int kDefaultCols = 100;
 const int kDefaultRows = 30;
+const bool kEnableGcovPrefix = true; // Set to false to disable gcov output redirection
+const char kGcovPrefixEnv[] = "GCOV_PREFIX";
+const char kGcovPrefixStripEnv[] = "GCOV_PREFIX_STRIP";
+const char kGcovPrefixDir[] = ".gcov";
+const int kGcovDirMode = 0755;
 
 }  // namespace
 
@@ -39,6 +46,19 @@ static void getTerminalSize(int& cols, int& rows) {
             rows = static_cast<int>(ws.ws_row);
         }
     }
+}
+
+static void configureCoverageOutput() {
+    if (!kEnableGcovPrefix) {
+        return;
+    }
+    const char* prefix = std::getenv(kGcovPrefixEnv);
+    if (prefix != nullptr && prefix[0] != '\0') {
+        return;
+    }
+    mkdir(kGcovPrefixDir, kGcovDirMode);
+    setenv(kGcovPrefixEnv, kGcovPrefixDir, 0);
+    setenv(kGcovPrefixStripEnv, "0", 0);
 }
 
 using namespace std;
@@ -61,6 +81,7 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"tui")==0) {
+        configureCoverageOutput();
         int cols = kDefaultCols;
         int rows = kDefaultRows;
         getTerminalSize(cols, rows);
