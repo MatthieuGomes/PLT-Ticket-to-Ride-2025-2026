@@ -411,7 +411,7 @@ std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = 
 std::shared_ptr<cardsState::PlayerCards> test_interact_hand = std::make_shared<cardsState::PlayerCards>(test_interact_dest_cards, test_interact_wagon_cards);
 
 
-TEST(calculatePoints)
+TEST(calculateDestinationPoints)
 {
     ANN_START("calculateDestinationPoints")
     {
@@ -453,6 +453,180 @@ TEST(calculatePoints)
     ANN_END("calculateDestinationPoints")
 }
 
+
+TEST(calculateWagonPoints)
+{
+    ANN_START("calculateWagonPoints")
+
+    auto stationA = std::make_shared<mapState::Station>("A", nullptr, nullptr);
+    auto stationB = std::make_shared<mapState::Station>("B", nullptr, nullptr);
+    auto stationC = std::make_shared<mapState::Station>("C", nullptr, nullptr);
+    auto stationD = std::make_shared<mapState::Station>("D", nullptr, nullptr);
+
+    ANN_START("Case 1: Single length 1 route → 1 point")
+    {
+        auto road1 = std::make_shared<mapState::Road>(
+            1, nullptr, stationA, stationB, mapState::RoadColor::RED, 1, nullptr
+        );
+
+        std::vector<std::shared_ptr<mapState::Road>> borrowed = {road1};
+
+        playersState::Player player(
+            "TestPlayer",
+            PlayerColor::RED,
+            0,
+            45,
+            3,
+            borrowed,
+            nullptr
+        );
+
+        CHECK_EQ(player.calculateWagonPoints(), 1);
+    }
+    ANN_END("Case 1: Single length 1 route → 1 point")
+
+    ANN_START("Case 2: Routes of different lengths (classic case)")
+    {
+        auto road1 = std::make_shared<mapState::Road>(1,nullptr, stationA, stationB, mapState::RoadColor::RED, 1, nullptr);
+        auto road2 = std::make_shared<mapState::Road>(2,nullptr, stationB, stationC, mapState::RoadColor::BLUE, 3, nullptr);
+        auto road3 = std::make_shared<mapState::Road>(3,nullptr, stationC, stationD, mapState::RoadColor::GREEN, 6, nullptr);
+
+        std::vector<std::shared_ptr<mapState::Road>> borrowed = {road1, road2, road3};
+
+        playersState::Player player(
+            "PlayerClassic",
+            PlayerColor::BLUE,
+            0,
+            40,
+            3,
+            borrowed,
+            nullptr
+        );
+
+        CHECK_EQ(player.calculateWagonPoints(), 20);
+    }
+    ANN_END("Case 2: Routes of different lengths (classic case)")
+
+    ANN_START("Case 3: No routes built → 0 points")
+    {
+        playersState::Player player(
+            "EmptyPlayer",
+            PlayerColor::GREEN,
+            0,
+            45,
+            3,
+            {},
+            nullptr
+        );
+
+        CHECK_EQ(player.calculateWagonPoints(), 0);
+    }
+    ANN_END("Case 3: No routes built → 0 points")
+
+    ANN_START("Case 4: Double route (same length) + long route")
+    {
+        auto road1 = std::make_shared<mapState::Road>(1,nullptr, stationA, stationB, mapState::RoadColor::RED, 4, nullptr);
+        auto road2 = std::make_shared<mapState::Road>(2,nullptr, stationA, stationB, mapState::RoadColor::BLUE, 4, nullptr);
+        auto road3 = std::make_shared<mapState::Road>(3,nullptr, stationB, stationC, mapState::RoadColor::PINK, 2, nullptr);
+
+        std::vector<std::shared_ptr<mapState::Road>> borrowed = {road1, road2, road3};
+
+        playersState::Player player(
+            "DoubleRoadPlayer",
+            PlayerColor::YELLOW,
+            0,
+            35,
+            2,
+            borrowed,
+            nullptr
+        );
+
+        CHECK_EQ(player.calculateWagonPoints(), 16);
+    }
+    ANN_END("Case 4: Double route (same length) + long route")
+
+    ANN_END("calculateWagonPoints")
+}
+
+
+
+TEST(calculatePoints)
+{
+    ANN_START("calculatePoints")
+
+    auto stationA = std::make_shared<mapState::Station>("A", nullptr, nullptr);
+    auto stationB = std::make_shared<mapState::Station>("B", nullptr, nullptr);
+    auto stationC = std::make_shared<mapState::Station>("C", nullptr, nullptr);
+
+    ANN_START("Empty player - no roads, no completed destinations → 0 points")
+    {
+        playersState::Player player(
+            "EmptyPlayer",
+            PlayerColor::RED,
+            0,
+            45,
+            3,
+            {},
+            nullptr
+        );
+
+        int total = player.calculatePoints();
+        CHECK_EQ(total, 0);
+    }
+    ANN_END("Empty player - no roads, no completed destinations → 0 points")
+
+    ANN_START("Classic case - some roads + completed destinations")
+    {
+        auto road1 = std::make_shared<mapState::Road>(1,nullptr, stationA, stationB, mapState::RoadColor::RED, 2, nullptr);
+        auto road2 = std::make_shared<mapState::Road>(2,nullptr, stationB, stationC, mapState::RoadColor::BLUE, 4, nullptr);
+
+        std::vector<std::shared_ptr<mapState::Road>> borrowed = {road1, road2};
+
+        playersState::Player player(
+            "NormalPlayer",
+            PlayerColor::BLUE,
+            0,
+            39,
+            3,
+            borrowed,
+            nullptr
+        );
+
+        player.completedDestinations = {
+            std::make_shared<cardsState::DestinationCard>(stationA, stationB, 20, false),
+            std::make_shared<cardsState::DestinationCard>(stationB, stationC, 13, false)
+        };
+
+        int total = player.calculatePoints();
+        CHECK_EQ(total, 42);
+    }
+    ANN_END("Classic case - some roads + completed destinations")
+
+    ANN_START("Only long roads - no destinations")
+    {
+        auto road1 = std::make_shared<mapState::Road>(1,nullptr, stationA, stationB, mapState::RoadColor::GREEN, 6, nullptr);
+        auto road2 = std::make_shared<mapState::Road>(2,nullptr, stationB, stationC, mapState::RoadColor::PINK, 5, nullptr);
+
+        std::vector<std::shared_ptr<mapState::Road>> borrowed = {road1, road2};
+
+        playersState::Player player(
+            "LongRoadsPlayer",
+            PlayerColor::YELLOW,
+            0,
+            34,
+            3,
+            borrowed,
+            nullptr
+        );
+
+        player.completedDestinations.clear();
+
+        CHECK_EQ(player.calculatePoints(), 25);
+    }
+    ANN_END("Only long roads - no destinations")
+
+    ANN_END("calculatePoints")
+}
 // TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
 TEST(isRoadBuildable)
 {
@@ -493,31 +667,176 @@ TEST(isRoadBuildable)
     ANN_END("isRoadBuildable")
 }
 // TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
+
 TEST(getClaimableRoads)
 {
     ANN_START("getClaimableRoads")
+    auto map = std::make_shared<mapState::MapState>(mapState::MapState::Test());
     {
-        
-        ANN_START("success case")
-
-        ANN_END("success case")
+        ANN_START("basic_success_many_wagons")
+        auto player = playersState::Player::Init("SimpleTest", PlayerColor::GREEN, nullptr);
+        player.nbWagons = 45;
+        auto claimable = player.getClaimableRoads(map);
+        BOOST_TEST(!claimable.empty());
+        ANN_END("basic_success_many_wagons")
     }
     {
-        ANN_START("insufficient wagons case")
-
-        ANN_END("insufficient wagons case")
-    }
-    {
-        ANN_START("insufficient cards case")
-
-        ANN_END("insufficient cards case")
-    }
-    {
-        ANN_START("blocked or owned case")
-
-        ANN_END("blocked or owned case")
+        ANN_START("very_few_wagons")
+        auto player = playersState::Player::Init("PoorPlayer", PlayerColor::BLUE, nullptr);
+        player.nbWagons = 1;
+        auto claimable = player.getClaimableRoads(map);
+        BOOST_TEST(claimable.size() <= 9);
+        ANN_END("very_few_wagons")
     }
     ANN_END("getClaimableRoads")
+}
+
+TEST(isDestinationReached)
+{
+
+    ANN_START("isDestinationReached")
+    {
+
+        ANN_START("nullptr_safety_checks")
+        Player player("TestPlayer", PlayerColor::RED, 0, 45, 3, {}, nullptr);
+
+        BOOST_TEST(player.isDestinationReached(nullptr, nullptr) == false);
+        BOOST_TEST(player.isDestinationReached(std::make_shared<mapState::MapState>(), nullptr) == false);
+
+        auto map = std::make_shared<mapState::MapState>();
+        BOOST_TEST(player.isDestinationReached(map, nullptr) == false);
+        ANN_END("nullptr_safety_checks")
+    }
+    {
+        ANN_START("destination_with_null_stations")
+        auto map = std::make_shared<mapState::MapState>();
+        Player player("Alice", PlayerColor::BLUE, 0, 40, 3, {}, nullptr);
+
+        auto badDest = std::make_shared<cardsState::DestinationCard>(nullptr, nullptr,0, 0);
+        BOOST_TEST(player.isDestinationReached(map, badDest) == false);
+        ANN_END("destination_with_null_stations")
+    }
+    {
+        ANN_START("destination_not_reached")
+        auto map = std::make_shared<mapState::MapState>();
+
+        Player player("Bob", PlayerColor::GREEN, 0, 35, 4, {}, nullptr);
+        auto dest = std::make_shared<cardsState::DestinationCard>(
+        std::make_shared<mapState::Station>("Madrid", nullptr, nullptr),
+        std::make_shared<mapState::Station>("Berlin", nullptr, nullptr),
+            12, 20
+        );
+
+        BOOST_TEST(player.isDestinationReached(map, dest) == false);
+        ANN_END("destination_not_reached")
+    }
+    {
+              {
+                  ANN_START("destination_reached")
+
+                  auto map = std::make_shared<mapState::MapState>(mapState::MapState::Europe());
+
+                  Player player("Bob", PlayerColor::GREEN, 0, 35, 4, {}, nullptr);
+
+                  auto madrid = map->getStationByName("madrid");
+                  auto berlin = map->getStationByName("berlin");
+
+                  BOOST_REQUIRE(madrid != nullptr);
+                  BOOST_REQUIRE(berlin != nullptr);
+
+                  auto dest = std::make_shared<cardsState::DestinationCard>(madrid, berlin, 12, 20);
+
+                  BOOST_TEST(player.isDestinationReached(map, dest) == false);
+
+                  std::vector<std::string> path_stations = {
+                      "madrid", "pamplona", "paris", "frankfurt", "berlin"
+                  };
+
+                  std::vector<std::shared_ptr<mapState::Road>> borrowed_roads;
+
+                  for(size_t i = 0; i + 1 < path_stations.size(); ++i)
+                  {
+                      auto stationA = map->getStationByName(path_stations[i]);
+                      auto stationB = map->getStationByName(path_stations[i+1]);
+
+                      BOOST_REQUIRE(stationA && stationB);
+
+                      auto roads_between = map->getRoadsBetweenStations(stationA, stationB);
+                      BOOST_REQUIRE(!roads_between.empty());
+
+                      borrowed_roads.push_back(roads_between[0]);
+                  }
+
+                  player.borrowedRoads = borrowed_roads;
+
+                  BOOST_TEST(player.isDestinationReached(map, dest) == true);
+
+                  if (!player.borrowedRoads.empty())
+                  {
+                      player.borrowedRoads.pop_back();
+                      BOOST_TEST(player.isDestinationReached(map, dest) == false);
+                  }
+
+                  ANN_END("destination_reached")
+              }
+    }
+}
+TEST(display_player) {
+    ANN_START("display") {
+
+        ANN_START("default constructed player (invalid state)")
+        {
+            Player p;
+            std::stringstream buffer;
+            std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+            p.display(0);
+            std::cout.rdbuf(old);
+            std::string out = buffer.str();
+
+            CHECK(out.find("##### PLAYER #####") != std::string::npos);
+            CHECK(out.find("Name: ") != std::string::npos);
+            CHECK(out.find("Color: UNKNOWN") != std::string::npos);
+            CHECK(out.find("Score: -1") != std::string::npos);
+            CHECK(out.find("NbWagons: -1") != std::string::npos);
+            CHECK(out.find("NbStations: -1") != std::string::npos);
+            CHECK(out.find("===== BORROWED ROADS =====") != std::string::npos);
+            CHECK(out.find("\tno roads borrowed yet") != std::string::npos);
+            CHECK(out.find("No hand available.") != std::string::npos);
+            CHECK(out.find("#####################") != std::string::npos);
+        }
+        ANN_END("default constructed player (invalid state)")
+
+        ANN_START("well initialized player - no roads")
+        {
+            std::shared_ptr<mapState::Station> test_stationA = test_interact_map->getStationByName(test_interract_stationA_name);
+            std::shared_ptr<mapState::Station> test_stationB = test_interact_map->getStationByName(test_interract_stationB_name);
+            auto dest = std::make_shared<cardsState::DestinationCard>(test_stationA,test_stationB, 12, false);
+            auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::GREEN);
+            std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
+            std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards = {wagon};
+            auto hand = std::make_shared<cardsState::PlayerCards>(destCards, wagonCards);
+
+            Player p("Sophie", PlayerColor::GREEN, 142, 38, 2, {}, hand);
+
+            std::stringstream buffer;
+            std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+            p.display(1);
+            std::cout.rdbuf(old);
+            std::string out = buffer.str();
+
+            CHECK(out.find("\t##### PLAYER #####") != std::string::npos);
+            CHECK(out.find("\tName: Sophie") != std::string::npos);
+            CHECK(out.find("\tColor: GREEN") != std::string::npos);
+            CHECK(out.find("\tScore: 142") != std::string::npos);
+            CHECK(out.find("\tNbWagons: 38") != std::string::npos);
+            CHECK(out.find("\tNbStations: 2") != std::string::npos);
+            CHECK(out.find("\t===== BORROWED ROADS =====") != std::string::npos);
+            CHECK(out.find("\t\tno roads borrowed yet") != std::string::npos);
+            CHECK(out.find("\t#####################") != std::string::npos);
+        }
+        ANN_END("well initialized player - no roads")
+    }
+    ANN_END("display")
 }
 
 
