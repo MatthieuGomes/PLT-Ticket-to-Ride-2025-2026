@@ -35,6 +35,15 @@ namespace playersState
    int Player::startNbWagons = 45;
    int Player::startNbStations = 3;
 
+   std::unordered_map<int,int> Player::PointsByRoadLength = {
+      {1,1},
+      {2,2},
+      {3,4},
+      {4,7},
+      {5,10},
+      {6,15}
+   };
+
    PlayerColor Player::possibleColors[6] = {PlayerColor::RED,
                                             PlayerColor::BLUE,
                                             PlayerColor::GREEN,
@@ -191,8 +200,7 @@ namespace playersState
       this->score += points;
    }
 
-   // Missing a lot of logic here   change  with  calculatePoints   ca  va  etre  en  fonction  de la map
-   int Player::calculatePoints()
+   int Player::calculateDestinationPoints()
    {
       int total = 0;
       for (std::shared_ptr<cardsState::DestinationCard> dest : completedDestinations)
@@ -203,6 +211,49 @@ namespace playersState
       return total;
    }
    // TODO:  add method to calculate final points
+   int Player::calculateWagonPoints()
+   {
+      int totalPoints = 0;
+      for (const auto& road : borrowedRoads)
+      {
+         int length = road->getLength();
+
+         auto it = Player::PointsByRoadLength.find(length);
+
+         if (it != Player::PointsByRoadLength.end())
+         {
+            totalPoints += it->second;
+         }
+         else
+         {
+            DEBUG_PRINT("Attention : longueur de route non prévue -> " << length);
+
+         }
+      }
+      return totalPoints;
+   }
+
+   int Player::calculatePoints()
+   {
+      return   calculateDestinationPoints() + calculateWagonPoints();
+   }
+
+   bool Player::isDestinationReached(std::shared_ptr<mapState::MapState> map,
+                                  std::shared_ptr<cardsState::DestinationCard> destinationCard)
+   {
+      if (!map || !destinationCard) return false;
+
+      auto stationA = destinationCard->getstationA();
+      auto stationB = destinationCard->getstationB();
+
+      if (!stationA || !stationB) return false;
+
+      return map->isDestinationReached(
+          std::make_shared<Player>(*this),
+          stationA,
+          stationB
+      );
+   }
 
    bool Player::isRoadBuildable(std::shared_ptr<mapState::MapState> map, std::shared_ptr<mapState::Road> road)
    {
@@ -344,7 +395,7 @@ namespace playersState
       std::string indentation(indent, '\t');
       std::cout << indentation <<"##### PLAYER #####" << std::endl;
       std::cout << indentation <<"Name: " << name << std::endl;
-      std::cout << indentation <<"Color: " << color << std::endl;
+      std::cout << indentation <<"Color: " << ColorsNames[this->color]  << std::endl;
       std::cout << indentation <<"Score: " << score << std::endl;
       std::cout << indentation <<"NbWagons: " << nbWagons << std::endl;
       std::cout << indentation <<"NbStations: " << nbStations << std::endl;
@@ -363,7 +414,7 @@ namespace playersState
       std::cout << indentation << "#####################" << std::endl;
       if (hand)
       {
-         hand->display(indent+1);
+        hand->display(indent+1);
       }
       else
       {
