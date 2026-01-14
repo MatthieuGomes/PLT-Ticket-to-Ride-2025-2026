@@ -14,7 +14,7 @@
 
 #include "CommandInput.h"
 #include "InfoPanel.h"
-#include "MapView.h"
+#include "GameView.h"
 #include "StatusBar.h"
 #include "Terminal.h"
 #include "mapState/MapState.h"
@@ -31,7 +31,7 @@ const int kTerminalOrigin = 1;
 const int kStatusBarHeight = 3;
 const int kCommandInputHeight = 3;
 const int kContentVerticalPadding = kStatusBarHeight + kCommandInputHeight;
-// MapView gets roughly 2/3 of the remaining vertical space.
+// GameView gets roughly 2/3 of the remaining vertical space.
 const int kMapHeightNumerator = 2;
 const int kMapHeightDenominator = 3;
 // InfoPanel keeps only the most recent messages.
@@ -53,7 +53,14 @@ const char kEscapeBracket = '[';
 const char kEscapeTerminator = '~';
 const char kPageUpCode = '5';
 const char kPageDownCode = '6';
+const char kArrowUpCode = 'A';
+const char kArrowDownCode = 'B';
+const char kArrowRightCode = 'C';
+const char kArrowLeftCode = 'D';
 const int kMinScrollLines = 1;
+// Disable line wrapping so drawing to the last column doesn't scroll the screen.
+const char kDisableLineWrap[] = "\033[?7l";
+const char kEnableLineWrap[] = "\033[?7h";
 // Key codes for basic input handling.
 const char kNewline = '\n';
 const char kCarriageReturn = '\r';
@@ -101,7 +108,7 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       rows(rows),
       term(terminal),
       statusbar(nullptr),
-      mapview(nullptr),
+      gameview(nullptr),
       infopanel(nullptr),
       commandinput(nullptr),
       running(false),
@@ -125,7 +132,7 @@ TUIManager::TUIManager(
       rows(rows),
       term(terminal),
       statusbar(nullptr),
-      mapview(nullptr),
+      gameview(nullptr),
       infopanel(nullptr),
       commandinput(nullptr),
       running(false),
@@ -162,17 +169,21 @@ void TUIManager::init() {
     statusbar->setTurn(1);
     statusbar->setColors(Color::White, Color::Red);
   }
-  if (!mapview) {
-    mapview = new MapView(
+  if (!gameview) {
+    gameview = new GameView(
         kTerminalOrigin,
         kTerminalOrigin,
         cols,
         std::max(kMinDimension, rows - kContentVerticalPadding));
-    mapview->setTitle("MapView");
-    mapview->setMapState(mapstate);
-    mapview->setHighlightActivePlayer(true);
+    gameview->setTitle("GameView");
+    gameview->setMapState(mapstate);
+    gameview->setPlayerState(playerstate);
+    gameview->setCardsState(cardstate);
+    gameview->setHighlightActivePlayer(true);
   } else {
-    mapview->setMapState(mapstate);
+    gameview->setMapState(mapstate);
+    gameview->setPlayerState(playerstate);
+    gameview->setCardsState(cardstate);
   }
   if (!infopanel) {
     infopanel = new InfoPanel(
@@ -200,7 +211,7 @@ void TUIManager::updateLayout(int newCols, int newRows) {
   cols = clampPositive(newCols, kMinDimension);
   rows = clampPositive(newRows, kMinDimension);
 
-  if (!statusbar || !mapview || !infopanel || !commandinput) {
+  if (!statusbar || !gameview || !infopanel || !commandinput) {
     return;
   }
 
@@ -220,7 +231,7 @@ void TUIManager::updateLayout(int newCols, int newRows) {
   statusbar->setSize(cols, statusHeight);
 
   const int contentY = kTerminalOrigin + statusHeight;
-  // MapView gets the larger share of the content height.
+  // GameView gets the larger share of the content height.
   int mapHeight = contentHeight * kMapHeightNumerator / kMapHeightDenominator;
   mapHeight = clampPositive(mapHeight, kMinDimension);
   int infoHeight = contentHeight - mapHeight;
@@ -229,8 +240,8 @@ void TUIManager::updateLayout(int newCols, int newRows) {
     mapHeight = clampPositive(contentHeight - infoHeight, kMinDimension);
   }
 
-  mapview->setPosition(kTerminalOrigin, contentY);
-  mapview->setSize(cols, mapHeight);
+  gameview->setPosition(kTerminalOrigin, contentY);
+  gameview->setSize(cols, mapHeight);
 
   infopanel->setPosition(kTerminalOrigin, contentY + mapHeight);
   infopanel->setSize(cols, infoHeight);
@@ -240,7 +251,7 @@ void TUIManager::updateLayout(int newCols, int newRows) {
   commandinput->setSize(cols, commandHeight);
 
   statusbar->requestRedraw();
-  mapview->requestRedraw();
+  gameview->requestRedraw();
   infopanel->requestRedraw();
   commandinput->requestRedraw();
 }
@@ -253,8 +264,8 @@ void TUIManager::drawAll() {
   if (statusbar) {
     statusbar->refresh(*term);
   }
-  if (mapview) {
-    mapview->refresh(*term);
+  if (gameview) {
+    gameview->refresh(*term);
   }
   if (infopanel) {
     infopanel->refresh(*term);
@@ -304,8 +315,8 @@ void TUIManager::shutdown() {
   delete statusbar;
   statusbar = nullptr;
 
-  delete mapview;
-  mapview = nullptr;
+  delete gameview;
+  gameview = nullptr;
 
   delete infopanel;
   infopanel = nullptr;
@@ -353,6 +364,7 @@ void TUIManager::runMainLoop() {
   init();
   running = true;
   term->hideCursor();
+  term->write(kDisableLineWrap);
 
   while (running) {
     if (g_shouldStop != 0) {
@@ -374,21 +386,37 @@ void TUIManager::runMainLoop() {
           if (!pollChar(seq2)) {
             continue;
           }
-          if (seq2 != kPageUpCode && seq2 != kPageDownCode) {
-            continue;
-          }
-          char seq3 = '\0';
-          if (!pollChar(seq3) || seq3 != kEscapeTerminator) {
+          if (seq2 == kPageUpCode || seq2 == kPageDownCode) {
+            char seq3 = '\0';
+            if (!pollChar(seq3) || seq3 != kEscapeTerminator) {
+              continue;
+            }
+
+            int scrollAmount = infopanel->getVisibleLineCount();
+            if (scrollAmount < kMinScrollLines) {
+              scrollAmount = kMinScrollLines;
+            }
+            const int delta = (seq2 == kPageUpCode) ? scrollAmount : -scrollAmount;
+            infopanel->scroll(delta);
+            updated = true;
             continue;
           }
 
-          int scrollAmount = infopanel->getVisibleLineCount();
-          if (scrollAmount < kMinScrollLines) {
-            scrollAmount = kMinScrollLines;
+          if (gameview != nullptr && gameview->getMode() == ViewMode::MAP) {
+            if (seq2 == kArrowUpCode) {
+              gameview->moveSelection(-1, 0);
+              updated = true;
+            } else if (seq2 == kArrowDownCode) {
+              gameview->moveSelection(1, 0);
+              updated = true;
+            } else if (seq2 == kArrowLeftCode) {
+              gameview->moveSelection(0, -1);
+              updated = true;
+            } else if (seq2 == kArrowRightCode) {
+              gameview->moveSelection(0, 1);
+              updated = true;
+            }
           }
-          const int delta = (seq2 == kPageUpCode) ? scrollAmount : -scrollAmount;
-          infopanel->scroll(delta);
-          updated = true;
         } else if (ch == kNewline || ch == kCarriageReturn) {
           // Submit current input line.
           std::string input = commandinput->getInput();
@@ -406,6 +434,18 @@ void TUIManager::runMainLoop() {
             updated = true;
           }
         } else if (std::isprint(static_cast<unsigned char>(ch)) != 0) {
+          if (gameview != nullptr && commandinput->getInput().empty()) {
+            if (ch == 'm' || ch == 'M') {
+              gameview->setMode(ViewMode::MAP);
+              updated = true;
+              continue;
+            }
+            if (ch == 'p' || ch == 'P') {
+              gameview->setMode(ViewMode::PLAYER);
+              updated = true;
+              continue;
+            }
+          }
           // Accept printable characters up to the input limit.
           std::string input = commandinput->getInput();
           if (static_cast<int>(input.size()) < kMaxInputLength) {
@@ -425,6 +465,7 @@ void TUIManager::runMainLoop() {
   }
 
   shutdown();
+  term->write(kEnableLineWrap);
   term->resetStyles();
   term->flush();
 

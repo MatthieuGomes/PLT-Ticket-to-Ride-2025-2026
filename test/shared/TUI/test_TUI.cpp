@@ -9,7 +9,7 @@
 #include "../../src/shared/tui/BaseView.h"
 #include "../../src/shared/tui/CommandInput.h"
 #include "../../src/shared/tui/InfoPanel.h"
-#include "../../src/shared/tui/MapView.h"
+#include "../../src/shared/tui/GameView.h"
 #include "../../src/shared/tui/StatusBar.h"
 #include "../../src/shared/tui/Terminal.h"
 #include "../../src/shared/tui/TUIManager.h"
@@ -318,8 +318,8 @@ BOOST_AUTO_TEST_CASE(UpdatesTurnAndPlayer)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-// MapView rendering with minimal map data
-BOOST_AUTO_TEST_SUITE(MapViewTests)
+// GameView rendering with minimal map data
+BOOST_AUTO_TEST_SUITE(GameViewTests)
 
 // Renders a simple map and validates station/route output
 BOOST_AUTO_TEST_CASE(RendersStationsAndRoutes)
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE(RendersStationsAndRoutes)
   mapState::MapState map_state;
   map_state.fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, graph);
 
-  tui::MapView view(1, 1, 80, 8);
+  tui::GameView view(1, 1, 80, 8);
   view.setMapState(&map_state);
 
   tui::Terminal term("");
@@ -366,13 +366,14 @@ BOOST_AUTO_TEST_CASE(RendersStationsAndRoutes)
   BOOST_CHECK(containsText(out, "Alpha"));
   BOOST_CHECK(containsText(out, "Beta"));
   BOOST_CHECK(containsText(out, "Alpha-Beta"));
-  BOOST_CHECK(containsText(out, "\033[48;5;214m"));
+  BOOST_CHECK(containsText(out, "len:4"));
+  BOOST_CHECK(containsText(out, "ORG"));
 }
 
 // Ensures the placeholder appears when no map state is set
 BOOST_AUTO_TEST_CASE(HandlesMissingMapState)
 {
-  tui::MapView view(1, 1, 40, 5);
+  tui::GameView view(1, 1, 40, 5);
 
   tui::Terminal term("");
   CoutCapture capture;
@@ -422,7 +423,7 @@ BOOST_AUTO_TEST_CASE(HighlightsAndFlags)
   mapState::MapState map_state;
   map_state.fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, graph);
 
-  tui::MapView view(1, 1, 80, 8);
+  tui::GameView view(1, 1, 80, 8);
   view.setMapState(&map_state);
   view.setHighlightNode(0);
   view.setHighlightActivePlayer(true);

@@ -5,6 +5,7 @@
 #include "client/Client.h"  
 #include <cstring>
 #include <memory>
+#include <vector>
 #include <cstdlib>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -13,8 +14,12 @@
 #include "tui/Terminal.h"
 #include "tui/TUIManager.h"
 #include "mapState/MapState.h"
+#include "mapState/Road.h"
+#include "mapState/Station.h"
 #include "playersState/PlayersState.h"
 #include "cardsState/CardsState.h"
+#include "cardsState/Deck.h"
+#include "cardsState/DestinationCard.h"
 
 void testSFML() {
     sf::Texture texture;
@@ -88,11 +93,77 @@ int main(int argc,char* argv[])
 
         tui::Terminal term;
         std::shared_ptr<mapState::MapState> map_state =
-            std::make_shared<mapState::MapState>(mapState::MapState::Test());
-        std::shared_ptr<playersState::PlayersState> players_state =
-            std::make_shared<playersState::PlayersState>();
+            std::make_shared<mapState::MapState>(mapState::MapState::Europe());
+
+        // Seed one player so the Player view shows real data.
+        playersState::PlayersState::nbPlayers = 1;
         std::shared_ptr<cardsState::CardsState> cards_state =
-            std::make_shared<cardsState::CardsState>();
+            std::make_shared<cardsState::CardsState>(
+                cardsState::CardsState::Europe(map_state->getStations()));
+        std::shared_ptr<cardsState::PlayerCards> player_hand;
+        if (!cards_state->playersCards.empty()) {
+            player_hand = cards_state->playersCards[0];
+        } else {
+            player_hand = std::make_shared<cardsState::PlayerCards>();
+        }
+
+        std::vector<std::shared_ptr<mapState::Station>> stations = map_state->getStations();
+        std::shared_ptr<mapState::Station> lisboaStation =
+            mapState::Station::getStationByName(stations, "lisboa");
+        std::shared_ptr<mapState::Station> danzigStation =
+            mapState::Station::getStationByName(stations, "danzig");
+        std::vector<std::shared_ptr<cardsState::DestinationCard>> destinationCards;
+        if (lisboaStation && danzigStation) {
+            std::shared_ptr<cardsState::DestinationCard> lisboaDanzig =
+                std::make_shared<cardsState::DestinationCard>(lisboaStation, danzigStation, 20, true);
+            destinationCards.push_back(lisboaDanzig);
+        }
+        player_hand->destinationCards =
+            std::make_shared<cardsState::Deck<cardsState::DestinationCard>>(destinationCards);
+
+        std::shared_ptr<playersState::Player> player =
+            std::make_shared<playersState::Player>(
+                playersState::Player::Init("Player 1", playersState::PlayerColor::RED, player_hand));
+        if (!destinationCards.empty()) {
+            player->completedDestinations.push_back(destinationCards[0]);
+        }
+
+        // Claim a Lisbon -> Danzig path for demo purposes.
+        std::vector<std::pair<std::string, std::string>> ownedPairs;
+        ownedPairs.push_back(std::make_pair("lisboa", "madrid"));
+        ownedPairs.push_back(std::make_pair("madrid", "pamplona"));
+        ownedPairs.push_back(std::make_pair("pamplona", "paris"));
+        ownedPairs.push_back(std::make_pair("paris", "frankfurt"));
+        ownedPairs.push_back(std::make_pair("frankfurt", "berlin"));
+        ownedPairs.push_back(std::make_pair("berlin", "danzig"));
+
+        std::vector<std::shared_ptr<mapState::Road>> roads = map_state->getRoads();
+        std::vector<bool> claimedPairs(ownedPairs.size(), false);
+        for (std::size_t i = 0; i < roads.size(); ++i) {
+            std::shared_ptr<mapState::Road> road = roads[i];
+            if (!road || !road->getStationA() || !road->getStationB()) {
+                continue;
+            }
+            const std::string a = road->getStationA()->getName();
+            const std::string b = road->getStationB()->getName();
+            for (std::size_t j = 0; j < ownedPairs.size(); ++j) {
+                if (claimedPairs[j]) {
+                    continue;
+                }
+                const std::string& first = ownedPairs[j].first;
+                const std::string& second = ownedPairs[j].second;
+                if ((a == first && b == second) || (a == second && b == first)) {
+                    road->setOwner(player);
+                    claimedPairs[j] = true;
+                    break;
+                }
+            }
+        }
+
+        std::vector<std::shared_ptr<playersState::Player>> players;
+        players.push_back(player);
+        std::shared_ptr<playersState::PlayersState> players_state =
+            std::make_shared<playersState::PlayersState>(players);
 
         tui::TUIManager manager(&term, cols, rows,
                                 map_state.get(),
