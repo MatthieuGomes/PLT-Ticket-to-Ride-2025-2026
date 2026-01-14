@@ -57,11 +57,14 @@ const char kArrowUpCode = 'A';
 const char kArrowDownCode = 'B';
 const char kArrowRightCode = 'C';
 const char kArrowLeftCode = 'D';
+const char kShiftTabCode = 'Z';
 const int kMinScrollLines = 1;
+const int kArrowScrollLines = 1;
 // Disable line wrapping so drawing to the last column doesn't scroll the screen.
 const char kDisableLineWrap[] = "\033[?7l";
 const char kEnableLineWrap[] = "\033[?7h";
 // Key codes for basic input handling.
+const char kTab = '\t';
 const char kNewline = '\n';
 const char kCarriageReturn = '\r';
 const char kBackspace = '\b';
@@ -112,6 +115,7 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       infopanel(nullptr),
       commandinput(nullptr),
       running(false),
+      focus(Focus::COMMAND_FOCUS),
       mapstate(nullptr),
       playerstate(nullptr),
       cardstate(nullptr),
@@ -136,6 +140,7 @@ TUIManager::TUIManager(
       infopanel(nullptr),
       commandinput(nullptr),
       running(false),
+      focus(Focus::COMMAND_FOCUS),
       mapstate(mapState),
       playerstate(playerState),
       cardstate(cardState),
@@ -205,6 +210,7 @@ void TUIManager::init() {
   }
 
   updateLayout(cols, rows);
+  setFocus(focus);
 }
 
 void TUIManager::updateLayout(int newCols, int newRows) {
@@ -254,6 +260,39 @@ void TUIManager::updateLayout(int newCols, int newRows) {
   gameview->requestRedraw();
   infopanel->requestRedraw();
   commandinput->requestRedraw();
+}
+
+void TUIManager::setFocus(Focus nextFocus) {
+  focus = nextFocus;
+  if (gameview) {
+    gameview->setFocused(focus == Focus::MAP_FOCUS);
+  }
+  if (infopanel) {
+    infopanel->setFocused(focus == Focus::INFO_FOCUS);
+  }
+  if (commandinput) {
+    commandinput->setFocused(focus == Focus::COMMAND_FOCUS);
+  }
+}
+
+void TUIManager::focusNext() {
+  if (focus == Focus::COMMAND_FOCUS) {
+    setFocus(Focus::MAP_FOCUS);
+  } else if (focus == Focus::MAP_FOCUS) {
+    setFocus(Focus::INFO_FOCUS);
+  } else {
+    setFocus(Focus::COMMAND_FOCUS);
+  }
+}
+
+void TUIManager::focusPrev() {
+  if (focus == Focus::COMMAND_FOCUS) {
+    setFocus(Focus::INFO_FOCUS);
+  } else if (focus == Focus::INFO_FOCUS) {
+    setFocus(Focus::MAP_FOCUS);
+  } else {
+    setFocus(Focus::COMMAND_FOCUS);
+  }
 }
 
 void TUIManager::drawAll() {
@@ -376,7 +415,13 @@ void TUIManager::runMainLoop() {
       char ch = '\0';
       bool updated = false;
       while (pollChar(ch)) {
-        if (ch == kEscape && infopanel != nullptr) {
+        if (ch == kTab) {
+          focusNext();
+          updated = true;
+          continue;
+        }
+
+        if (ch == kEscape) {
           // Handle PageUp/PageDown escape sequences to scroll the info panel.
           char seq1 = '\0';
           if (!pollChar(seq1) || seq1 != kEscapeBracket) {
@@ -386,23 +431,43 @@ void TUIManager::runMainLoop() {
           if (!pollChar(seq2)) {
             continue;
           }
+          if (seq2 == kShiftTabCode) {
+            focusPrev();
+            updated = true;
+            continue;
+          }
           if (seq2 == kPageUpCode || seq2 == kPageDownCode) {
             char seq3 = '\0';
             if (!pollChar(seq3) || seq3 != kEscapeTerminator) {
               continue;
             }
-
-            int scrollAmount = infopanel->getVisibleLineCount();
-            if (scrollAmount < kMinScrollLines) {
-              scrollAmount = kMinScrollLines;
+            if (infopanel != nullptr && focus == Focus::INFO_FOCUS) {
+              int scrollAmount = infopanel->getVisibleLineCount();
+              if (scrollAmount < kMinScrollLines) {
+                scrollAmount = kMinScrollLines;
+              }
+              const int delta = (seq2 == kPageUpCode) ? scrollAmount : -scrollAmount;
+              infopanel->scroll(delta);
+              updated = true;
             }
-            const int delta = (seq2 == kPageUpCode) ? scrollAmount : -scrollAmount;
-            infopanel->scroll(delta);
-            updated = true;
             continue;
           }
 
-          if (gameview != nullptr && gameview->getMode() == ViewMode::MAP) {
+          if (infopanel != nullptr && focus == Focus::INFO_FOCUS) {
+            if (seq2 == kArrowUpCode) {
+              infopanel->scroll(kArrowScrollLines);
+              updated = true;
+              continue;
+            }
+            if (seq2 == kArrowDownCode) {
+              infopanel->scroll(-kArrowScrollLines);
+              updated = true;
+              continue;
+            }
+          }
+
+          if (gameview != nullptr && focus == Focus::MAP_FOCUS &&
+              gameview->getMode() == ViewMode::MAP) {
             if (seq2 == kArrowUpCode) {
               gameview->moveSelection(-1, 0);
               updated = true;
@@ -417,41 +482,41 @@ void TUIManager::runMainLoop() {
               updated = true;
             }
           }
-        } else if (ch == kNewline || ch == kCarriageReturn) {
-          // Submit current input line.
-          std::string input = commandinput->getInput();
-          if (!input.empty()) {
-            handleInput(input);
-          }
-          commandinput->clearInput();
-          updated = true;
-        } else if (ch == kDelete || ch == kBackspace) {
-          // Backspace support.
-          std::string input = commandinput->getInput();
-          if (!input.empty()) {
-            input.pop_back();
-            commandinput->setInput(input);
+        } else if (focus == Focus::COMMAND_FOCUS) {
+          if (ch == kNewline || ch == kCarriageReturn) {
+            // Submit current input line.
+            std::string input = commandinput->getInput();
+            if (!input.empty()) {
+              handleInput(input);
+            }
+            commandinput->clearInput();
             updated = true;
+          } else if (ch == kDelete || ch == kBackspace) {
+            // Backspace support.
+            std::string input = commandinput->getInput();
+            if (!input.empty()) {
+              input.pop_back();
+              commandinput->setInput(input);
+              updated = true;
+            }
+          } else if (std::isprint(static_cast<unsigned char>(ch)) != 0) {
+            // Accept printable characters up to the input limit.
+            std::string input = commandinput->getInput();
+            if (static_cast<int>(input.size()) < kMaxInputLength) {
+              input.push_back(ch);
+              commandinput->setInput(input);
+              updated = true;
+            }
           }
-        } else if (std::isprint(static_cast<unsigned char>(ch)) != 0) {
+        } else if (focus == Focus::MAP_FOCUS) {
           if (gameview != nullptr && commandinput->getInput().empty()) {
             if (ch == 'm' || ch == 'M') {
               gameview->setMode(ViewMode::MAP);
               updated = true;
-              continue;
-            }
-            if (ch == 'p' || ch == 'P') {
+            } else if (ch == 'p' || ch == 'P') {
               gameview->setMode(ViewMode::PLAYER);
               updated = true;
-              continue;
             }
-          }
-          // Accept printable characters up to the input limit.
-          std::string input = commandinput->getInput();
-          if (static_cast<int>(input.size()) < kMaxInputLength) {
-            input.push_back(ch);
-            commandinput->setInput(input);
-            updated = true;
           }
         }
       }

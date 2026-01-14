@@ -15,6 +15,9 @@ const int kFrameOffset = 1;
 // Use a solid gray border (bright black) made of spaces with a gray background.
 const Color kFrameBorderFg = Color::BrightBlack;
 const Color kFrameBorderBg = Color::BrightBlack;
+// Focused border uses a brighter background for emphasis.
+const Color kFocusBorderFg = Color::Black;
+const Color kFocusBorderBg = Color::BrightWhite;
 const char kFrameBorderFill = ' ';
 // Header needs at least corners + 2 chars to be worth drawing.
 const int kHeaderMinWidth = 4;
@@ -23,6 +26,9 @@ const int kHeaderPadding = 2;
 // Title label colors: light gray background with black text.
 const Color kHeaderTextFg = Color::Black;
 const Color kHeaderTextBg = Color::BrightWhite;
+// Focused header tint to highlight the active panel.
+const Color kHeaderFocusTextFg = Color::Black;
+const Color kHeaderFocusTextBg = Color::BrightYellow;
 
 }  // namespace
 
@@ -34,7 +40,8 @@ BaseView::BaseView(int x, int y, int width, int height, const std::string& title
       title(title),
       needsRedraw(true),
       bgColor(Color::Default),
-      fgColor(Color::Default) {}
+      fgColor(Color::Default),
+      focused(false) {}
 
 BaseView::~BaseView() {}
 
@@ -70,6 +77,14 @@ void BaseView::setColors(Color fg, Color bg) {
   }
   fgColor = fg;
   bgColor = bg;
+  requestRedraw();
+}
+
+void BaseView::setFocused(bool value) {
+  if (focused == value) {
+    return;
+  }
+  focused = value;
   requestRedraw();
 }
 
@@ -124,8 +139,10 @@ void BaseView::drawFrame(Terminal& term) {
     return;
   }
 
-  term.setBg(kFrameBorderBg);
-  term.setFg(kFrameBorderFg);
+  Color borderBg = focused ? kFocusBorderBg : kFrameBorderBg;
+  Color borderFg = focused ? kFocusBorderFg : kFrameBorderFg;
+  term.setBg(borderBg);
+  term.setFg(borderFg);
 
   // Top border (solid block).
   term.moveTo(y, x);
@@ -167,8 +184,10 @@ void BaseView::drawHeader(Terminal& term) {
 
   term.setBg(bgColor);
   term.setFg(fgColor);
-  term.setBg(kHeaderTextBg);
-  term.setFg(kHeaderTextFg);
+  Color headerBg = focused ? kHeaderFocusTextBg : kHeaderTextBg;
+  Color headerFg = focused ? kHeaderFocusTextFg : kHeaderTextFg;
+  term.setBg(headerBg);
+  term.setFg(headerFg);
   term.moveTo(y, x + kHeaderPadding);
   term.write(text);
   // Restore view colors for the remaining drawing operations.
@@ -258,6 +277,10 @@ void BaseView::setFgColor(Color value) {
   }
   fgColor = value;
   requestRedraw();
+}
+
+bool BaseView::getFocused() const {
+  return focused;
 }
 
 }  // namespace tui
