@@ -263,6 +263,11 @@ void TUIManager::updateLayout(int newCols, int newRows) {
 }
 
 void TUIManager::setFocus(Focus nextFocus) {
+  if (focus == Focus::MAP_FOCUS && nextFocus != Focus::MAP_FOCUS) {
+    if (gameview) {
+      gameview->clearSearchQuery();
+    }
+  }
   focus = nextFocus;
   if (gameview) {
     gameview->setFocused(focus == Focus::MAP_FOCUS);
@@ -509,12 +514,29 @@ void TUIManager::runMainLoop() {
             }
           }
         } else if (focus == Focus::MAP_FOCUS) {
-          if (gameview != nullptr && commandinput->getInput().empty()) {
-            if (ch == 'm' || ch == 'M') {
+          if (ch == kNewline || ch == kCarriageReturn) {
+            if (gameview != nullptr && gameview->getMode() == ViewMode::MAP) {
+              gameview->clearSearchQuery();
+              updated = true;
+            }
+          } else if (ch == kDelete || ch == kBackspace) {
+            if (gameview != nullptr && gameview->getMode() == ViewMode::MAP) {
+              gameview->backspaceSearch();
+              updated = true;
+            }
+          } else if (ch == 'M') {
+            if (gameview != nullptr) {
               gameview->setMode(ViewMode::MAP);
               updated = true;
-            } else if (ch == 'p' || ch == 'P') {
+            }
+          } else if (ch == 'P') {
+            if (gameview != nullptr) {
               gameview->setMode(ViewMode::PLAYER);
+              updated = true;
+            }
+          } else if (std::isalnum(static_cast<unsigned char>(ch)) != 0) {
+            if (gameview != nullptr && gameview->getMode() == ViewMode::MAP) {
+              gameview->appendSearchChar(ch);
               updated = true;
             }
           }

@@ -122,6 +122,16 @@ std::string toUpperShort(const std::string& text) {
   return out;
 }
 
+std::string toLowerText(const std::string& text) {
+  std::string out;
+  out.reserve(text.size());
+  for (std::size_t i = 0; i < text.size(); ++i) {
+    char ch = text[i];
+    out.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+  }
+  return out;
+}
+
 std::string stationNameOrPlaceholder(const std::shared_ptr<mapState::Station>& station) {
   if (station) {
     return station->getName();
@@ -224,7 +234,8 @@ GameView::GameView(int x, int y, int width, int height)
       layoutMinCol(0),
       layoutMaxCol(0),
       layoutPath(kDefaultLayoutPath),
-      layoutEntries() {
+      layoutEntries(),
+      searchQuery() {
   requestRedraw();
 }
 
@@ -233,6 +244,7 @@ void GameView::setMapState(mapState::MapState* state) {
     return;
   }
   mapState = state;
+  searchQuery.clear();
   if (!mapState) {
     highlightNodeId = kNoHighlight;
     layoutLoaded = false;
@@ -290,6 +302,9 @@ void GameView::setMode(ViewMode newMode) {
     return;
   }
   mode = newMode;
+  if (!searchQuery.empty()) {
+    searchQuery.clear();
+  }
   requestRedraw();
 }
 
@@ -397,6 +412,47 @@ void GameView::moveSelection(int deltaRow, int deltaCol) {
     highlightNodeId = targetIndex;
     requestRedraw();
   }
+}
+
+void GameView::setSearchQuery(const std::string& query) {
+  std::string normalized = toLowerText(trim(query));
+  if (searchQuery == normalized) {
+    return;
+  }
+  searchQuery = normalized;
+  if (!searchQuery.empty()) {
+    int matchIndex = findUniqueMatchIndex(searchQuery);
+    if (matchIndex >= 0) {
+      highlightNodeId = matchIndex;
+    }
+  }
+  requestRedraw();
+}
+
+void GameView::appendSearchChar(char ch) {
+  if (std::isalnum(static_cast<unsigned char>(ch)) == 0) {
+    return;
+  }
+  std::string next = searchQuery;
+  next.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+  setSearchQuery(next);
+}
+
+void GameView::backspaceSearch() {
+  if (searchQuery.empty()) {
+    return;
+  }
+  std::string next = searchQuery;
+  next.pop_back();
+  setSearchQuery(next);
+}
+
+void GameView::clearSearchQuery() {
+  if (searchQuery.empty()) {
+    return;
+  }
+  searchQuery.clear();
+  requestRedraw();
 }
 
 void GameView::refreshOwnerships() {
@@ -704,6 +760,15 @@ void GameView::drawContent(Terminal& term) {
       writeClampedLine(term, detailsRow, detailsX, detailsWidth, "X=unclaimed");
     }
   }
+
+  // Draw the search query on the last line of the map area.
+  const int searchRow = endRow - 1;
+  if (searchRow >= row) {
+    std::string prompt = "Search: " + searchQuery;
+    term.setBg(bgColor);
+    term.setFg(fgColor);
+    writeClampedLine(term, searchRow, x + kFrameOffset, mapWidth, prompt);
+  }
 }
 
 std::string GameView::colorCardToString(mapState::RoadColor color) {
@@ -721,6 +786,23 @@ std::string GameView::colorCardToString(mapState::RoadColor color) {
     default:
       return "NON";
   }
+}
+
+int GameView::findUniqueMatchIndex(const std::string& query) {
+  if (query.empty()) {
+    return -1;
+  }
+  int matchIndex = -1;
+  for (std::size_t i = 0; i < layoutEntries.size(); ++i) {
+    const std::string& name = layoutEntries[i].name;
+    if (name.compare(0, query.size(), query) == 0) {
+      if (matchIndex >= 0) {
+        return -1;
+      }
+      matchIndex = static_cast<int>(i);
+    }
+  }
+  return matchIndex;
 }
 
 void GameView::writeClampedLine(
