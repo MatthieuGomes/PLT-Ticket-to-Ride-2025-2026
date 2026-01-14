@@ -1,11 +1,13 @@
 # TUI Navigation / Navigation TUI
 
 ## English
-- `m`: switch to Map view (only when the input line is empty)
-- `p`: switch to Player view (only when the input line is empty)
-- Arrow keys: move station selection in Map view (same column index for up/down, same row for left/right)
-- `PageUp` / `PageDown`: scroll InfoPanel history
-- Type text: goes into the CommandInput line
+- `Tab`: cycle focus (Command -> Map -> Info). The focused panel is highlighted.
+- `Shift+Tab`: cycle focus backwards
+- `m`: switch to Map view (focus must be Map)
+- `p`: switch to Player view (focus must be Map)
+- Arrow keys: move station selection in Map view (focus must be Map); scroll InfoPanel (focus must be Info)
+- `PageUp` / `PageDown`: scroll InfoPanel history (focus must be Info)
+- Type text: goes into CommandInput (focus must be Command)
 - `Enter`: submit a command (`exit` closes the TUI)
 - `Backspace` / `Delete`: remove the last character
 - `Ctrl+C`: quit immediately
@@ -15,11 +17,13 @@ Notes:
 - The map layout is loaded from `ressources/europe_layout.txt`. Edit that file to move station labels.
 
 ## Francais
-- `m` : basculer vers la vue Carte (ligne de commande vide)
-- `p` : basculer vers la vue Joueur (ligne de commande vide)
-- Fleches : deplacer la selection en vue Carte (meme colonne pour haut/bas, meme ligne pour gauche/droite)
-- `PageUp` / `PageDown` : defiler l'InfoPanel
-- Saisie : texte dans la ligne de commande
+- `Tab` : changer le focus (Commande -> Carte -> Info). Le panneau actif est mis en evidence.
+- `Shift+Tab` : changer le focus en sens inverse
+- `m` : basculer vers la vue Carte (focus sur Carte)
+- `p` : basculer vers la vue Joueur (focus sur Carte)
+- Fleches : deplacer la selection en vue Carte (focus sur Carte) ; defiler l'InfoPanel (focus sur Info)
+- `PageUp` / `PageDown` : defiler l'InfoPanel (focus sur Info)
+- Saisie : texte dans CommandInput (focus sur Commande)
 - `Entree` : envoyer la commande (`exit` ferme la TUI)
 - `Retour arriere` / `Suppr` : enlever le dernier caractere
 - `Ctrl+C` : quitter immediatement
