@@ -3,9 +3,11 @@
 ## English
 - `Tab`: cycle focus (Command -> Map -> Info). The focused panel is highlighted.
 - `Shift+Tab`: cycle focus backwards
-- `m`: switch to Map view (focus must be Map)
-- `p`: switch to Player view (focus must be Map)
+- `M`: switch to Map view (focus must be Map)
+- `P`: switch to Player view (focus must be Map)
 - Arrow keys: move station selection in Map view (focus must be Map); scroll InfoPanel (focus must be Info)
+- Type letters/digits in Map focus: search stations by name prefix (unique match highlights)
+- `Enter` in Map focus: clear search
 - `PageUp` / `PageDown`: scroll InfoPanel history (focus must be Info)
 - Type text: goes into CommandInput (focus must be Command)
 - `Enter`: submit a command (`exit` closes the TUI)
@@ -19,9 +21,11 @@ Notes:
 ## Francais
 - `Tab` : changer le focus (Commande -> Carte -> Info). Le panneau actif est mis en evidence.
 - `Shift+Tab` : changer le focus en sens inverse
-- `m` : basculer vers la vue Carte (focus sur Carte)
-- `p` : basculer vers la vue Joueur (focus sur Carte)
+- `M` : basculer vers la vue Carte (focus sur Carte)
+- `P` : basculer vers la vue Joueur (focus sur Carte)
 - Fleches : deplacer la selection en vue Carte (focus sur Carte) ; defiler l'InfoPanel (focus sur Info)
+- Saisie lettres/chiffres en focus Carte : recherche par prefixe (affiche une station si unique)
+- `Entree` en focus Carte : effacer la recherche
 - `PageUp` / `PageDown` : defiler l'InfoPanel (focus sur Info)
 - Saisie : texte dans CommandInput (focus sur Commande)
 - `Entree` : envoyer la commande (`exit` ferme la TUI)
