@@ -129,6 +129,7 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       infopanel(nullptr),
       commandinput(nullptr),
       running(false),
+      debugRender(false),
       focus(Focus::COMMAND_FOCUS),
       mapstate(nullptr),
       playerstate(nullptr),
@@ -154,6 +155,7 @@ TUIManager::TUIManager(
       infopanel(nullptr),
       commandinput(nullptr),
       running(false),
+      debugRender(false),
       focus(Focus::COMMAND_FOCUS),
       mapstate(mapState),
       playerstate(playerState),
@@ -225,6 +227,10 @@ void TUIManager::init() {
 
   updateLayout(cols, rows);
   setFocus(focus);
+}
+
+void TUIManager::setDebugRender(bool enabled) {
+  debugRender = enabled;
 }
 
 void TUIManager::updateLayout(int newCols, int newRows) {
@@ -551,6 +557,11 @@ void TUIManager::runMainLoop() {
           } else if (ch == 'P') {
             if (gameview != nullptr) {
               gameview->setMode(ViewMode::PLAYER);
+              updated = true;
+            }
+          } else if (ch == 'C') {
+            if (debugRender && gameview != nullptr) {
+              gameview->setMode(ViewMode::CARDS);
               updated = true;
             }
           } else if (std::isalnum(static_cast<unsigned char>(ch)) != 0) {
