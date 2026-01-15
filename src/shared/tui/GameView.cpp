@@ -42,9 +42,12 @@ const int kPanelGap = 2;
 const int kScrollMargin = 1;
 // When no player is available.
 const char kNoPlayerText[] = "No player data";
+const char kNoCardText[] = "No card data";
 const int kCardBlockWidth = 2;
 const int kCardBlockGap = 2;
 const int kCardLabelWidth = 3;
+const int kPlayerColumnGap = 2;
+const int kMinPlayerColumnWidth = 18;
 
 Color roadColorToAnsi(mapState::RoadColor color) {
   switch (color) {
@@ -63,6 +66,19 @@ Color roadColorToAnsi(mapState::RoadColor color) {
   }
 }
 
+Color playerColorToAnsi(playersState::PlayerColor color) {
+  switch (color) {
+    case playersState::PlayerColor::RED: return Color::BrightRed;
+    case playersState::PlayerColor::BLUE: return Color::BrightBlue;
+    case playersState::PlayerColor::GREEN: return Color::BrightGreen;
+    case playersState::PlayerColor::BLACK: return Color::BrightBlack;
+    case playersState::PlayerColor::YELLOW: return Color::BrightYellow;
+    case playersState::PlayerColor::UNKNOWN:
+    default:
+      return Color::Default;
+  }
+}
+
 std::string roadTypeToken(const std::shared_ptr<mapState::Road>& road) {
   if (!road) {
     return "R";
@@ -74,23 +90,6 @@ std::string roadTypeToken(const std::shared_ptr<mapState::Road>& road) {
     return "F";
   }
   return "R";
-}
-
-std::string wagonColorToString(cardsState::ColorCard color) {
-  switch (color) {
-    case cardsState::ColorCard::RED: return "RED";
-    case cardsState::ColorCard::BLUE: return "BLU";
-    case cardsState::ColorCard::GREEN: return "GRN";
-    case cardsState::ColorCard::BLACK: return "BLK";
-    case cardsState::ColorCard::YELLOW: return "YEL";
-    case cardsState::ColorCard::ORANGE: return "ORG";
-    case cardsState::ColorCard::PINK: return "PNK";
-    case cardsState::ColorCard::WHITE: return "WHT";
-    case cardsState::ColorCard::LOCOMOTIVE: return "LOC";
-    case cardsState::ColorCard::UNKNOWN:
-    default:
-      return "UNK";
-  }
 }
 
 Color wagonColorToAnsi(cardsState::ColorCard color) {
@@ -139,7 +138,7 @@ std::string stationNameOrPlaceholder(const std::shared_ptr<mapState::Station>& s
   return "Unknown";
 }
 
-void drawWagonCards(
+void drawWagonBlocks(
     Terminal& term,
     int row,
     int col,
@@ -153,7 +152,7 @@ void drawWagonCards(
 
   int cursor = 0;
   for (std::size_t i = 0; i < cards.size(); ++i) {
-    if (cursor + kCardBlockWidth + kCardLabelWidth > width) {
+    if (cursor + kCardBlockWidth > width) {
       break;
     }
     std::shared_ptr<cardsState::WagonCard> card = cards[i];
@@ -177,11 +176,7 @@ void drawWagonCards(
     term.setBg(bg);
     term.setFg(fg);
 
-    term.write(" ");
-    term.write(wagonColorToString(card->getColor()));
-
     cursor += kCardBlockWidth;
-    cursor += 1 + kCardLabelWidth;
     if (cursor + kCardBlockGap > width) {
       break;
     }
@@ -473,90 +468,299 @@ void GameView::drawContent(Terminal& term) {
   term.setFg(fgColor);
 
   if (mode == ViewMode::PLAYER) {
-    const int playerWidth = contentWidth;
     for (int r = 0; r < contentRows; ++r) {
-      writeClampedLine(term, row + r, x + kFrameOffset, playerWidth, "");
+      writeClampedLine(term, row + r, x + kFrameOffset, contentWidth, "");
     }
     if (!playerState || playerState->players.empty()) {
-      writeClampedLine(term, row, x + kFrameOffset, playerWidth, kNoPlayerText);
+      writeClampedLine(term, row, x + kFrameOffset, contentWidth, kNoPlayerText);
       return;
     }
 
-    std::shared_ptr<playersState::Player> player = playerState->players[0];
-    std::ostringstream header;
-    header << "Player: " << player->getName() << " | Score " << player->getScore();
-    writeClampedLine(term, row, x + kFrameOffset, playerWidth, header.str());
-    row += 2;
-
-    std::ostringstream wagons;
-    wagons << "Wagons: " << player->getNbWagons() << " | Stations: " << player->getNbStations();
-    writeClampedLine(term, row, x + kFrameOffset, playerWidth, wagons.str());
-    row += 2;
-
-    std::shared_ptr<cardsState::PlayerCards> hand = player->getHand();
-    writeClampedLine(term, row, x + kFrameOffset, playerWidth, "Hand:");
-    ++row;
-
-    if (hand && hand->wagonCards) {
-      std::vector<std::shared_ptr<cardsState::WagonCard>> wagonsCards = hand->wagonCards->cards;
-      writeClampedLine(term, row, x + kFrameOffset, playerWidth, "");
-      drawWagonCards(term, row, x + kFrameOffset, playerWidth, wagonsCards, fgColor, bgColor);
-      ++row;
+    int playerCount = static_cast<int>(playerState->players.size());
+    int maxPlayers = contentWidth / kMinPlayerColumnWidth;
+    if (maxPlayers < 1) {
+      maxPlayers = 1;
+    }
+    int shownPlayers = playerCount;
+    if (shownPlayers > maxPlayers) {
+      shownPlayers = maxPlayers;
     }
 
-    if (cardState && cardState->gameWagonCards && cardState->gameWagonCards->faceUpCards) {
-      writeClampedLine(term, row, x + kFrameOffset, playerWidth, "Face-up:");
-      ++row;
-      const std::vector<std::shared_ptr<cardsState::WagonCard>> faceUpCards =
-          cardState->gameWagonCards->faceUpCards->cards;
-      writeClampedLine(term, row, x + kFrameOffset, playerWidth, "");
-      drawWagonCards(term, row, x + kFrameOffset, playerWidth, faceUpCards, fgColor, bgColor);
-      row += 2;
+    int totalGap = kPlayerColumnGap * (shownPlayers - 1);
+    int columnWidth = (contentWidth - totalGap) / shownPlayers;
+    if (columnWidth < 1) {
+      columnWidth = contentWidth;
     }
 
-    writeClampedLine(term, row, x + kFrameOffset, playerWidth, "Destinations:");
-    ++row;
-    if (hand && hand->destinationCards) {
-      const std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards =
-          hand->destinationCards->cards;
-      for (std::size_t i = 0; i < destCards.size() && row < endRow; ++i) {
-        if (!destCards[i]) {
-          continue;
-        }
-        std::shared_ptr<mapState::Station> stationA = destCards[i]->getstationA();
-        std::shared_ptr<mapState::Station> stationB = destCards[i]->getstationB();
-        const std::string a = stationNameOrPlaceholder(stationA);
-        const std::string b = stationNameOrPlaceholder(stationB);
-        bool completed = false;
-        for (std::size_t j = 0; j < player->completedDestinations.size(); ++j) {
-          std::shared_ptr<cardsState::DestinationCard> completedCard =
-              player->completedDestinations[j];
-          if (!completedCard) {
+    for (int i = 0; i < shownPlayers; ++i) {
+      std::shared_ptr<playersState::Player> player = playerState->players[i];
+      int col = x + kFrameOffset + i * (columnWidth + kPlayerColumnGap);
+      int currentRow = row;
+
+      if (!player) {
+        std::ostringstream placeholder;
+        placeholder << "Player " << (i + 1);
+        writeClampedLine(term, currentRow, col, columnWidth, placeholder.str());
+        continue;
+      }
+
+      term.setBg(playerColorToAnsi(player->getColor()));
+      term.setFg(Color::Black);
+      term.moveTo(currentRow, col);
+      term.writeRepeat(' ', 2);
+      term.setBg(bgColor);
+      term.setFg(fgColor);
+      writeClampedLine(term, currentRow, col + 2, columnWidth - 2, " " + player->getName());
+      ++currentRow;
+
+      if (currentRow >= endRow) {
+        continue;
+      }
+      std::ostringstream scoreLine;
+      scoreLine << "Score: " << player->getScore();
+      writeClampedLine(term, currentRow, col, columnWidth, scoreLine.str());
+      ++currentRow;
+
+      if (currentRow >= endRow) {
+        continue;
+      }
+      std::ostringstream wagonsLine;
+      wagonsLine << "Wagons: " << player->getNbWagons();
+      writeClampedLine(term, currentRow, col, columnWidth, wagonsLine.str());
+      ++currentRow;
+
+      if (currentRow >= endRow) {
+        continue;
+      }
+      std::ostringstream stationsLine;
+      stationsLine << "Stations: " << player->getNbStations();
+      writeClampedLine(term, currentRow, col, columnWidth, stationsLine.str());
+      ++currentRow;
+
+      if (currentRow >= endRow) {
+        continue;
+      }
+      writeClampedLine(term, currentRow, col, columnWidth, "Hand:");
+      ++currentRow;
+
+      std::shared_ptr<cardsState::PlayerCards> hand = player->getHand();
+      if (currentRow < endRow && hand && hand->wagonCards) {
+        drawWagonBlocks(term, currentRow, col, columnWidth, hand->wagonCards->cards,
+                        fgColor, bgColor);
+        ++currentRow;
+      }
+
+      if (currentRow >= endRow) {
+        continue;
+      }
+      writeClampedLine(term, currentRow, col, columnWidth, "Destinations:");
+      ++currentRow;
+
+      if (hand && hand->destinationCards) {
+        const std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards =
+            hand->destinationCards->cards;
+        for (std::size_t j = 0; j < destCards.size() && currentRow < endRow; ++j) {
+          if (!destCards[j]) {
             continue;
           }
-          std::shared_ptr<mapState::Station> completedA = completedCard->getstationA();
-          std::shared_ptr<mapState::Station> completedB = completedCard->getstationB();
-          if (!completedA || !completedB || !stationA || !stationB) {
+          std::shared_ptr<mapState::Station> stationA = destCards[j]->getstationA();
+          std::shared_ptr<mapState::Station> stationB = destCards[j]->getstationB();
+          const std::string a = stationNameOrPlaceholder(stationA);
+          const std::string b = stationNameOrPlaceholder(stationB);
+          bool completed = false;
+          for (std::size_t k = 0; k < player->completedDestinations.size(); ++k) {
+            std::shared_ptr<cardsState::DestinationCard> completedCard =
+                player->completedDestinations[k];
+            if (!completedCard) {
+              continue;
+            }
+            std::shared_ptr<mapState::Station> completedA = completedCard->getstationA();
+            std::shared_ptr<mapState::Station> completedB = completedCard->getstationB();
+            if (!completedA || !completedB || !stationA || !stationB) {
+              continue;
+            }
+            if (completedA->getName() == a && completedB->getName() == b) {
+              completed = true;
+              break;
+            }
+          }
+          std::ostringstream line;
+          line << a << "-" << b << " " << (completed ? "V" : "X");
+          std::string lineText = line.str();
+          writeClampedLine(term, currentRow, col, columnWidth, lineText);
+          int markerOffset = static_cast<int>(lineText.size()) - 1;
+          if (markerOffset >= 0 && markerOffset < columnWidth) {
+            term.setBg(bgColor);
+            term.setFg(completed ? Color::BrightGreen : Color::BrightRed);
+            term.moveTo(currentRow, col + markerOffset);
+            term.write(completed ? "V" : "X");
+            term.setFg(fgColor);
+          }
+          ++currentRow;
+        }
+      }
+    }
+    return;
+  }
+
+  if (mode == ViewMode::CARDS) {
+    for (int r = 0; r < contentRows; ++r) {
+      writeClampedLine(term, row + r, x + kFrameOffset, contentWidth, "");
+    }
+    if (!cardState) {
+      writeClampedLine(term, row, x + kFrameOffset, contentWidth, kNoCardText);
+      return;
+    }
+
+    int currentRow = row;
+    writeClampedLine(term, currentRow, x + kFrameOffset, contentWidth, "Shared Wagon Deck");
+    ++currentRow;
+
+    if (cardState->gameWagonCards) {
+      int faceDownCount = 0;
+      int trashCount = 0;
+      if (cardState->gameWagonCards->faceDownCards) {
+        faceDownCount =
+            static_cast<int>(cardState->gameWagonCards->faceDownCards->cards.size());
+      }
+      if (cardState->gameWagonCards->trash) {
+        trashCount = static_cast<int>(cardState->gameWagonCards->trash->cards.size());
+      }
+      std::ostringstream wagonInfo;
+      wagonInfo << "Face down: " << faceDownCount << " | Trash: " << trashCount;
+      writeClampedLine(term, currentRow, x + kFrameOffset, contentWidth, wagonInfo.str());
+      ++currentRow;
+
+      if (cardState->gameWagonCards->faceUpCards && currentRow < endRow) {
+        writeClampedLine(term, currentRow, x + kFrameOffset, contentWidth, "Face up:");
+        ++currentRow;
+        if (currentRow < endRow) {
+          drawWagonBlocks(term, currentRow, x + kFrameOffset, contentWidth,
+                          cardState->gameWagonCards->faceUpCards->cards, fgColor, bgColor);
+          ++currentRow;
+        }
+      }
+    }
+
+    if (currentRow < endRow) {
+      ++currentRow;
+    }
+    if (currentRow < endRow) {
+      writeClampedLine(term, currentRow, x + kFrameOffset, contentWidth, "Destination Deck");
+      ++currentRow;
+    }
+
+    if (cardState->gameDestinationCards && currentRow < endRow) {
+      int destFaceDown = 0;
+      int destTrash = 0;
+      int outOfGame = 0;
+      if (cardState->gameDestinationCards->faceDownCards) {
+        destFaceDown =
+            static_cast<int>(cardState->gameDestinationCards->faceDownCards->cards.size());
+      }
+      if (cardState->gameDestinationCards->trash) {
+        destTrash = static_cast<int>(cardState->gameDestinationCards->trash->cards.size());
+      }
+      if (cardState->outOfGameCards) {
+        outOfGame = static_cast<int>(cardState->outOfGameCards->cards.size());
+      }
+      std::ostringstream destInfo;
+      destInfo << "Face down: " << destFaceDown
+               << " | Trash: " << destTrash
+               << " | Out: " << outOfGame;
+      writeClampedLine(term, currentRow, x + kFrameOffset, contentWidth, destInfo.str());
+      ++currentRow;
+    }
+
+    if (currentRow < endRow) {
+      ++currentRow;
+    }
+
+    int playerCount = 0;
+    if (playerState && !playerState->players.empty()) {
+      playerCount = static_cast<int>(playerState->players.size());
+    } else if (!cardState->playersCards.empty()) {
+      playerCount = static_cast<int>(cardState->playersCards.size());
+    }
+    if (playerCount == 0) {
+      writeClampedLine(term, currentRow, x + kFrameOffset, contentWidth, kNoPlayerText);
+      return;
+    }
+
+    int maxPlayers = contentWidth / kMinPlayerColumnWidth;
+    if (maxPlayers < 1) {
+      maxPlayers = 1;
+    }
+    int shownPlayers = playerCount;
+    if (shownPlayers > maxPlayers) {
+      shownPlayers = maxPlayers;
+    }
+    int totalGap = kPlayerColumnGap * (shownPlayers - 1);
+    int columnWidth = (contentWidth - totalGap) / shownPlayers;
+    if (columnWidth < 1) {
+      columnWidth = contentWidth;
+    }
+
+    for (int i = 0; i < shownPlayers; ++i) {
+      int col = x + kFrameOffset + i * (columnWidth + kPlayerColumnGap);
+      int playerRow = currentRow;
+      std::shared_ptr<playersState::Player> player;
+      if (playerState && i < static_cast<int>(playerState->players.size())) {
+        player = playerState->players[i];
+      }
+      std::shared_ptr<cardsState::PlayerCards> hand;
+      if (player) {
+        hand = player->getHand();
+      } else if (i < static_cast<int>(cardState->playersCards.size())) {
+        hand = cardState->playersCards[static_cast<std::size_t>(i)];
+      }
+
+      if (player) {
+        term.setBg(playerColorToAnsi(player->getColor()));
+        term.setFg(Color::Black);
+        term.moveTo(playerRow, col);
+        term.writeRepeat(' ', 2);
+        term.setBg(bgColor);
+        term.setFg(fgColor);
+        writeClampedLine(term, playerRow, col + 2, columnWidth - 2, " " + player->getName());
+      } else {
+        std::ostringstream label;
+        label << "Player " << (i + 1);
+        writeClampedLine(term, playerRow, col, columnWidth, label.str());
+      }
+      ++playerRow;
+
+      if (playerRow >= endRow) {
+        continue;
+      }
+      writeClampedLine(term, playerRow, col, columnWidth, "Destinations:");
+      ++playerRow;
+
+      if (hand && hand->destinationCards) {
+        const std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards =
+            hand->destinationCards->cards;
+        for (std::size_t j = 0; j < destCards.size() && playerRow < endRow; ++j) {
+          if (!destCards[j]) {
             continue;
           }
-          if (completedA->getName() == a && completedB->getName() == b) {
-            completed = true;
-            break;
-          }
+          std::shared_ptr<mapState::Station> stationA = destCards[j]->getstationA();
+          std::shared_ptr<mapState::Station> stationB = destCards[j]->getstationB();
+          const std::string a = stationNameOrPlaceholder(stationA);
+          const std::string b = stationNameOrPlaceholder(stationB);
+          writeClampedLine(term, playerRow, col, columnWidth, a + "-" + b);
+          ++playerRow;
         }
-        std::ostringstream line;
-        line << a << "-" << b << " " << (completed ? "V" : "X");
-        std::string lineText = line.str();
-        writeClampedLine(term, row, x + kFrameOffset, playerWidth, lineText);
-        int markerOffset = static_cast<int>(lineText.size()) - 1;
-        if (markerOffset >= 0 && markerOffset < playerWidth) {
-          term.setBg(bgColor);
-          term.setFg(completed ? Color::BrightGreen : Color::BrightRed);
-          term.moveTo(row, x + kFrameOffset + markerOffset);
-          term.write(completed ? "V" : "X");
-          term.setFg(fgColor);
-        }
-        ++row;
+      }
+
+      if (playerRow >= endRow) {
+        continue;
+      }
+      writeClampedLine(term, playerRow, col, columnWidth, "Hand:");
+      ++playerRow;
+
+      if (hand && hand->wagonCards && playerRow < endRow) {
+        drawWagonBlocks(term, playerRow, col, columnWidth, hand->wagonCards->cards,
+                        fgColor, bgColor);
       }
     }
     return;
