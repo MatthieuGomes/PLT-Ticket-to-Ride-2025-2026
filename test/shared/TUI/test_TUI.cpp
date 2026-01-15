@@ -241,7 +241,9 @@ BOOST_AUTO_TEST_CASE(RendersStatusLine)
   std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards;
   std::shared_ptr<cardsState::PlayerCards> hand =
       std::make_shared<cardsState::PlayerCards>(destinationCards, wagonCards);
-  playersState::Player player("Alice", playersState::PlayerColor::RED, 0, 0, 0, 0, hand);
+  std::vector<std::shared_ptr<mapState::Road>> borrowedRoads;
+  playersState::Player player("Alice", playersState::PlayerColor::RED, 0, 0, 0,
+                              borrowedRoads, hand);
 
   tui::StatusBar bar(1, 1, 80, 3);
   bar.setGameInfo("TestGame", "1.0");
@@ -284,8 +286,11 @@ BOOST_AUTO_TEST_CASE(UpdatesTurnAndPlayer)
   std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards;
   std::shared_ptr<cardsState::PlayerCards> hand =
       std::make_shared<cardsState::PlayerCards>(destinationCards, wagonCards);
-  playersState::Player playerA("Alice", playersState::PlayerColor::RED, 0, 0, 0, 0, hand);
-  playersState::Player playerB("Bob", playersState::PlayerColor::BLUE, 0, 0, 0, 0, hand);
+  std::vector<std::shared_ptr<mapState::Road>> borrowedRoads;
+  playersState::Player playerA("Alice", playersState::PlayerColor::RED, 0, 0, 0,
+                               borrowedRoads, hand);
+  playersState::Player playerB("Bob", playersState::PlayerColor::BLUE, 0, 0, 0,
+                               borrowedRoads, hand);
 
   tui::StatusBar bar(1, 1, 60, 3);
   bar.setGameInfo("TestGame", "1.0");
@@ -391,8 +396,10 @@ BOOST_AUTO_TEST_CASE(HighlightsAndFlags)
   std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards;
   std::shared_ptr<cardsState::PlayerCards> hand =
       std::make_shared<cardsState::PlayerCards>(destinationCards, wagonCards);
+  std::vector<std::shared_ptr<mapState::Road>> borrowedRoads;
   std::shared_ptr<playersState::Player> owner =
-      std::make_shared<playersState::Player>("Owner", playersState::PlayerColor::RED, 0, 0, 0, 0, hand);
+      std::make_shared<playersState::Player>("Owner", playersState::PlayerColor::RED, 0, 0, 0,
+                                             borrowedRoads, hand);
 
   std::shared_ptr<boost::adjacency_list<>> graph =
       std::make_shared<boost::adjacency_list<>>();

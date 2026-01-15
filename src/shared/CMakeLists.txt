@@ -7,7 +7,7 @@ generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../cardsState.dia")
 generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../playersState.dia")
 generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../mapState.dia")
 generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../tui.dia")
-generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../engine.dia")
+#generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../engine.dia")
 #generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../ai.dia")
 
 # Find all source files to compile into a library
