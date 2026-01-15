@@ -99,7 +99,8 @@ int main(int argc,char* argv[])
         playersState::PlayersState::nbPlayers = 1;
         std::shared_ptr<cardsState::CardsState> cards_state =
             std::make_shared<cardsState::CardsState>(
-                cardsState::CardsState::Europe(map_state->getStations()));
+                cardsState::CardsState::Europe(map_state->getStations(),
+                                               playersState::PlayersState::nbPlayers));
         std::shared_ptr<cardsState::PlayerCards> player_hand;
         if (!cards_state->playersCards.empty()) {
             player_hand = cards_state->playersCards[0];

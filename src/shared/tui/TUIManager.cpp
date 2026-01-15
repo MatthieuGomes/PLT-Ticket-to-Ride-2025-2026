@@ -80,6 +80,20 @@ void handleSigInt(int) {
   g_shouldStop = 1;
 }
 
+std::string extractAction(const std::string& json) {
+  const std::string key = "\"action\":\"";
+  const std::size_t start = json.find(key);
+  if (start == std::string::npos) {
+    return "";
+  }
+  const std::size_t value_start = start + key.size();
+  const std::size_t end = json.find('"', value_start);
+  if (end == std::string::npos || end <= value_start) {
+    return "";
+  }
+  return json.substr(value_start, end - value_start);
+}
+
 bool pollChar(char& ch) {
   // Non-blocking single character read from stdin.
   fd_set readfds;
@@ -329,16 +343,21 @@ void TUIManager::handleInput(const std::string& input) {
   line << "> " << input;
   infopanel->addMessage(line.str());
 
-  engine::ParseResult result = parser.parse(input);
+  ParseResult result = parser.parse(input);
   if (!result.ok) {
     if (!result.error.empty()) {
       infopanel->addMessage(result.error);
     }
-  } else if (result.command.type == engine::CommandType::EXIT) {
-    infopanel->addMessage("Exiting...");
-    running = false;
-  } else if (result.command.type == engine::CommandType::HELP) {
-    infopanel->addMessage("Available commands: exit");
+  } else {
+    const std::string action = extractAction(result.json);
+    if (action == "exit") {
+      infopanel->addMessage("Exiting...");
+      running = false;
+    } else if (action == "help") {
+      infopanel->addMessage("Available commands: exit");
+    } else {
+      // JSON payload is ready for the engine when it's wired in.
+    }
   }
 
   commandinput->clearInput();
