@@ -12,12 +12,22 @@ namespace state
         
         // Initialize state variables here
     }
-    State::State(std::vector<playersInitInfos> playersInfos){
-        this->map = mapState::MapState();
+    State::State(std::string mapName, std::vector<playersInitInfos> playersInfos){
+        this->map = mapState::MapState::NamedMapState(mapName);
         this->cards = cardsState::CardsState::Europe(map.getStations(), static_cast<int>(playersInfos.size()));
         this->players = playersState::PlayersState(playersInfos, cards.playersCards);
     }
-    // rename to display
+
+    State::State(std::string pathToFile)
+    {
+        std::string jsonContent;
+        this->players = playersState::PlayersState::InitFromJSON(jsonContent);
+        this->map = mapState::MapState::ParseFromJSON(jsonContent, std::make_shared<playersState::PlayersState>(players));
+        this->cards = cardsState::CardsState::ParseFromJSON(jsonContent, std::make_shared<mapState::MapState>(map));
+        this->players.setupFromJSON(jsonContent, std::make_shared<mapState::MapState>(map), std::make_shared<cardsState::CardsState>(cards));
+
+    }
+
     void State::display(int indent)
     {
         std::string indentation = std::string(indent, '\t');

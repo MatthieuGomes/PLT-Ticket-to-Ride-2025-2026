@@ -273,8 +273,7 @@ namespace mapState
             Station::initData("F"),
             Station::initData("G"),
             Station::genData(stationOwnerH, "H"),
-            Station::initData("I")
-        };
+            Station::initData("I")};
         std::vector<std::shared_ptr<Station>> stationsObject = Station::BatchConstructor(stationsInfos, mapState.gameGraph);
 
         std::vector<RoadInfo> roadsInfos = {
@@ -322,27 +321,28 @@ namespace mapState
     {
         std::string indentation(indent, '\t');
         std::cout << indentation << "~~~~~ MAP STATE ~~~~~" << std::endl;
-        std::cout << indentation <<"\t" <<"##### STATIONS #####" << std::endl;
+        std::cout << indentation << "\t" << "##### STATIONS #####" << std::endl;
         for (const std::shared_ptr<Station> &station : stations)
         {
-            station->display(indent+2);
+            station->display(indent + 2);
         }
         std::cout << indentation << "\t" << "#####################" << std::endl;
         std::cout << indentation << "\t" << "##### ROADS #####" << std::endl;
         for (const std::shared_ptr<Road> &road : roads)
         {
-            if(typeid(*road) == typeid(Tunnel))
+            if (typeid(*road) == typeid(Tunnel))
             {
                 std::shared_ptr<Tunnel> tunnel = std::dynamic_pointer_cast<Tunnel>(road);
-                tunnel->display(indent+2);
+                tunnel->display(indent + 2);
             }
-            else if(typeid(*road) == typeid(Ferry))
+            else if (typeid(*road) == typeid(Ferry))
             {
                 std::shared_ptr<Ferry> ferry = std::dynamic_pointer_cast<Ferry>(road);
-                ferry->display(indent+2);
+                ferry->display(indent + 2);
             }
-            else {
-                road->display(indent+2);
+            else
+            {
+                road->display(indent + 2);
             }
         }
         std::cout << indentation << "\t" << "#####################" << std::endl;
@@ -561,14 +561,14 @@ namespace mapState
     }
     std::vector<std::shared_ptr<Road>> MapState::getRoadsOwnedByPlayer(std::shared_ptr<playersState::Player> player)
     {
-        return Road::getRoadsOwnedByPlayer(player,this->roads);
+        return Road::getRoadsOwnedByPlayer(player, this->roads);
     }
     std::vector<std::shared_ptr<Road>> MapState::getRoadsUsableByPlayer(std::shared_ptr<playersState::Player> player)
     {
-        return Road::getRoadsUsableByPlayer(player,this->roads);
+        return Road::getRoadsUsableByPlayer(player, this->roads);
     }
     bool MapState::isDestinationReached(std::vector<std::shared_ptr<Road>> playerRoads, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
-    {      
+    {
         if (!stationA || !stationB)
         {
             return false;
@@ -633,11 +633,11 @@ namespace mapState
         }
         return false;
     }
-    
+
     bool MapState::isDestinationReached(std::shared_ptr<playersState::Player> player, std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {
         std::vector<std::shared_ptr<Road>> playerRoads = this->getRoadsUsableByPlayer(player);
-        
+
         return MapState::isDestinationReached(playerRoads, stationA, stationB);
     }
     bool MapState::isDestinationReached(std::shared_ptr<playersState::Player> player, std::shared_ptr<cardsState::DestinationCard> destinationCard)
@@ -668,4 +668,9 @@ namespace mapState
         return out.str();
     }
 
-};
+    MapState MapState::ParseFromJSON(std::string json, std::shared_ptr<playersState::PlayersState> playersState)
+    {
+          
+    }
+
+}

@@ -68,4 +68,8 @@ namespace cardsState
 
     std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~\n";
   }
+
+  CardsState cardsState::ParseFromJSON(std::string json, std::shared_ptr<mapState::MapState> mapState){
+
+  }
 }
