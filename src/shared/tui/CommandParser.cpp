@@ -3,6 +3,8 @@
 #include <cctype>
 #include <string>
 
+#include <json/json.h>
+
 namespace tui {
 
 std::string CommandParser::trim(const std::string& input) {
@@ -76,13 +78,28 @@ ParseResult CommandParser::parse(const std::string& input) {
     action = "exit";
   }
 
-  result.ok = true;
-  result.json = std::string("{\"action\":\"") + escapeJson(action) + "\"";
+  parser::CommandMessage command;
+  command.kind = "command";
+  command.origin = "tui";
+  command.version = 1;
+  command.requestID = requestID;
+  command.playerID = playerID;
+  command.turn = turn;
+  command.name = action;
+  command.payload = Json::Value(Json::objectValue);
   if (!args.empty()) {
-    result.json += std::string(",\"args\":\"") + escapeJson(args) + "\"";
+    command.payload["args"] = args;
   }
-  result.json += "}";
+
+  result.ok = true;
+  result.json = jsonParser.serializeCommand(command);
   return result;
+}
+
+void CommandParser::setContext(int newPlayerID, int newTurn, const std::string& newRequestID) {
+  playerID = newPlayerID;
+  turn = newTurn;
+  requestID = newRequestID;
 }
 
 }  // namespace tui

@@ -83,17 +83,26 @@ void handleSigInt(int) {
 }
 
 std::string extractAction(const std::string& json) {
-  const std::string key = "\"action\":\"";
-  const std::size_t start = json.find(key);
+  const std::string nameKey = "\"name\":\"";
+  std::size_t start = json.find(nameKey);
+  if (start != std::string::npos) {
+    const std::size_t valueStart = start + nameKey.size();
+    const std::size_t end = json.find('"', valueStart);
+    if (end != std::string::npos && end > valueStart) {
+      return json.substr(valueStart, end - valueStart);
+    }
+  }
+  const std::string actionKey = "\"action\":\"";
+  start = json.find(actionKey);
   if (start == std::string::npos) {
     return "";
   }
-  const std::size_t value_start = start + key.size();
-  const std::size_t end = json.find('"', value_start);
-  if (end == std::string::npos || end <= value_start) {
+  const std::size_t valueStart = start + actionKey.size();
+  const std::size_t end = json.find('"', valueStart);
+  if (end == std::string::npos || end <= valueStart) {
     return "";
   }
-  return json.substr(value_start, end - value_start);
+  return json.substr(valueStart, end - valueStart);
 }
 
 bool pollChar(char& ch) {
@@ -139,7 +148,9 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       ownsMapState(true),
       ownsPlayerState(true),
       ownsCardState(true),
-      parser() {}
+      parser() {
+  parser.setContext(-1, -1, "");
+}
       
 // Parametrized constructor to accept external game states
 TUIManager::TUIManager(
@@ -165,7 +176,9 @@ TUIManager::TUIManager(
       ownsMapState(mapState == nullptr),
       ownsPlayerState(playerState == nullptr),
       ownsCardState(cardState == nullptr),
-      parser() {}
+      parser() {
+  parser.setContext(-1, -1, "");
+}
 
 void TUIManager::init() {
   cols = clampPositive(cols, kMinDimension);
