@@ -74,6 +74,7 @@ using namespace std;
 int main(int argc,char* argv[])
 {
     cout << "Client application started." << endl;
+    configureCoverageOutput();
     if (argc<=1) {
         cout << "So far, nothing here..." << endl;
         cout << "Testing map" << endl;
@@ -89,7 +90,7 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"render")==0) {
-        configureCoverageOutput();
+        
         int cols = kDefaultCols;
         int rows = kDefaultRows;
         getTerminalSize(cols, rows);
