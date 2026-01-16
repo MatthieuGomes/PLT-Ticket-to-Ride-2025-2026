@@ -1,0 +1,110 @@
+{
+  "players": [
+    {
+      "name": "Alice",
+      "color": "RED",
+      "score": 5,
+      "wagons": 40,
+      "stations": 2,
+      "roads": [
+        {
+          "from": "alpha",
+          "to": "beta",
+          "type": "ROAD",
+          "length": 3,
+          "color": "BLUE"
+        }
+      ],
+      "borrowedRoads": [
+        {
+          "from": "alpha",
+          "to": "gamma",
+          "type": "FERRY",
+          "length": 5,
+          "locomotives": 1
+        }
+      ],
+      "stationsOwned": [
+        "alpha"
+      ],
+      "destinationCards": [
+        {
+          "from": "alpha",
+          "to": "beta",
+          "points": 7,
+          "isLong": false,
+          "completed": true
+        }
+      ],
+      "wagonCards": [
+        "RED",
+        "LOCOMOTIVE"
+      ]
+    },
+    {
+      "name": "Bob",
+      "color": "BLUE",
+      "score": 0,
+      "wagons": 45,
+      "stations": 3,
+      "roads": [
+        {
+          "from": "beta",
+          "to": "gamma",
+          "type": "TUNNEL",
+          "length": 4,
+          "color": "GREEN"
+        }
+      ],
+      "wagonCards": [
+        "BLUE",
+        "BLUE"
+      ]
+    }
+  ],
+  "map": {
+    "stations": [
+      "alpha",
+      "beta",
+      "gamma"
+    ],
+    "roads": [
+      {
+        "from": "alpha",
+        "to": "beta",
+        "length": 3,
+        "color": "BLUE"
+      }
+    ],
+    "tunnels": [
+      {
+        "from": "beta",
+        "to": "gamma",
+        "length": 4,
+        "color": "GREEN"
+      }
+    ],
+    "ferries": [
+      {
+        "from": "alpha",
+        "to": "gamma",
+        "length": 5,
+        "locomotives": 1
+      }
+    ]
+  },
+  "cards": {
+    "destinationCards": [
+      {
+        "from": "alpha",
+        "to": "gamma",
+        "points": 8,
+        "isLong": false
+      }
+    ],
+    "wagonCards": [
+      "YELLOW",
+      "BLACK"
+    ]
+  }
+}
