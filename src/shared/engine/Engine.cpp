@@ -1,8 +1,6 @@
 #include "Engine.h"
 
-#include "EngineCommand.h"
-#include "EngineEvent.h"
-#include "EngineEventType.h"
+#include "CommandParser.h"
 
 namespace engine
 {
@@ -62,28 +60,10 @@ namespace engine
 
   EngineResult Engine::applyCommand(const std::string& json)
   {
-    if (!this->stateMachine)
-    {
-      EngineResult result;
-      result.ok = false;
-      result.error = "No state machine";
-      result.nextPhase = this->phase;
-
-      EngineEvent event;
-      event.type = EngineEventType::ERROR;
-      event.message = result.error;
-      event.payload = "";
-      result.events.push_back(event);
-
-      return result;
-    }
-
-    // TODO: parse JSON and build a full EngineCommand before dispatching
-    EngineCommand command;
-    command.name = json;
-    command.payload = "";
-    std::shared_ptr<Engine> engine;
-    return this->stateMachine->handleCommand(engine, command);
+    CommandParser parser;
+    // Non-owning shared_ptr wrapper for passing this engine into the state machine.
+    std::shared_ptr<Engine> engineRef(this, [](Engine*) {});
+    return parser.parseAndApply(engineRef, json);
   }
 
   void Engine::setState(std::shared_ptr<state::State> state)
