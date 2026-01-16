@@ -3,6 +3,13 @@
 #include "SharedDeck.h"
 #include "OutOfGame.h"
 #include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
+#include <json/json.h>
+
+#include "DestinationCard.h"
+#include "WagonCard.h"
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -21,6 +28,85 @@ namespace cardsState
 
 namespace cardsState
 {
+  namespace {
+
+    std::string toUpper(const std::string& value)
+    {
+      std::string out = value;
+      std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c) {
+        return static_cast<char>(std::toupper(c));
+      });
+      return out;
+    }
+
+    std::string normalizeName(const std::string& value)
+    {
+      std::string out = value;
+      std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+      });
+      return out;
+    }
+
+    bool parseRoot(const std::string& jsonText, Json::Value& root, std::string& error)
+    {
+      error.clear();
+      Json::CharReaderBuilder builder;
+      builder["collectComments"] = false;
+      std::istringstream input(jsonText);
+      return Json::parseFromStream(builder, input, &root, &error);
+    }
+
+    std::string readString(const Json::Value& node, const char* key)
+    {
+      if (node.isMember(key) && node[key].isString())
+      {
+        return node[key].asString();
+      }
+      return std::string();
+    }
+
+    int readInt(const Json::Value& node, const char* key, int fallback)
+    {
+      if (node.isMember(key) && node[key].isInt())
+      {
+        return node[key].asInt();
+      }
+      return fallback;
+    }
+
+    bool readBool(const Json::Value& node, const char* key, bool fallback)
+    {
+      if (node.isMember(key) && node[key].isBool())
+      {
+        return node[key].asBool();
+      }
+      return fallback;
+    }
+
+    cardsState::ColorCard parseCardColorValue(const Json::Value& value)
+    {
+      if (value.isInt())
+      {
+        return static_cast<cardsState::ColorCard>(value.asInt());
+      }
+      if (value.isString())
+      {
+        std::string token = toUpper(value.asString());
+        if (token == "RED") return cardsState::ColorCard::RED;
+        if (token == "BLUE") return cardsState::ColorCard::BLUE;
+        if (token == "GREEN") return cardsState::ColorCard::GREEN;
+        if (token == "BLACK") return cardsState::ColorCard::BLACK;
+        if (token == "YELLOW") return cardsState::ColorCard::YELLOW;
+        if (token == "ORANGE") return cardsState::ColorCard::ORANGE;
+        if (token == "PINK") return cardsState::ColorCard::PINK;
+        if (token == "WHITE") return cardsState::ColorCard::WHITE;
+        if (token == "LOCOMOTIVE") return cardsState::ColorCard::LOCOMOTIVE;
+      }
+      return cardsState::ColorCard::UNKNOWN;
+    }
+
+  } // namespace
 
   /// class CardsState -
   CardsState::CardsState()
@@ -71,9 +157,169 @@ namespace cardsState
 
   CardsState CardsState::ParseFromJSON(std::string json, std::shared_ptr<mapState::MapState> mapState)
   {
-    // Stub implementation until JSON loading is implemented.
-    (void)json;
-    (void)mapState;
-    return CardsState();
+    if (json.empty())
+    {
+      return CardsState();
+    }
+
+    Json::Value root;
+    std::string error;
+    if (!parseRoot(json, root, error))
+    {
+      return CardsState();
+    }
+
+    if (root.isString())
+    {
+      std::string preset = toUpper(root.asString());
+      if (preset == "EUROPE" && mapState)
+      {
+        return CardsState::Europe(mapState->getStations(), 0);
+      }
+      return CardsState();
+    }
+
+    if (!root.isObject())
+    {
+      return CardsState();
+    }
+
+    std::string preset = readString(root, "preset");
+    if (preset.empty())
+    {
+      preset = readString(root, "name");
+    }
+    if (preset.empty())
+    {
+      preset = readString(root, "type");
+    }
+    if (!preset.empty() && mapState)
+    {
+      std::string presetToken = toUpper(preset);
+      if (presetToken == "EUROPE")
+      {
+        int playersCount = readInt(root, "playersCount", 0);
+        if (playersCount == 0)
+        {
+          playersCount = readInt(root, "nbPlayers", 0);
+        }
+        return CardsState::Europe(mapState->getStations(), playersCount);
+      }
+    }
+
+    CardsState cardsState;
+    cardsState.outOfGameCards = std::make_shared<OutOfGame<DestinationCard>>();
+
+    std::vector<std::shared_ptr<DestinationCard>> destinationCards;
+    if (root.isMember("destinationCards") && root["destinationCards"].isArray() && mapState)
+    {
+      for (Json::ArrayIndex i = 0; i < root["destinationCards"].size(); ++i)
+      {
+        const Json::Value& dest = root["destinationCards"][i];
+        if (!dest.isObject())
+        {
+          continue;
+        }
+        std::string from = readString(dest, "from");
+        std::string to = readString(dest, "to");
+        int points = readInt(dest, "points", 0);
+        bool isLong = readBool(dest, "isLong", false);
+        std::shared_ptr<mapState::Station> stationA = mapState->getStationByName(normalizeName(from));
+        std::shared_ptr<mapState::Station> stationB = mapState->getStationByName(normalizeName(to));
+        if (!stationA || !stationB)
+        {
+          continue;
+        }
+        destinationCards.push_back(std::make_shared<DestinationCard>(stationA, stationB, points, isLong));
+      }
+    }
+
+    std::vector<std::shared_ptr<WagonCard>> wagonCards;
+    if (root.isMember("wagonCards") && root["wagonCards"].isArray())
+    {
+      for (Json::ArrayIndex i = 0; i < root["wagonCards"].size(); ++i)
+      {
+        const Json::Value& card = root["wagonCards"][i];
+        cardsState::ColorCard color = cardsState::ColorCard::UNKNOWN;
+        if (card.isObject() && card.isMember("color"))
+        {
+          color = parseCardColorValue(card["color"]);
+        }
+        else
+        {
+          color = parseCardColorValue(card);
+        }
+        wagonCards.push_back(std::make_shared<WagonCard>(color));
+      }
+    }
+
+    if (!destinationCards.empty())
+    {
+      cardsState.gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>(destinationCards);
+    }
+    if (!wagonCards.empty())
+    {
+      cardsState.gameWagonCards = std::make_shared<SharedDeck<WagonCard>>(wagonCards);
+    }
+
+    if (root.isMember("playersHands") && root["playersHands"].isArray())
+    {
+      for (Json::ArrayIndex i = 0; i < root["playersHands"].size(); ++i)
+      {
+        const Json::Value& entry = root["playersHands"][i];
+        if (!entry.isObject())
+        {
+          continue;
+        }
+        std::vector<std::shared_ptr<DestinationCard>> playerDestinations;
+        std::vector<std::shared_ptr<WagonCard>> playerWagons;
+
+        if (entry.isMember("destinationCards") && entry["destinationCards"].isArray() && mapState)
+        {
+          for (Json::ArrayIndex d = 0; d < entry["destinationCards"].size(); ++d)
+          {
+            const Json::Value& dest = entry["destinationCards"][d];
+            if (!dest.isObject())
+            {
+              continue;
+            }
+            std::string from = readString(dest, "from");
+            std::string to = readString(dest, "to");
+            int points = readInt(dest, "points", 0);
+            bool isLong = readBool(dest, "isLong", false);
+            std::shared_ptr<mapState::Station> stationA = mapState->getStationByName(normalizeName(from));
+            std::shared_ptr<mapState::Station> stationB = mapState->getStationByName(normalizeName(to));
+            if (!stationA || !stationB)
+            {
+              continue;
+            }
+            playerDestinations.push_back(std::make_shared<DestinationCard>(stationA, stationB, points, isLong));
+          }
+        }
+
+        if (entry.isMember("wagonCards") && entry["wagonCards"].isArray())
+        {
+          for (Json::ArrayIndex w = 0; w < entry["wagonCards"].size(); ++w)
+          {
+            const Json::Value& card = entry["wagonCards"][w];
+            cardsState::ColorCard color = cardsState::ColorCard::UNKNOWN;
+            if (card.isObject() && card.isMember("color"))
+            {
+              color = parseCardColorValue(card["color"]);
+            }
+            else
+            {
+              color = parseCardColorValue(card);
+            }
+            playerWagons.push_back(std::make_shared<WagonCard>(color));
+          }
+        }
+
+        std::shared_ptr<PlayerCards> hand = std::make_shared<PlayerCards>(playerDestinations, playerWagons);
+        cardsState.playersCards.push_back(hand);
+      }
+    }
+
+    return cardsState;
   }
 }

@@ -14,6 +14,10 @@
 #include <memory>
 #include <map>
 #include <queue>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
+#include <json/json.h>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -39,6 +43,195 @@ namespace mapState
     using TunnelInfo = RoadInfo;
     using FerryDetail = std::tuple<int, std::shared_ptr<playersState::Player>, int, int>;
     using FerryInfo = std::pair<StationPair, FerryDetail>;
+
+    namespace {
+
+        std::string trimString(const std::string& value)
+        {
+            std::size_t start = 0;
+            while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start])))
+            {
+                ++start;
+            }
+            std::size_t end = value.size();
+            while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1])))
+            {
+                --end;
+            }
+            return value.substr(start, end - start);
+        }
+
+        std::string normalizeName(const std::string& value)
+        {
+            std::string trimmed = trimString(value);
+            std::string lower = trimmed;
+            std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) {
+                return static_cast<char>(std::tolower(c));
+            });
+            return lower;
+        }
+
+        std::string toUpper(const std::string& value)
+        {
+            std::string out = value;
+            std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c) {
+                return static_cast<char>(std::toupper(c));
+            });
+            return out;
+        }
+
+        bool parseRoot(const std::string& jsonText, Json::Value& root, std::string& error)
+        {
+            error.clear();
+            Json::CharReaderBuilder builder;
+            builder["collectComments"] = false;
+            std::istringstream input(jsonText);
+            return Json::parseFromStream(builder, input, &root, &error);
+        }
+
+        std::string readString(const Json::Value& node, const char* key)
+        {
+            if (node.isMember(key) && node[key].isString())
+            {
+                return node[key].asString();
+            }
+            return std::string();
+        }
+
+        int readInt(const Json::Value& node, const char* key, int fallback)
+        {
+            if (node.isMember(key) && node[key].isInt())
+            {
+                return node[key].asInt();
+            }
+            return fallback;
+        }
+
+        mapState::RoadColor parseRoadColorValue(const Json::Value& value)
+        {
+            if (value.isInt())
+            {
+                return static_cast<mapState::RoadColor>(value.asInt());
+            }
+            if (value.isString())
+            {
+                std::string token = toUpper(value.asString());
+                if (token == "NONE") return mapState::RoadColor::NONE;
+                if (token == "RED") return mapState::RoadColor::RED;
+                if (token == "BLUE") return mapState::RoadColor::BLUE;
+                if (token == "GREEN") return mapState::RoadColor::GREEN;
+                if (token == "BLACK") return mapState::RoadColor::BLACK;
+                if (token == "YELLOW") return mapState::RoadColor::YELLOW;
+                if (token == "ORANGE") return mapState::RoadColor::ORANGE;
+                if (token == "PINK") return mapState::RoadColor::PINK;
+                if (token == "WHITE") return mapState::RoadColor::WHITE;
+            }
+            return mapState::RoadColor::UNKNOWN;
+        }
+
+        std::string readRoadType(const Json::Value& node)
+        {
+            std::string type = readString(node, "type");
+            if (type.empty())
+            {
+                type = readString(node, "roadType");
+            }
+            if (type.empty())
+            {
+                return std::string("ROAD");
+            }
+            return toUpper(type);
+        }
+
+        std::shared_ptr<playersState::Player> resolveOwner(
+            const Json::Value& node,
+            const std::shared_ptr<playersState::PlayersState>& playersState)
+        {
+            if (!playersState)
+            {
+                return std::shared_ptr<playersState::Player>();
+            }
+            std::string ownerName = readString(node, "owner");
+            if (ownerName.empty())
+            {
+                return std::shared_ptr<playersState::Player>();
+            }
+            return playersState->getPlayerByName(ownerName);
+        }
+
+        void parseRoadEntry(
+            const Json::Value& entry,
+            const std::vector<std::shared_ptr<mapState::Station>>& stationObjects,
+            const std::shared_ptr<playersState::PlayersState>& playersState,
+            int& nextId,
+            std::vector<RoadInfo>& roadsInfos,
+            std::vector<TunnelInfo>& tunnelsInfos,
+            std::vector<FerryInfo>& ferrysInfos)
+        {
+            if (!entry.isObject())
+            {
+                return;
+            }
+
+            std::string fromName = readString(entry, "from");
+            if (fromName.empty())
+            {
+                fromName = readString(entry, "stationA");
+            }
+            std::string toName = readString(entry, "to");
+            if (toName.empty())
+            {
+                toName = readString(entry, "stationB");
+            }
+            if (fromName.empty() || toName.empty())
+            {
+                return;
+            }
+
+            int length = readInt(entry, "length", 0);
+            int id = readInt(entry, "id", 0);
+            if (id == 0)
+            {
+                id = nextId;
+                ++nextId;
+            }
+
+            std::shared_ptr<playersState::Player> owner = resolveOwner(entry, playersState);
+            std::string type = readRoadType(entry);
+
+            if (type == "FERRY")
+            {
+                int locomotives = readInt(entry, "locomotives", 0);
+                if (locomotives == 0)
+                {
+                    locomotives = readInt(entry, "locos", 0);
+                }
+                ferrysInfos.push_back(Ferry::genDataByName(
+                    stationObjects, normalizeName(fromName), normalizeName(toName),
+                    id, owner, locomotives, length));
+                return;
+            }
+
+            mapState::RoadColor color = mapState::RoadColor::UNKNOWN;
+            if (entry.isMember("color"))
+            {
+                color = parseRoadColorValue(entry["color"]);
+            }
+
+            if (type == "TUNNEL")
+            {
+                tunnelsInfos.push_back(Tunnel::genDataByName(
+                    stationObjects, normalizeName(fromName), normalizeName(toName),
+                    id, owner, color, length));
+                return;
+            }
+
+            roadsInfos.push_back(Road::genDataByName(
+                stationObjects, normalizeName(fromName), normalizeName(toName),
+                id, owner, color, length));
+        }
+
+    } // namespace
 
     MapState::MapState()
     {
@@ -670,10 +863,122 @@ namespace mapState
 
     MapState MapState::ParseFromJSON(std::string json, std::shared_ptr<playersState::PlayersState> playersState)
     {
-        // Stub implementation until JSON loading is implemented.
-        (void)json;
-        (void)playersState;
-        return MapState();
+        if (json.empty())
+        {
+            return MapState();
+        }
+
+        Json::Value root;
+        std::string error;
+        if (!parseRoot(json, root, error))
+        {
+            return MapState();
+        }
+
+        if (root.isString())
+        {
+            return MapState::NamedMapState(root.asString());
+        }
+
+        if (!root.isObject())
+        {
+            return MapState();
+        }
+
+        std::string mapName = readString(root, "mapName");
+        if (mapName.empty())
+        {
+            mapName = readString(root, "name");
+        }
+
+        bool hasStations = root.isMember("stations") && root["stations"].isArray();
+        bool hasRoads = (root.isMember("roads") && root["roads"].isArray())
+                        || (root.isMember("tunnels") && root["tunnels"].isArray())
+                        || (root.isMember("ferries") && root["ferries"].isArray());
+
+        if (!mapName.empty() && !hasStations && !hasRoads)
+        {
+            return MapState::NamedMapState(mapName);
+        }
+
+        MapState mapState;
+        mapState.gameGraph = std::make_shared<boost::adjacency_list<>>();
+
+        std::vector<StationInfo> stationsInfos;
+        if (hasStations)
+        {
+            for (Json::ArrayIndex i = 0; i < root["stations"].size(); ++i)
+            {
+                const Json::Value& entry = root["stations"][i];
+                std::string name;
+                std::shared_ptr<playersState::Player> owner;
+                if (entry.isString())
+                {
+                    name = entry.asString();
+                }
+                else if (entry.isObject())
+                {
+                    name = readString(entry, "name");
+                    owner = resolveOwner(entry, playersState);
+                }
+                if (name.empty())
+                {
+                    continue;
+                }
+                stationsInfos.push_back(Station::genData(owner, normalizeName(name)));
+            }
+        }
+
+        if (stationsInfos.empty())
+        {
+            return mapState;
+        }
+
+        std::vector<std::shared_ptr<Station>> stationObjects =
+            Station::BatchConstructor(stationsInfos, mapState.gameGraph);
+
+        std::vector<RoadInfo> roadsInfos;
+        std::vector<TunnelInfo> tunnelsInfos;
+        std::vector<FerryInfo> ferrysInfos;
+        int nextId = 1;
+
+        if (root.isMember("roads") && root["roads"].isArray())
+        {
+            for (Json::ArrayIndex i = 0; i < root["roads"].size(); ++i)
+            {
+                parseRoadEntry(root["roads"][i], stationObjects, playersState, nextId,
+                               roadsInfos, tunnelsInfos, ferrysInfos);
+            }
+        }
+        if (root.isMember("tunnels") && root["tunnels"].isArray())
+        {
+            for (Json::ArrayIndex i = 0; i < root["tunnels"].size(); ++i)
+            {
+                Json::Value entry = root["tunnels"][i];
+                if (entry.isObject() && !entry.isMember("type"))
+                {
+                    entry["type"] = "TUNNEL";
+                }
+                parseRoadEntry(entry, stationObjects, playersState, nextId,
+                               roadsInfos, tunnelsInfos, ferrysInfos);
+            }
+        }
+        if (root.isMember("ferries") && root["ferries"].isArray())
+        {
+            for (Json::ArrayIndex i = 0; i < root["ferries"].size(); ++i)
+            {
+                Json::Value entry = root["ferries"][i];
+                if (entry.isObject() && !entry.isMember("type"))
+                {
+                    entry["type"] = "FERRY";
+                }
+                parseRoadEntry(entry, stationObjects, playersState, nextId,
+                               roadsInfos, tunnelsInfos, ferrysInfos);
+            }
+        }
+
+        mapState.fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferrysInfos, mapState.gameGraph);
+        return mapState;
     }
 
 }
