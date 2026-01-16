@@ -21,10 +21,13 @@ namespace state
     State::State(std::string pathToFile)
     {
         std::string jsonContent;
-        this->players = playersState::PlayersState::InitFromJSON(jsonContent);
-        this->map = mapState::MapState::ParseFromJSON(jsonContent, std::make_shared<playersState::PlayersState>(players));
-        this->cards = cardsState::CardsState::ParseFromJSON(jsonContent, std::make_shared<mapState::MapState>(map));
-        this->players.setupFromJSON(jsonContent, std::make_shared<mapState::MapState>(map), std::make_shared<cardsState::CardsState>(cards));
+        std::string jsonMap;
+        std::string jsonPlayers;
+        std::string jsonCards;
+        this->players = playersState::PlayersState::InitFromJSON(jsonPlayers);
+        this->map = mapState::MapState::ParseFromJSON(jsonMap, std::make_shared<playersState::PlayersState>(players));
+        this->cards = cardsState::CardsState::ParseFromJSON(jsonCards, std::make_shared<mapState::MapState>(map));
+        this->players.setupFromJSON(jsonPlayers, std::make_shared<mapState::MapState>(map), std::make_shared<cardsState::CardsState>(cards));
 
     }
 
