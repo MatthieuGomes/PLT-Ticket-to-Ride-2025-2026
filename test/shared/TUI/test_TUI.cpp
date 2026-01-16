@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../../src/shared/tui/BaseView.h"
+#include "../../src/shared/tui/CommandParser.h"
 #include "../../src/shared/tui/CommandInput.h"
 #include "../../src/shared/tui/InfoPanel.h"
 #include "../../src/shared/tui/GameView.h"
@@ -21,8 +22,16 @@
 #include "../../src/shared/playersState/Player.h"
 
 #include <boost/graph/adjacency_list.hpp>
+#include <json/json.h>
 
 namespace {
+
+#define DEBUG_MODE true
+#if DEBUG_MODE == true
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
 
 // Captures std::cout output for ANSI/string assertions
 class CoutCapture {
@@ -44,6 +53,15 @@ class CoutCapture {
 // Substring lookup helper for test assertions
 bool containsText(const std::string& str1, const std::string& str2) {
   return str1.find(str2) != std::string::npos;
+}
+
+// Helper to parse JSON from a string for command assertions.
+bool parseJsonText(const std::string& text, Json::Value& root) {
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  std::string error;
+  std::istringstream input(text);
+  return Json::parseFromStream(builder, input, &root, &error);
 }
 
 // Minimal BaseView subclass that writes a small content marker
@@ -194,6 +212,61 @@ BOOST_AUTO_TEST_CASE(ExternalStatesConstructor)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+/*
+// Command parser JSON output and context wiring
+// Disabled on this branch: requires parser::JSONParser implementation
+BOOST_AUTO_TEST_SUITE(CommandParserTests)
+
+// Ensures command JSON includes kind/origin/name and context fields.
+BOOST_AUTO_TEST_CASE(EncodesBasicCommand)
+{
+  tui::CommandParser parser;
+  parser.setContext(1, 2, "req-1");
+
+  tui::ParseResult result = parser.parse("exit");
+  DEBUG_PRINT("Command JSON: " << result.json);
+  BOOST_CHECK(result.ok);
+
+  Json::Value root;
+  BOOST_CHECK(parseJsonText(result.json, root));
+  BOOST_CHECK_EQUAL(root["kind"].asString(), "command");
+  BOOST_CHECK_EQUAL(root["origin"].asString(), "tui");
+  BOOST_CHECK_EQUAL(root["name"].asString(), "exit");
+  BOOST_CHECK_EQUAL(root["playerId"].asInt(), 1);
+  BOOST_CHECK_EQUAL(root["turn"].asInt(), 2);
+  BOOST_CHECK_EQUAL(root["requestId"].asString(), "req-1");
+  BOOST_CHECK(root.isMember("payload"));
+}
+
+// Verifies args are captured in the payload and quit maps to exit.
+BOOST_AUTO_TEST_CASE(EncodesArgsAndAlias)
+{
+  tui::CommandParser parser;
+  parser.setContext(3, 4, "req-2");
+
+  tui::ParseResult result = parser.parse("quit Alpha Beta");
+  DEBUG_PRINT("Command JSON with args: " << result.json);
+  BOOST_CHECK(result.ok);
+
+  Json::Value root;
+  BOOST_CHECK(parseJsonText(result.json, root));
+  BOOST_CHECK_EQUAL(root["name"].asString(), "exit");
+  BOOST_CHECK_EQUAL(root["payload"]["args"].asString(), "Alpha Beta");
+}
+
+// Empty input should be rejected without JSON output.
+BOOST_AUTO_TEST_CASE(RejectsEmptyInput)
+{
+  tui::CommandParser parser;
+  tui::ParseResult result = parser.parse("   ");
+  DEBUG_PRINT("Empty input ok: " << result.ok << " json: " << result.json);
+  BOOST_CHECK(!result.ok);
+  BOOST_CHECK(result.json.empty());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+*/
 
 // BaseView redraw and geometry behavior
 BOOST_AUTO_TEST_SUITE(BaseViewTests)
