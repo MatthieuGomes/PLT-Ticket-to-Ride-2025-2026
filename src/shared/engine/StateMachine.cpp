@@ -24,7 +24,8 @@ namespace engine
 
   void StateMachine::setState(std::shared_ptr<GameState> state)
   {
-    transitionTo(engine::Engine::getInstance(), state);
+    std::shared_ptr<Engine> engine;
+    transitionTo(engine, state);
   }
 
   std::shared_ptr<GameState> StateMachine::getState()
