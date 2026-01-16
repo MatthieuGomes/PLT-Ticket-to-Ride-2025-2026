@@ -1,5 +1,7 @@
 #include "PlayersState.h"
 #include <iostream>
+#include <fstream>
+// #include <nlohmann/json.hpp>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -91,6 +93,26 @@ namespace playersState
         }
         std::cout << indentation << "\t" << "#######################\n";
         std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    }
+
+    std::shared_ptr<Player> PlayersState::getPlayerByName(std::string name)
+    {
+        for (const auto &player : this->players)
+        {
+            if (player->name == name)
+            {
+                return player;
+            }
+        }
+        return nullptr;
+    }
+
+    PlayersState PlayersState::InitFromJSON(std::string json)
+    {
+        return PlayersState();
+    }
+    void PlayersState::setupFromJSON(std::string json, std::shared_ptr<mapState::MapState> mapState, std::shared_ptr<cardsState::CardsState> cardState)
+    {
     }
 
 };
