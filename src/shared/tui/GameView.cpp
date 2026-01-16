@@ -49,9 +49,9 @@ const int kCardBlockWidth = 3;
 const int kCardBlockGap = 1;
 const int kCardLabelWidth = 3;
 const int kPlayerColorBlockWidth = 3;
-const int kLocalPlayerIndex = 0;
 const int kPlayerColumnGap = 2;
 const int kMinPlayerColumnWidth = 18;
+const int kDefaultLocalPlayerIndex = 0;
 const int kTableColumnCount = 6;
 const int kTableMinTypeWidth = 3;
 const int kTableMinEndpointsWidth = 5;
@@ -253,18 +253,43 @@ std::string playerShortLabel(int index) {
 
 std::string playerDisplayLabel(
     const std::shared_ptr<playersState::Player>& player,
-    const std::vector<std::shared_ptr<playersState::Player>>* players) {
+    const std::vector<std::shared_ptr<playersState::Player>>* players,
+    int localPlayerIndex,
+    bool showLocalMarker,
+    bool useCompactLabels) {
   if (!player || !players) {
     return "PLYR?";
+  }
+  if (!useCompactLabels) {
+    return player->getName();
   }
   int index = findPlayerIndex(*players, player);
   if (index < 0) {
     return "PLYR?";
   }
-  if (index == kLocalPlayerIndex) {
+  if (showLocalMarker && index == localPlayerIndex) {
     return "YOU";
   }
   return playerShortLabel(index);
+}
+
+std::string playerHeaderLabel(
+    const std::shared_ptr<playersState::Player>& player,
+    const std::vector<std::shared_ptr<playersState::Player>>* players,
+    int localPlayerIndex,
+    bool showLocalMarker,
+    bool compactLabels) {
+  if (!player || !players) {
+    return "PLYR?";
+  }
+  int index = findPlayerIndex(*players, player);
+  if (compactLabels) {
+    if (showLocalMarker && index == localPlayerIndex) {
+      return "YOU";
+    }
+    return playerShortLabel(index);
+  }
+  return player->getName();
 }
 
 std::string padCell(const std::string& text, int width) {
@@ -391,6 +416,8 @@ int clampInt(int value, int minimum, int maximum) {
 
 GameView::GameView(int x, int y, int width, int height)
     : BaseView(x, y, width, height),
+      compactOtherPlayers(false),
+      showLocalPlayerMarker(false),
       mapState(nullptr),
       playerState(nullptr),
       cardState(nullptr),
@@ -406,7 +433,9 @@ GameView::GameView(int x, int y, int width, int height)
       layoutMaxCol(0),
       layoutPath(kDefaultLayoutPath),
       layoutEntries(),
-      searchQuery() {
+      searchQuery(),
+      playerScrollIndex(0),
+      localPlayerIndex(kDefaultLocalPlayerIndex) {
   requestRedraw();
 }
 
@@ -457,6 +486,17 @@ void GameView::setPlayerState(playersState::PlayersState* state) {
     return;
   }
   playerState = state;
+  playerScrollIndex = 0;
+  if (playerState) {
+    int playerCount = static_cast<int>(playerState->players.size());
+    if (playerCount <= 0) {
+      localPlayerIndex = kDefaultLocalPlayerIndex;
+    } else if (localPlayerIndex < 0 || localPlayerIndex >= playerCount) {
+      localPlayerIndex = kDefaultLocalPlayerIndex;
+    }
+  } else {
+    localPlayerIndex = kDefaultLocalPlayerIndex;
+  }
   requestRedraw();
 }
 
@@ -500,6 +540,47 @@ void GameView::setHighlightNode(int nodeID) {
 }
 
 void GameView::moveSelection(int deltaRow, int deltaCol) {
+  if (mode == ViewMode::PLAYER) {
+    if (!playerState || playerState->players.empty()) {
+      return;
+    }
+    const int playerCount = static_cast<int>(playerState->players.size());
+    if (playerCount <= 1) {
+      return;
+    }
+    int maxPlayers = (width - kFrameInset) / kMinPlayerColumnWidth;
+    if (maxPlayers < 1) {
+      maxPlayers = 1;
+    }
+    int shownPlayers = playerCount;
+    if (shownPlayers > maxPlayers) {
+      shownPlayers = maxPlayers;
+    }
+    if (shownPlayers <= 1) {
+      return;
+    }
+    int otherCount = playerCount - 1;
+    int visibleOthers = shownPlayers - 1;
+    if (visibleOthers <= 0 || otherCount <= visibleOthers) {
+      return;
+    }
+    int maxScroll = otherCount - visibleOthers;
+    if (deltaCol != 0) {
+      int nextIndex = playerScrollIndex + ((deltaCol > 0) ? 1 : -1);
+      if (nextIndex < 0) {
+        nextIndex = 0;
+      }
+      if (nextIndex > maxScroll) {
+        nextIndex = maxScroll;
+      }
+      if (nextIndex != playerScrollIndex) {
+        playerScrollIndex = nextIndex;
+        requestRedraw();
+      }
+    }
+    return;
+  }
+
   if (mode != ViewMode::MAP || !layoutLoaded || layoutEntries.empty()) {
     return;
   }
@@ -668,8 +749,42 @@ void GameView::drawContent(Terminal& term) {
       columnWidth = contentWidth;
     }
 
-    for (int i = 0; i < shownPlayers; ++i) {
-      std::shared_ptr<playersState::Player> player = playerState->players[i];
+    const std::vector<std::shared_ptr<playersState::Player>>& playersRef =
+        playerState->players;
+    std::vector<std::shared_ptr<playersState::Player>> displayPlayers;
+    int localIndex = localPlayerIndex;
+    if (localIndex < 0 || localIndex >= playerCount) {
+      localIndex = 0;
+    }
+    displayPlayers.push_back(playersRef[static_cast<std::size_t>(localIndex)]);
+
+    std::vector<std::shared_ptr<playersState::Player>> otherPlayers;
+    for (int i = 0; i < playerCount; ++i) {
+      if (i == localIndex) {
+        continue;
+      }
+      otherPlayers.push_back(playersRef[static_cast<std::size_t>(i)]);
+    }
+    const int visibleOthers = shownPlayers - 1;
+    int maxScroll = 0;
+    if (visibleOthers > 0 && static_cast<int>(otherPlayers.size()) > visibleOthers) {
+      maxScroll = static_cast<int>(otherPlayers.size()) - visibleOthers;
+    }
+    if (playerScrollIndex < 0) {
+      playerScrollIndex = 0;
+    }
+    if (playerScrollIndex > maxScroll) {
+      playerScrollIndex = maxScroll;
+    }
+    for (int i = 0; i < visibleOthers; ++i) {
+      int index = playerScrollIndex + i;
+      if (index >= 0 && index < static_cast<int>(otherPlayers.size())) {
+        displayPlayers.push_back(otherPlayers[static_cast<std::size_t>(index)]);
+      }
+    }
+
+    for (int i = 0; i < static_cast<int>(displayPlayers.size()); ++i) {
+      std::shared_ptr<playersState::Player> player = displayPlayers[static_cast<std::size_t>(i)];
       int col = x + kFrameOffset + i * (columnWidth + kPlayerColumnGap);
       int currentRow = row;
 
@@ -682,7 +797,8 @@ void GameView::drawContent(Terminal& term) {
 
       const std::vector<std::shared_ptr<playersState::Player>>* players =
           playerState ? &playerState->players : nullptr;
-      const std::string playerLabel = playerDisplayLabel(player, players);
+      const std::string playerLabel = playerHeaderLabel(
+          player, players, localIndex, showLocalPlayerMarker, compactOtherPlayers);
       {
         const playersState::PlayerColor color = player->getColor();
         std::string label = playerColorLabel(color);
@@ -701,6 +817,9 @@ void GameView::drawContent(Terminal& term) {
       writeClampedLine(term, currentRow, col + kPlayerColorBlockWidth,
                        columnWidth - kPlayerColorBlockWidth, " " + playerLabel);
       ++currentRow;
+
+      const bool isLocal = (player == displayPlayers[0]);
+      const bool showFullDetails = (!compactOtherPlayers) || isLocal;
 
       if (currentRow >= endRow) {
         continue;
@@ -726,7 +845,7 @@ void GameView::drawContent(Terminal& term) {
       writeClampedLine(term, currentRow, col, columnWidth, stationsLine.str());
       ++currentRow;
 
-      if (currentRow >= endRow) {
+      if (!showFullDetails || currentRow >= endRow) {
         continue;
       }
       writeClampedLine(term, currentRow, col, columnWidth, "Hand:");
@@ -906,9 +1025,14 @@ void GameView::drawContent(Terminal& term) {
 
       const std::vector<std::shared_ptr<playersState::Player>>* players =
           playerState ? &playerState->players : nullptr;
+      int localIndex = localPlayerIndex;
+      if (players && (localIndex < 0 || localIndex >= static_cast<int>(players->size()))) {
+        localIndex = 0;
+      }
       if (player) {
         const playersState::PlayerColor color = player->getColor();
-        const std::string playerLabel = playerDisplayLabel(player, players);
+        const std::string playerLabel = playerDisplayLabel(
+            player, players, localIndex, showLocalPlayerMarker, compactOtherPlayers);
         std::string label = playerColorLabel(color);
         if (label.size() < static_cast<std::size_t>(kPlayerColorBlockWidth)) {
           label.append(static_cast<std::size_t>(kPlayerColorBlockWidth) - label.size(), ' ');
@@ -1123,12 +1247,17 @@ void GameView::drawContent(Terminal& term) {
     const std::vector<std::shared_ptr<mapState::Station>> stations = mapState->getStations();
     const std::vector<std::shared_ptr<playersState::Player>>* players =
         playerState ? &playerState->players : nullptr;
+    int localIndex = localPlayerIndex;
+    if (players && (localIndex < 0 || localIndex >= static_cast<int>(players->size()))) {
+      localIndex = 0;
+    }
     std::shared_ptr<mapState::Station> selectedStation = findStationByName(stations, selected.name);
     std::ostringstream selectedLine;
     selectedLine << "Selected: [" << selected.label << "] " << selected.name;
     if (selectedStation && selectedStation->getOwner() != nullptr) {
       selectedLine << " (Owned by "
-                   << playerDisplayLabel(selectedStation->getOwner(), players)
+                   << playerDisplayLabel(selectedStation->getOwner(), players, localIndex,
+                                         showLocalPlayerMarker, compactOtherPlayers)
                    << ")";
     } else {
       selectedLine << " (unowned)";
@@ -1215,7 +1344,8 @@ void GameView::drawContent(Terminal& term) {
 
       std::string ownerTag = "X";
       if (road->getOwner() != nullptr) {
-        ownerTag = playerDisplayLabel(road->getOwner(), players);
+        ownerTag = playerDisplayLabel(road->getOwner(), players, localIndex,
+                                      showLocalPlayerMarker, compactOtherPlayers);
       }
       std::string locsText = "NONE";
       if (std::dynamic_pointer_cast<mapState::Ferry>(road)) {

@@ -31,6 +31,8 @@ const int kTerminalOrigin = 1;
 const int kStatusBarHeight = 3;
 const int kCommandInputHeight = 3;
 const int kContentVerticalPadding = kStatusBarHeight + kCommandInputHeight;
+const char kGameName[] = "Ticket to Ride";
+const char kGameVersion[] = "0.1";
 // GameView gets roughly 2/3 of the remaining vertical space.
 const int kMapHeightNumerator = 2;
 const int kMapHeightDenominator = 3;
@@ -186,7 +188,7 @@ void TUIManager::init() {
   if (!statusbar) {
     statusbar = new StatusBar(kTerminalOrigin, kTerminalOrigin, cols, kStatusBarHeight);
     statusbar->setTitle("StatusBar");
-    statusbar->setGameInfo("Ticket to Ride", "0.1");
+    statusbar->setGameInfo(kGameName, kGameVersion);
     statusbar->setTurn(1);
     statusbar->setColors(Color::White, Color::Red);
   }
@@ -205,6 +207,13 @@ void TUIManager::init() {
     gameview->setMapState(mapstate);
     gameview->setPlayerState(playerstate);
     gameview->setCardsState(cardstate);
+  }
+  if (gameview) {
+    gameview->compactOtherPlayers = !debugRender;
+    gameview->showLocalPlayerMarker = !debugRender;
+  }
+  if (statusbar) {
+    statusbar->setDebugRender(debugRender);
   }
   if (!infopanel) {
     infopanel = new InfoPanel(
@@ -231,6 +240,14 @@ void TUIManager::init() {
 
 void TUIManager::setDebugRender(bool enabled) {
   debugRender = enabled;
+  if (gameview) {
+    gameview->compactOtherPlayers = !debugRender;
+    gameview->showLocalPlayerMarker = !debugRender;
+    gameview->requestRedraw();
+  }
+  if (statusbar) {
+    statusbar->setDebugRender(debugRender);
+  }
 }
 
 void TUIManager::updateLayout(int newCols, int newRows) {
@@ -497,7 +514,8 @@ void TUIManager::runMainLoop() {
           }
 
           if (gameview != nullptr && focus == Focus::MAP_FOCUS &&
-              gameview->getMode() == ViewMode::MAP) {
+              (gameview->getMode() == ViewMode::MAP ||
+               gameview->getMode() == ViewMode::PLAYER)) {
             if (seq2 == kArrowUpCode) {
               gameview->moveSelection(-1, 0);
               updated = true;
