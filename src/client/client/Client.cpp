@@ -1,5 +1,6 @@
 #include "Client.h"
 #include <iostream>
+#include "render/RenderState.h"
 #include "../shared/state/State.h"
 
 namespace client
@@ -22,5 +23,12 @@ namespace client
     {
         // @Yosra + @Chahrazed + @Theo will call here the printState method from state class
         this->currentGameState->display();
+    }
+
+    void Client::callRender()
+    {
+        render::RenderState renderer;
+        const int playerCount = 6;
+        renderer.renderStateLoop(playerCount);
     }
 }

@@ -539,6 +539,31 @@ void GameView::setHighlightNode(int nodeID) {
   requestRedraw();
 }
 
+void GameView::setLocalPlayerIndex(int index) {
+  if (localPlayerIndex == index) {
+    return;
+  }
+  localPlayerIndex = index;
+  playerScrollIndex = 0;
+  requestRedraw();
+}
+
+void GameView::setCompactOtherPlayers(bool enabled) {
+  if (compactOtherPlayers == enabled) {
+    return;
+  }
+  compactOtherPlayers = enabled;
+  requestRedraw();
+}
+
+void GameView::setShowLocalPlayerMarker(bool enabled) {
+  if (showLocalPlayerMarker == enabled) {
+    return;
+  }
+  showLocalPlayerMarker = enabled;
+  requestRedraw();
+}
+
 void GameView::moveSelection(int deltaRow, int deltaCol) {
   if (mode == ViewMode::PLAYER) {
     if (!playerState || playerState->players.empty()) {

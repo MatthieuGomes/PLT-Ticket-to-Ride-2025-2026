@@ -90,50 +90,7 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"render")==0) {
-        
-        int cols = kDefaultCols;
-        int rows = kDefaultRows;
-        getTerminalSize(cols, rows);
-
-        const int playerCount = 6;
-        std::srand(static_cast<unsigned int>(std::time(nullptr)));
-
-        std::vector<playersState::PlayerColor> colors;
-        colors.push_back(playersState::PlayerColor::RED);
-        colors.push_back(playersState::PlayerColor::BLUE);
-        colors.push_back(playersState::PlayerColor::GREEN);
-        colors.push_back(playersState::PlayerColor::BLACK);
-        colors.push_back(playersState::PlayerColor::YELLOW);
-
-        for (int i = static_cast<int>(colors.size()) - 1; i > 0; --i) {
-            int j = std::rand() % (i + 1);
-            playersState::PlayerColor tmp = colors[static_cast<std::size_t>(i)];
-            colors[static_cast<std::size_t>(i)] = colors[static_cast<std::size_t>(j)];
-            colors[static_cast<std::size_t>(j)] = tmp;
-        }
-
-        std::vector<std::tuple<std::string, playersState::PlayerColor,
-                               std::shared_ptr<cardsState::PlayerCards>>> playersInfos;
-        for (int i = 0; i < playerCount; ++i) {
-            std::string name = std::string("Player ") + std::to_string(i + 1);
-            playersInfos.push_back(std::make_tuple(
-                name,
-                colors[static_cast<std::size_t>(i % static_cast<int>(colors.size()))],
-                std::shared_ptr<cardsState::PlayerCards>()));
-        }
-
-        state::State debugState;
-        debugState.map = mapState::MapState::Europe();
-        debugState.cards = cardsState::CardsState::Europe(debugState.map.getStations(), playerCount);
-        debugState.players = playersState::PlayersState(playersInfos, debugState.cards.playersCards);
-
-        tui::Terminal term;
-        tui::TUIManager manager(&term, cols, rows,
-                                &debugState.map,
-                                &debugState.players,
-                                &debugState.cards);
-        manager.setDebugRender(true);
-        manager.runMainLoop();
+        client.callRender();
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"tui")==0) {
@@ -146,7 +103,7 @@ int main(int argc,char* argv[])
         std::shared_ptr<mapState::MapState> map_state =
             std::make_shared<mapState::MapState>(mapState::MapState::Europe());
 
-        const int playerCount = 6;
+        const int playerCount = 7;
         playersState::PlayersState::nbPlayers = playerCount;
         std::shared_ptr<cardsState::CardsState> cards_state =
             std::make_shared<cardsState::CardsState>(
