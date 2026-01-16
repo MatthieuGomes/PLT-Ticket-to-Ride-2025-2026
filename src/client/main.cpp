@@ -94,7 +94,7 @@ int main(int argc,char* argv[])
         int rows = kDefaultRows;
         getTerminalSize(cols, rows);
 
-        const int playerCount = 4;
+        const int playerCount = 6;
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
         std::vector<playersState::PlayerColor> colors;
@@ -115,9 +115,10 @@ int main(int argc,char* argv[])
                                std::shared_ptr<cardsState::PlayerCards>>> playersInfos;
         for (int i = 0; i < playerCount; ++i) {
             std::string name = std::string("Player ") + std::to_string(i + 1);
-            playersInfos.push_back(std::make_tuple(name,
-                                                   colors[static_cast<std::size_t>(i)],
-                                                   std::shared_ptr<cardsState::PlayerCards>()));
+            playersInfos.push_back(std::make_tuple(
+                name,
+                colors[static_cast<std::size_t>(i % static_cast<int>(colors.size()))],
+                std::shared_ptr<cardsState::PlayerCards>()));
         }
 
         state::State debugState;
@@ -144,15 +145,47 @@ int main(int argc,char* argv[])
         std::shared_ptr<mapState::MapState> map_state =
             std::make_shared<mapState::MapState>(mapState::MapState::Europe());
 
-        // Seed one player so the Player view shows real data.
-        playersState::PlayersState::nbPlayers = 1;
+        const int playerCount = 6;
+        playersState::PlayersState::nbPlayers = playerCount;
         std::shared_ptr<cardsState::CardsState> cards_state =
             std::make_shared<cardsState::CardsState>(
                 cardsState::CardsState::Europe(map_state->getStations(),
                                                playersState::PlayersState::nbPlayers));
+
+        std::vector<playersState::PlayerColor> colors;
+        colors.push_back(playersState::PlayerColor::RED);
+        colors.push_back(playersState::PlayerColor::BLUE);
+        colors.push_back(playersState::PlayerColor::GREEN);
+        colors.push_back(playersState::PlayerColor::BLACK);
+        colors.push_back(playersState::PlayerColor::YELLOW);
+
+        std::vector<std::tuple<std::string, playersState::PlayerColor,
+                               std::shared_ptr<cardsState::PlayerCards>>> playersInfos;
+        for (int i = 0; i < playerCount; ++i) {
+            std::string name = std::string("Player ") + std::to_string(i + 1);
+            std::shared_ptr<cardsState::PlayerCards> hand;
+            if (i < static_cast<int>(cards_state->playersCards.size())) {
+                hand = cards_state->playersCards[static_cast<std::size_t>(i)];
+            } else {
+                hand = std::make_shared<cardsState::PlayerCards>();
+            }
+            playersInfos.push_back(std::make_tuple(
+                name,
+                colors[static_cast<std::size_t>(i % static_cast<int>(colors.size()))],
+                hand));
+        }
+
+        std::shared_ptr<playersState::PlayersState> players_state =
+            std::make_shared<playersState::PlayersState>(playersInfos,
+                                                         cards_state->playersCards);
+
+        std::shared_ptr<playersState::Player> player;
+        if (players_state && !players_state->players.empty()) {
+            player = players_state->players[0];
+        }
         std::shared_ptr<cardsState::PlayerCards> player_hand;
-        if (!cards_state->playersCards.empty()) {
-            player_hand = cards_state->playersCards[0];
+        if (player) {
+            player_hand = player->getHand();
         } else {
             player_hand = std::make_shared<cardsState::PlayerCards>();
         }
@@ -171,11 +204,10 @@ int main(int argc,char* argv[])
         player_hand->destinationCards =
             std::make_shared<cardsState::Deck<cardsState::DestinationCard>>(destinationCards);
 
-        std::shared_ptr<playersState::Player> player =
-            std::make_shared<playersState::Player>(
-                playersState::Player::Init("Player 1", playersState::PlayerColor::RED, player_hand));
         if (!destinationCards.empty()) {
-            player->completedDestinations.push_back(destinationCards[0]);
+            if (player) {
+                player->completedDestinations.push_back(destinationCards[0]);
+            }
         }
 
         // Claim a Lisbon -> Danzig path for demo purposes.
@@ -203,17 +235,14 @@ int main(int argc,char* argv[])
                 const std::string& first = ownedPairs[j].first;
                 const std::string& second = ownedPairs[j].second;
                 if ((a == first && b == second) || (a == second && b == first)) {
-                    road->setOwner(player);
+                    if (player) {
+                        road->setOwner(player);
+                    }
                     claimedPairs[j] = true;
                     break;
                 }
             }
         }
-
-        std::vector<std::shared_ptr<playersState::Player>> players;
-        players.push_back(player);
-        std::shared_ptr<playersState::PlayersState> players_state =
-            std::make_shared<playersState::PlayersState>(players);
 
         tui::TUIManager manager(&term, cols, rows,
                                 map_state.get(),

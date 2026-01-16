@@ -23,6 +23,7 @@ StatusBar::StatusBar(int x, int y, int width, int height)
   version.clear();
   currentTurn = 0;
   currentPlayer = nullptr;
+  debugRender = false;
   requestRedraw();
 }
 
@@ -51,6 +52,14 @@ void StatusBar::setCurrentPlayer(playersState::Player* player) {
   requestRedraw();
 }
 
+void StatusBar::setDebugRender(bool enabled) {
+  if (debugRender == enabled) {
+    return;
+  }
+  debugRender = enabled;
+  requestRedraw();
+}
+
 void StatusBar::drawFrame(Terminal& term) {
   BaseView::drawFrame(term);
 }
@@ -74,19 +83,26 @@ void StatusBar::drawHeader(Terminal& term) {
     statusLine << "v" << version;
   }
 
-  if (currentTurn > 0) {
+  if (debugRender) {
     if (statusLine.tellp() > 0) {
       statusLine << " | ";
     }
-    statusLine << "Turn " << currentTurn;
-    statusLine << " | Your turn";
-  }
-
-  if (currentPlayer != nullptr) {
-    if (statusLine.tellp() > 0) {
-      statusLine << " - ";
+    statusLine << "RENDER DEBUG";
+  } else {
+    if (currentTurn > 0) {
+      if (statusLine.tellp() > 0) {
+        statusLine << " | ";
+      }
+      statusLine << "Turn " << currentTurn;
+      statusLine << " | Your turn";
     }
-    statusLine << currentPlayer->getName();
+
+    if (currentPlayer != nullptr) {
+      if (statusLine.tellp() > 0) {
+        statusLine << " - ";
+      }
+      statusLine << currentPlayer->getName();
+    }
   }
 
   std::string text = statusLine.str();
