@@ -137,7 +137,7 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"tui")==0) {
-        configureCoverageOutput();
+        // configureCoverageOutput();
         int cols = kDefaultCols;
         int rows = kDefaultRows;
         getTerminalSize(cols, rows);
