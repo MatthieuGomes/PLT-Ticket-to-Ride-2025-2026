@@ -69,7 +69,11 @@ namespace cardsState
     std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~\n";
   }
 
-  CardsState cardsState::ParseFromJSON(std::string json, std::shared_ptr<mapState::MapState> mapState){
-
+  CardsState CardsState::ParseFromJSON(std::string json, std::shared_ptr<mapState::MapState> mapState)
+  {
+    // Stub implementation until JSON loading is implemented.
+    (void)json;
+    (void)mapState;
+    return CardsState();
   }
 }

@@ -670,7 +670,10 @@ namespace mapState
 
     MapState MapState::ParseFromJSON(std::string json, std::shared_ptr<playersState::PlayersState> playersState)
     {
-          
+        // Stub implementation until JSON loading is implemented.
+        (void)json;
+        (void)playersState;
+        return MapState();
     }
 
 }
