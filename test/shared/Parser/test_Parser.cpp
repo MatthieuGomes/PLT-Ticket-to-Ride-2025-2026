@@ -78,6 +78,15 @@ std::string jsonSection(const Json::Value& root, const char* key)
   return Json::writeString(writer, root[key]);
 }
 
+// Serialize a Json::Value for inline test fixtures.
+std::string writeJson(const Json::Value& root)
+{
+  Json::StreamWriterBuilder writer;
+  writer["commentStyle"] = "None";
+  writer["indentation"] = "";
+  return Json::writeString(writer, root);
+}
+
 } // namespace
 
 TEST(TestStaticAssert)
@@ -87,6 +96,7 @@ TEST(TestStaticAssert)
 
 SUITE_START(Parser)
 
+// Verifies full state construction via InitFromJSON/ParseFromJSON/setupFromJSON.
 TEST(ParseInitStateFixture)
 {
   ANN_START("ParseInitStateFixture")
@@ -201,6 +211,7 @@ TEST(ParseInitStateFixture)
   ANN_END("ParseInitStateFixture")
 }
 
+// Ensures command JSON survives a serialize/parse round-trip.
 TEST(JSONParserCommandRoundTrip)
 {
   ANN_START("JSONParserCommandRoundTrip")
@@ -224,6 +235,156 @@ TEST(JSONParserCommandRoundTrip)
   CHECK_EQ(parsed.requestID, "req-1");
   CHECK_EQ(parsed.payload["count"].asInt(), 2);
   ANN_END("JSONParserCommandRoundTrip")
+}
+
+// Accepts missing kind/origin and defaults them for commands.
+TEST(JSONParserCommandDefaults)
+{
+  ANN_START("JSONParserCommandDefaults")
+  parser::JSONParser parser;
+  Json::Value root(Json::objectValue);
+  root["name"] = "exit";
+  std::string json = writeJson(root);
+  DEBUG_PRINT("Command defaults JSON: " << json);
+
+  parser::CommandMessage parsed;
+  std::string error;
+  bool ok = parser.parseCommand(json, parsed, error);
+  DEBUG_PRINT("Command defaults ok: " << ok << " error: " << error);
+  DEBUG_PRINT("Command defaults parsed kind: " << parsed.kind
+              << " origin: " << parsed.origin
+              << " name: " << parsed.name);
+  CHECK(ok);
+  CHECK_EQ(parsed.name, "exit");
+  CHECK_EQ(parsed.kind, "command");
+  CHECK_EQ(parsed.origin, "tui");
+  CHECK_EQ(parsed.version, 1);
+  ANN_END("JSONParserCommandDefaults")
+}
+
+// Rejects commands that claim to originate from the engine.
+TEST(JSONParserCommandRejectsOrigin)
+{
+  ANN_START("JSONParserCommandRejectsOrigin")
+  parser::JSONParser parser;
+  Json::Value root(Json::objectValue);
+  root["name"] = "exit";
+  root["kind"] = "command";
+  root["origin"] = "engine";
+  std::string json = writeJson(root);
+  DEBUG_PRINT("Command bad origin JSON: " << json);
+
+  parser::CommandMessage parsed;
+  std::string error;
+  bool ok = parser.parseCommand(json, parsed, error);
+  DEBUG_PRINT("Command bad origin ok: " << ok << " error: " << error);
+  CHECK(!ok);
+  CHECK(!error.empty());
+  ANN_END("JSONParserCommandRejectsOrigin")
+}
+
+// Ensures result JSON and its events round-trip correctly.
+TEST(JSONParserResultRoundTrip)
+{
+  ANN_START("JSONParserResultRoundTrip")
+  parser::JSONParser parser;
+  parser::ResultMessage result;
+  result.ok = true;
+  result.error = "";
+  result.kind = "result";
+  result.origin = "engine";
+  result.version = 1;
+  result.requestID = "req-9";
+  result.playerID = 3;
+  result.turn = 7;
+  result.payload["nextPhase"] = 2;
+  parser::EventMessage event;
+  event.kind = "event";
+  event.origin = "engine";
+  event.version = 1;
+  event.requestID = "req-9";
+  event.playerID = 3;
+  event.turn = 7;
+  event.type = "INFO";
+  event.message = "hello";
+  event.payload["note"] = "test";
+  result.events.push_back(event);
+
+  std::string json = parser.serializeResult(result);
+  DEBUG_PRINT("Result roundtrip JSON: " << json);
+
+  parser::ResultMessage parsed;
+  std::string error;
+  bool ok = parser.parseResult(json, parsed, error);
+  DEBUG_PRINT("Result roundtrip ok: " << ok << " error: " << error);
+  DEBUG_PRINT("Result roundtrip parsed kind: " << parsed.kind
+              << " origin: " << parsed.origin
+              << " events: " << parsed.events.size());
+  CHECK(ok);
+  CHECK_EQ(parsed.ok, true);
+  CHECK_EQ(parsed.kind, "result");
+  CHECK_EQ(parsed.origin, "engine");
+  CHECK_EQ(parsed.requestID, "req-9");
+  CHECK_EQ(parsed.playerID, 3);
+  CHECK_EQ(parsed.turn, 7);
+  CHECK_EQ(parsed.payload["nextPhase"].asInt(), 2);
+  CHECK_EQ(parsed.events.size(), 1);
+  CHECK_EQ(parsed.events[0].type, "INFO");
+  CHECK_EQ(parsed.events[0].message, "hello");
+  CHECK_EQ(parsed.events[0].origin, "engine");
+  CHECK_EQ(parsed.events[0].playerID, 3);
+  CHECK_EQ(parsed.events[0].turn, 7);
+  ANN_END("JSONParserResultRoundTrip")
+}
+
+// Rejects result payloads that declare the wrong kind.
+TEST(JSONParserResultRejectsKind)
+{
+  ANN_START("JSONParserResultRejectsKind")
+  parser::JSONParser parser;
+  Json::Value root(Json::objectValue);
+  root["kind"] = "command";
+  root["origin"] = "engine";
+  root["ok"] = true;
+  root["payload"] = Json::Value(Json::objectValue);
+  std::string json = writeJson(root);
+  DEBUG_PRINT("Result bad kind JSON: " << json);
+
+  parser::ResultMessage parsed;
+  std::string error;
+  bool ok = parser.parseResult(json, parsed, error);
+  DEBUG_PRINT("Result bad kind ok: " << ok << " error: " << error);
+  CHECK(!ok);
+  CHECK(!error.empty());
+  ANN_END("JSONParserResultRejectsKind")
+}
+
+// Rejects events that claim to originate from the TUI.
+TEST(JSONParserEventRejectsOrigin)
+{
+  ANN_START("JSONParserEventRejectsOrigin")
+  parser::JSONParser parser;
+  Json::Value root(Json::objectValue);
+  root["kind"] = "result";
+  root["origin"] = "engine";
+  root["ok"] = true;
+  Json::Value event(Json::objectValue);
+  event["kind"] = "event";
+  event["type"] = "INFO";
+  event["message"] = "bad-origin";
+  event["origin"] = "tui";
+  root["events"] = Json::Value(Json::arrayValue);
+  root["events"].append(event);
+  std::string json = writeJson(root);
+  DEBUG_PRINT("Event bad origin JSON: " << json);
+
+  parser::ResultMessage parsed;
+  std::string error;
+  bool ok = parser.parseResult(json, parsed, error);
+  DEBUG_PRINT("Event bad origin ok: " << ok << " error: " << error);
+  CHECK(!ok);
+  CHECK(!error.empty());
+  ANN_END("JSONParserEventRejectsOrigin")
 }
 
 SUITE_END() // Parser
