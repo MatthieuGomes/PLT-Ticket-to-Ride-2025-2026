@@ -38,8 +38,10 @@ const char kDefaultLayoutPath[] = "ressources/europe_layout.txt";
 const int kMinMapWidth = 16;
 const int kMinDetailsWidth = 26;
 const int kMaxDetailsWidth = 40;
+const int kDetailsWidthExtra = 7;
 const int kPanelGap = 2;
 const int kScrollMargin = 1;
+const char kPanelSeparatorChar = '|';
 // When no player is available.
 const char kNoPlayerText[] = "No player data";
 const char kNoCardText[] = "No card data";
@@ -47,8 +49,16 @@ const int kCardBlockWidth = 3;
 const int kCardBlockGap = 1;
 const int kCardLabelWidth = 3;
 const int kPlayerColorBlockWidth = 3;
+const int kLocalPlayerIndex = 0;
 const int kPlayerColumnGap = 2;
 const int kMinPlayerColumnWidth = 18;
+const int kTableColumnCount = 6;
+const int kTableMinTypeWidth = 3;
+const int kTableMinEndpointsWidth = 5;
+const int kTableMinLengthWidth = 2;
+const int kTableMinColorWidth = 3;
+const int kTableMinOwnerWidth = 3;
+const int kTableMinLocsWidth = 4;
 
 Color roadColorToAnsi(mapState::RoadColor color) {
   switch (color) {
@@ -115,6 +125,19 @@ std::string roadTypeToken(const std::shared_ptr<mapState::Road>& road) {
     return "F";
   }
   return "R";
+}
+
+std::string roadTypeName(const std::shared_ptr<mapState::Road>& road) {
+  if (!road) {
+    return "Road";
+  }
+  if (std::dynamic_pointer_cast<mapState::Tunnel>(road)) {
+    return "Tunnel";
+  }
+  if (std::dynamic_pointer_cast<mapState::Ferry>(road)) {
+    return "Ferry";
+  }
+  return "Road";
 }
 
 Color wagonColorToAnsi(cardsState::ColorCard color) {
@@ -198,6 +221,89 @@ std::string stationNameOrPlaceholder(const std::shared_ptr<mapState::Station>& s
     return station->getName();
   }
   return "Unknown";
+}
+
+std::shared_ptr<mapState::Station> findStationByName(
+    const std::vector<std::shared_ptr<mapState::Station>>& stations,
+    const std::string& name) {
+  for (std::size_t i = 0; i < stations.size(); ++i) {
+    if (stations[i] && stations[i]->getName() == name) {
+      return stations[i];
+    }
+  }
+  return std::shared_ptr<mapState::Station>();
+}
+
+int findPlayerIndex(
+    const std::vector<std::shared_ptr<playersState::Player>>& players,
+    const std::shared_ptr<playersState::Player>& player) {
+  for (std::size_t i = 0; i < players.size(); ++i) {
+    if (players[i] == player) {
+      return static_cast<int>(i);
+    }
+  }
+  return -1;
+}
+
+std::string playerShortLabel(int index) {
+  std::ostringstream out;
+  out << "PLYR" << (index + 1);
+  return out.str();
+}
+
+std::string playerDisplayLabel(
+    const std::shared_ptr<playersState::Player>& player,
+    const std::vector<std::shared_ptr<playersState::Player>>* players) {
+  if (!player || !players) {
+    return "PLYR?";
+  }
+  int index = findPlayerIndex(*players, player);
+  if (index < 0) {
+    return "PLYR?";
+  }
+  if (index == kLocalPlayerIndex) {
+    return "YOU";
+  }
+  return playerShortLabel(index);
+}
+
+std::string padCell(const std::string& text, int width) {
+  if (width <= 0) {
+    return std::string();
+  }
+  if (static_cast<int>(text.size()) >= width) {
+    return text.substr(0, static_cast<std::size_t>(width));
+  }
+  return text + std::string(static_cast<std::size_t>(width - text.size()), ' ');
+}
+
+std::string buildTableRow(
+    const std::vector<std::string>& cells,
+    const std::vector<int>& widths) {
+  std::ostringstream out;
+  out << "|";
+  for (std::size_t i = 0; i < cells.size() && i < widths.size(); ++i) {
+    out << padCell(cells[i], widths[i]) << "|";
+  }
+  return out.str();
+}
+
+std::string buildTableSeparator(const std::vector<int>& widths) {
+  std::ostringstream out;
+  out << "|";
+  for (std::size_t i = 0; i < widths.size(); ++i) {
+    out << std::string(static_cast<std::size_t>(widths[i]), '-') << "|";
+  }
+  return out.str();
+}
+
+std::string buildTableFooter(const std::vector<int>& widths) {
+  std::ostringstream out;
+  out << "|";
+  for (std::size_t i = 0; i < widths.size(); ++i) {
+    out << std::string(static_cast<std::size_t>(widths[i]), '-') << "|";
+  }
+  return out.str();
 }
 
 void drawWagonBlocks(
@@ -569,11 +675,14 @@ void GameView::drawContent(Terminal& term) {
 
       if (!player) {
         std::ostringstream placeholder;
-        placeholder << "Player " << (i + 1);
+        placeholder << "PLYR" << (i + 1);
         writeClampedLine(term, currentRow, col, columnWidth, placeholder.str());
         continue;
       }
 
+      const std::vector<std::shared_ptr<playersState::Player>>* players =
+          playerState ? &playerState->players : nullptr;
+      const std::string playerLabel = playerDisplayLabel(player, players);
       {
         const playersState::PlayerColor color = player->getColor();
         std::string label = playerColorLabel(color);
@@ -590,7 +699,7 @@ void GameView::drawContent(Terminal& term) {
       term.setBg(bgColor);
       term.setFg(fgColor);
       writeClampedLine(term, currentRow, col + kPlayerColorBlockWidth,
-                       columnWidth - kPlayerColorBlockWidth, " " + player->getName());
+                       columnWidth - kPlayerColorBlockWidth, " " + playerLabel);
       ++currentRow;
 
       if (currentRow >= endRow) {
@@ -795,8 +904,11 @@ void GameView::drawContent(Terminal& term) {
         hand = cardState->playersCards[static_cast<std::size_t>(i)];
       }
 
+      const std::vector<std::shared_ptr<playersState::Player>>* players =
+          playerState ? &playerState->players : nullptr;
       if (player) {
         const playersState::PlayerColor color = player->getColor();
+        const std::string playerLabel = playerDisplayLabel(player, players);
         std::string label = playerColorLabel(color);
         if (label.size() < static_cast<std::size_t>(kPlayerColorBlockWidth)) {
           label.append(static_cast<std::size_t>(kPlayerColorBlockWidth) - label.size(), ' ');
@@ -810,10 +922,10 @@ void GameView::drawContent(Terminal& term) {
         term.setBg(bgColor);
         term.setFg(fgColor);
         writeClampedLine(term, playerRow, col + kPlayerColorBlockWidth,
-                         columnWidth - kPlayerColorBlockWidth, " " + player->getName());
+                         columnWidth - kPlayerColorBlockWidth, " " + playerLabel);
       } else {
         std::ostringstream label;
-        label << "Player " << (i + 1);
+        label << "PLYR" << (i + 1);
         writeClampedLine(term, playerRow, col, columnWidth, label.str());
       }
       ++playerRow;
@@ -865,7 +977,9 @@ void GameView::drawContent(Terminal& term) {
     return;
   }
 
-  int detailsWidth = std::min(kMaxDetailsWidth, std::max(kMinDetailsWidth, contentWidth / 3));
+  int detailsWidth = std::min(kMaxDetailsWidth + kDetailsWidthExtra,
+                              std::max(kMinDetailsWidth + kDetailsWidthExtra,
+                                       contentWidth / 3 + kDetailsWidthExtra));
   int mapWidth = contentWidth - detailsWidth - kPanelGap;
   if (mapWidth < kMinMapWidth) {
     mapWidth = kMinMapWidth;
@@ -880,6 +994,15 @@ void GameView::drawContent(Terminal& term) {
     writeClampedLine(term, row + r, x + kFrameOffset, mapWidth, "");
     if (detailsWidth > 0) {
       writeClampedLine(term, row + r, detailsX, detailsWidth, "");
+    }
+  }
+  if (detailsWidth > 0) {
+    const int separatorCol = x + kFrameOffset + mapWidth;
+    term.setBg(bgColor);
+    term.setFg(fgColor);
+    for (int r = 0; r < contentRows; ++r) {
+      term.moveTo(row + r, separatorCol);
+      term.write(std::string(1, kPanelSeparatorChar));
     }
   }
 
@@ -997,13 +1120,80 @@ void GameView::drawContent(Terminal& term) {
     writeClampedLine(term, detailsRow, detailsX, detailsWidth, "Station Details");
     ++detailsRow;
 
+    const std::vector<std::shared_ptr<mapState::Station>> stations = mapState->getStations();
+    const std::vector<std::shared_ptr<playersState::Player>>* players =
+        playerState ? &playerState->players : nullptr;
+    std::shared_ptr<mapState::Station> selectedStation = findStationByName(stations, selected.name);
     std::ostringstream selectedLine;
     selectedLine << "Selected: [" << selected.label << "] " << selected.name;
+    if (selectedStation && selectedStation->getOwner() != nullptr) {
+      selectedLine << " (Owned by "
+                   << playerDisplayLabel(selectedStation->getOwner(), players)
+                   << ")";
+    } else {
+      selectedLine << " (unowned)";
+    }
     writeClampedLine(term, detailsRow, detailsX, detailsWidth, selectedLine.str());
     detailsRow += 2;
 
-    writeClampedLine(term, detailsRow, detailsX, detailsWidth, "Roads:");
-    ++detailsRow;
+    const std::string headerType = "RoadType";
+    const std::string headerEndpoints = "Endpoints";
+    const std::string headerLength = "Length";
+    const std::string headerColor = "Color";
+    const std::string headerOwner = "Owner";
+    const std::string headerLocs = "Locs";
+    std::vector<int> columnWidths;
+    columnWidths.push_back(static_cast<int>(headerType.size()));
+    columnWidths.push_back(static_cast<int>(headerEndpoints.size()));
+    columnWidths.push_back(static_cast<int>(headerLength.size()));
+    columnWidths.push_back(static_cast<int>(headerColor.size()));
+    columnWidths.push_back(static_cast<int>(headerOwner.size()));
+    columnWidths.push_back(static_cast<int>(headerLocs.size()));
+    const int separatorCount = kTableColumnCount + 1;
+    int totalWidth = separatorCount;
+    for (std::size_t i = 0; i < columnWidths.size(); ++i) {
+      totalWidth += columnWidths[i];
+    }
+    const int minWidths[kTableColumnCount] = {
+      kTableMinTypeWidth,
+      kTableMinEndpointsWidth,
+      kTableMinLengthWidth,
+      kTableMinColorWidth,
+      kTableMinOwnerWidth,
+      kTableMinLocsWidth
+    };
+    const int shrinkOrder[kTableColumnCount] = {1, 4, 5, 0, 3, 2};
+    while (totalWidth > detailsWidth) {
+      bool reduced = false;
+      for (int idx = 0; idx < kTableColumnCount && totalWidth > detailsWidth; ++idx) {
+        const int colIndex = shrinkOrder[idx];
+        if (columnWidths[colIndex] > minWidths[colIndex]) {
+          columnWidths[colIndex] -= 1;
+          totalWidth -= 1;
+          reduced = true;
+        }
+      }
+      if (!reduced) {
+        break;
+      }
+    }
+    if (detailsRow < endRow) {
+      std::vector<std::string> headerCells;
+      headerCells.push_back(headerType);
+      headerCells.push_back(headerEndpoints);
+      headerCells.push_back(headerLength);
+      headerCells.push_back(headerColor);
+      headerCells.push_back(headerOwner);
+      headerCells.push_back(headerLocs);
+      writeClampedLine(term, detailsRow, detailsX, detailsWidth,
+                       buildTableRow(headerCells, columnWidths));
+      ++detailsRow;
+    }
+    if (detailsRow < endRow) {
+      writeClampedLine(term, detailsRow, detailsX, detailsWidth,
+                       buildTableSeparator(columnWidths));
+      ++detailsRow;
+    }
 
     const std::vector<std::shared_ptr<mapState::Road>> roads = mapState->getRoads();
     for (std::size_t i = 0; i < roads.size() && detailsRow < endRow; ++i) {
@@ -1023,21 +1213,39 @@ void GameView::drawContent(Terminal& term) {
           ? layoutEntries[static_cast<std::size_t>(layoutIndex)].label
           : toUpperShort(otherName);
 
-      const std::string ownerTag =
-          (road->getOwner() != nullptr) ? road->getOwner()->getName() : "X";
+      std::string ownerTag = "X";
+      if (road->getOwner() != nullptr) {
+        ownerTag = playerDisplayLabel(road->getOwner(), players);
+      }
+      std::string locsText = "NONE";
+      if (std::dynamic_pointer_cast<mapState::Ferry>(road)) {
+        std::shared_ptr<mapState::Ferry> ferry =
+            std::dynamic_pointer_cast<mapState::Ferry>(road);
+        if (ferry) {
+          locsText = std::to_string(ferry->getLocomotives());
+        }
+      }
 
-      std::ostringstream line;
-      line << "- " << otherLabel << " " << road->getLength() << " "
-           << roadTypeToken(road) << " "
-           << colorCardToString(road->getColor()) << " " << ownerTag;
+      const std::string endpointText = selected.label + "<->" + otherLabel;
+      const std::string lengthText = std::to_string(road->getLength());
+      std::vector<std::string> rowCells;
+      rowCells.push_back(roadTypeName(road));
+      rowCells.push_back(endpointText);
+      rowCells.push_back(lengthText);
+      rowCells.push_back(colorCardToString(road->getColor()));
+      rowCells.push_back(ownerTag);
+      rowCells.push_back(locsText);
 
       term.setFg(roadColorToAnsi(road->getColor()));
-      writeClampedLine(term, detailsRow, detailsX, detailsWidth, line.str());
+      writeClampedLine(term, detailsRow, detailsX, detailsWidth,
+                       buildTableRow(rowCells, columnWidths));
       term.setFg(fgColor);
       ++detailsRow;
     }
 
     if (detailsRow < endRow) {
+      writeClampedLine(term, detailsRow, detailsX, detailsWidth,
+                       buildTableFooter(columnWidths));
       ++detailsRow;
     }
     if (detailsRow < endRow) {
@@ -1045,11 +1253,8 @@ void GameView::drawContent(Terminal& term) {
       ++detailsRow;
     }
     if (detailsRow < endRow) {
-      writeClampedLine(term, detailsRow, detailsX, detailsWidth, "R=road T=tunnel F=ferry");
+      writeClampedLine(term, detailsRow, detailsX, detailsWidth, "    Ownership: X=unclaimed");
       ++detailsRow;
-    }
-    if (detailsRow < endRow) {
-      writeClampedLine(term, detailsRow, detailsX, detailsWidth, "X=unclaimed");
     }
   }
 
