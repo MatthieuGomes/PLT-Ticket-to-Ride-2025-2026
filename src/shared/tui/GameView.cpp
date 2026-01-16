@@ -43,9 +43,10 @@ const int kScrollMargin = 1;
 // When no player is available.
 const char kNoPlayerText[] = "No player data";
 const char kNoCardText[] = "No card data";
-const int kCardBlockWidth = 2;
-const int kCardBlockGap = 2;
+const int kCardBlockWidth = 3;
+const int kCardBlockGap = 1;
 const int kCardLabelWidth = 3;
+const int kPlayerColorBlockWidth = 3;
 const int kPlayerColumnGap = 2;
 const int kMinPlayerColumnWidth = 18;
 
@@ -79,6 +80,30 @@ Color playerColorToAnsi(playersState::PlayerColor color) {
   }
 }
 
+std::string playerColorLabel(playersState::PlayerColor color) {
+  switch (color) {
+    case playersState::PlayerColor::RED: return "RED";
+    case playersState::PlayerColor::BLUE: return "BLU";
+    case playersState::PlayerColor::GREEN: return "GRN";
+    case playersState::PlayerColor::BLACK: return "BLK";
+    case playersState::PlayerColor::YELLOW: return "YEL";
+    case playersState::PlayerColor::UNKNOWN:
+    default:
+      return "UNK";
+  }
+}
+
+Color playerLabelBg(playersState::PlayerColor color) {
+  return playerColorToAnsi(color);
+}
+
+Color playerLabelFg(playersState::PlayerColor color) {
+  if (color == playersState::PlayerColor::YELLOW) {
+    return Color::Black;
+  }
+  return Color::BrightWhite;
+}
+
 std::string roadTypeToken(const std::shared_ptr<mapState::Road>& road) {
   if (!road) {
     return "R";
@@ -107,6 +132,43 @@ Color wagonColorToAnsi(cardsState::ColorCard color) {
     default:
       return Color::BrightBlack;
   }
+}
+
+std::string wagonColorLabel(cardsState::ColorCard color) {
+  switch (color) {
+    case cardsState::ColorCard::RED: return "RED";
+    case cardsState::ColorCard::BLUE: return "BLU";
+    case cardsState::ColorCard::GREEN: return "GRN";
+    case cardsState::ColorCard::BLACK: return "BLK";
+    case cardsState::ColorCard::YELLOW: return "YEL";
+    case cardsState::ColorCard::ORANGE: return "ORG";
+    case cardsState::ColorCard::PINK: return "PNK";
+    case cardsState::ColorCard::WHITE: return "WHT";
+    case cardsState::ColorCard::LOCOMOTIVE: return "LOC";
+    case cardsState::ColorCard::UNKNOWN:
+    default:
+      return "UNK";
+  }
+}
+
+Color wagonLabelBg(cardsState::ColorCard color) {
+  if (color == cardsState::ColorCard::BLACK) {
+    return Color::Black;
+  }
+  if (color == cardsState::ColorCard::WHITE) {
+    return Color::White;
+  }
+  if (color == cardsState::ColorCard::LOCOMOTIVE) {
+    return Color::BrightMagenta;
+  }
+  return wagonColorToAnsi(color);
+}
+
+Color wagonLabelFg(cardsState::ColorCard color) {
+  if (color == cardsState::ColorCard::WHITE) {
+    return Color::Black;
+  }
+  return Color::BrightWhite;
 }
 
 std::string toUpperShort(const std::string& text) {
@@ -161,17 +223,25 @@ void drawWagonBlocks(
     }
 
     term.moveTo(row, col + cursor);
-    if (card->getColor() == cardsState::ColorCard::LOCOMOTIVE) {
+    const cardsState::ColorCard color = card->getColor();
+    std::string label = wagonColorLabel(color);
+    if (label.size() < static_cast<std::size_t>(kCardBlockWidth)) {
+      label.append(static_cast<std::size_t>(kCardBlockWidth) - label.size(), ' ');
+    } else if (label.size() > static_cast<std::size_t>(kCardBlockWidth)) {
+      label = label.substr(0, static_cast<std::size_t>(kCardBlockWidth));
+    }
+    if (color == cardsState::ColorCard::LOCOMOTIVE) {
+      term.setFg(Color::Black);
       term.setBg(Color::BrightMagenta);
-      term.setFg(Color::Black);
-      term.writeRepeat(' ', 1);
+      term.write(label.substr(0, 1));
       term.setBg(Color::BrightCyan);
-      term.setFg(Color::Black);
-      term.writeRepeat(' ', 1);
+      term.write(label.substr(1, 1));
+      term.setBg(Color::BrightMagenta);
+      term.write(label.substr(2, 1));
     } else {
-      term.setBg(wagonColorToAnsi(card->getColor()));
-      term.setFg(Color::Black);
-      term.writeRepeat(' ', kCardBlockWidth);
+      term.setBg(wagonLabelBg(color));
+      term.setFg(wagonLabelFg(color));
+      term.write(label);
     }
     term.setBg(bg);
     term.setFg(fg);
@@ -504,13 +574,23 @@ void GameView::drawContent(Terminal& term) {
         continue;
       }
 
-      term.setBg(playerColorToAnsi(player->getColor()));
-      term.setFg(Color::Black);
-      term.moveTo(currentRow, col);
-      term.writeRepeat(' ', 2);
+      {
+        const playersState::PlayerColor color = player->getColor();
+        std::string label = playerColorLabel(color);
+        if (label.size() < static_cast<std::size_t>(kPlayerColorBlockWidth)) {
+          label.append(static_cast<std::size_t>(kPlayerColorBlockWidth) - label.size(), ' ');
+        } else if (label.size() > static_cast<std::size_t>(kPlayerColorBlockWidth)) {
+          label = label.substr(0, static_cast<std::size_t>(kPlayerColorBlockWidth));
+        }
+        term.setBg(playerLabelBg(color));
+        term.setFg(playerLabelFg(color));
+        term.moveTo(currentRow, col);
+        term.write(label);
+      }
       term.setBg(bgColor);
       term.setFg(fgColor);
-      writeClampedLine(term, currentRow, col + 2, columnWidth - 2, " " + player->getName());
+      writeClampedLine(term, currentRow, col + kPlayerColorBlockWidth,
+                       columnWidth - kPlayerColorBlockWidth, " " + player->getName());
       ++currentRow;
 
       if (currentRow >= endRow) {
@@ -716,13 +796,21 @@ void GameView::drawContent(Terminal& term) {
       }
 
       if (player) {
-        term.setBg(playerColorToAnsi(player->getColor()));
-        term.setFg(Color::Black);
+        const playersState::PlayerColor color = player->getColor();
+        std::string label = playerColorLabel(color);
+        if (label.size() < static_cast<std::size_t>(kPlayerColorBlockWidth)) {
+          label.append(static_cast<std::size_t>(kPlayerColorBlockWidth) - label.size(), ' ');
+        } else if (label.size() > static_cast<std::size_t>(kPlayerColorBlockWidth)) {
+          label = label.substr(0, static_cast<std::size_t>(kPlayerColorBlockWidth));
+        }
+        term.setBg(playerLabelBg(color));
+        term.setFg(playerLabelFg(color));
         term.moveTo(playerRow, col);
-        term.writeRepeat(' ', 2);
+        term.write(label);
         term.setBg(bgColor);
         term.setFg(fgColor);
-        writeClampedLine(term, playerRow, col + 2, columnWidth - 2, " " + player->getName());
+        writeClampedLine(term, playerRow, col + kPlayerColorBlockWidth,
+                         columnWidth - kPlayerColorBlockWidth, " " + player->getName());
       } else {
         std::ostringstream label;
         label << "Player " << (i + 1);
