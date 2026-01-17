@@ -1,0 +1,117 @@
+{
+    "players": [
+        {
+            "name":"player_name",
+            "color":"PLAYER_COLOR",
+            "score":0,
+            "nbWagons":0,
+            "nbStations":0,
+            "borrowedRoads": [
+                "road_id"
+            ],
+            "hand": "position_in_vector_of_cards_playerCards"
+        }
+    ],
+    "map": {
+        "stations":[
+            {
+                "name": "station_name",
+                "owner": "player_name/null"
+            }
+        ],
+        "roads": [
+            {
+                "id": 0,
+                "stationA": "station_name",
+                "stationB": "station_name",
+                "length": 0,
+                "color": "ROAD_COLOR",
+                "type": "ROAD"
+            },
+            {
+                "id": 0,
+                "stationA": "station_name",
+                "stationB": "station_name",
+                "length": 0,
+                "color": "ROAD_COLOR",
+                "type": "TUNNEL"
+            },
+            {
+                "id": 0,
+                "stationA": "station_name",
+                "stationB": "station_name",
+                "length": 0,
+                "type": "FERRY",
+                "locomotives": 0
+            }
+        ]
+    },
+    "cards": {
+        "outOfGame": {
+            "destinationCards": [
+                {
+                    "stationA": "",
+                    "stationB": "",
+                    "points": 0,
+                    "isLong": false,
+                    "completed": false
+                }
+            ],
+            "wagonCards": [
+                {
+                    "color": "CARD_COLOR"
+                }
+            ]
+        },
+        "faceUp": {
+            "destinationCards": [
+                {
+                    "stationA": "",
+                    "stationB": "",
+                    "points": 0,
+                    "isLong": false,
+                    "completed": false
+                }
+            ],
+            "wagonCards": [
+                {
+                    "color": "CARD_COLOR"
+                }
+            ]
+        },
+        "faceDown": {
+            "destinationCards": [
+                {
+                    "stationA": "",
+                    "stationB": "",
+                    "points": 0,
+                    "isLong": false,
+                    "completed": false
+                }
+            ],
+            "wagonCards": [
+                {
+                    "color": "CARD_COLOR"
+                }
+            ]
+        },
+        "playerCards": [
+            {
+                "destinationCards": [
+                    {
+                        "stationA": "",
+                        "stationB": "",
+                        "points": 0,
+                        "isLong": false,
+                        "completed": false
+                    }
+                ],
+                "wagonCards": [
+                    {
+                        "color": "CARD_COLOR"
+                    }
+                ]
+            }
+        ]
+    }
+}

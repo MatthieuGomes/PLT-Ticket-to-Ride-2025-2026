@@ -107,6 +107,11 @@ namespace state
         }
     }
 
+    State State::Europe()
+    {
+        return State("/app/static/europe_state.json");
+    }
+
     void State::display(int indent)
     {
         std::string indentation = std::string(indent, '\t');
