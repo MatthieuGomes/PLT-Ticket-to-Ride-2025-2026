@@ -3,8 +3,8 @@
     {
       "name": "Player1",
       "color": "RED",
-      "score": 10,
-      "nbWagons": 40,
+      "score": 26,
+      "nbWagons": 28,
       "nbStations": 3,
       "borrowedRoads": [],
       "hand": 0
@@ -12,17 +12,19 @@
     {
       "name": "Player2",
       "color": "BLUE",
-      "score": 5,
-      "nbWagons": 38,
+      "score": 19,
+      "nbWagons": 32,
       "nbStations": 2,
-      "borrowedRoads": [],
+      "borrowedRoads": [
+        1
+      ],
       "hand": 1
     },
     {
       "name": "Player3",
       "color": "GREEN",
-      "score": 7,
-      "nbWagons": 39,
+      "score": 14,
+      "nbWagons": 35,
       "nbStations": 2,
       "borrowedRoads": [],
       "hand": 2
@@ -367,7 +369,8 @@
         "stationB": "madrid",
         "length": 3,
         "color": "PINK",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player1"
       },
       {
         "id": 2,
@@ -432,7 +435,8 @@
         "stationB": "paris",
         "length": 4,
         "color": "BLUE",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player1"
       },
       {
         "id": 10,
@@ -464,7 +468,8 @@
         "stationB": "frankfurt",
         "length": 3,
         "color": "WHITE",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player1"
       },
       {
         "id": 14,
@@ -941,7 +946,8 @@
         "stationB": "pamplona",
         "length": 3,
         "color": "WHITE",
-        "type": "TUNNEL"
+        "type": "TUNNEL",
+        "owner": "Player1"
       },
       {
         "id": 73,
@@ -957,7 +963,8 @@
         "stationB": "paris",
         "length": 3,
         "color": "NONE",
-        "type": "TUNNEL"
+        "type": "TUNNEL",
+        "owner": "Player2"
       },
       {
         "id": 75,
@@ -1150,7 +1157,8 @@
         "stationB": "roma",
         "length": 4,
         "locomotives": 1,
-        "type": "FERRY"
+        "type": "FERRY",
+        "owner": "Player1"
       },
       {
         "id": 99,
@@ -1250,13 +1258,7 @@
             "color": "RED"
           },
           {
-            "color": "RED"
-          },
-          {
-            "color": "LOCOMOTIVE"
-          },
-          {
-            "color": "WHITE"
+            "color": "BLACK"
           }
         ]
       },
@@ -1265,7 +1267,7 @@
           {
             "stationA": "berlin",
             "stationB": "moskva",
-            "points": 7,
+            "points": 12,
             "isLong": false,
             "completed": true
           }
@@ -1275,10 +1277,10 @@
             "color": "BLUE"
           },
           {
-            "color": "GREEN"
+            "color": "BLUE"
           },
           {
-            "color": "YELLOW"
+            "color": "LOCOMOTIVE"
           }
         ]
       },
@@ -1290,14 +1292,18 @@
             "points": 10,
             "isLong": false,
             "completed": true
+          },
+          {
+            "stationA": "barcelona",
+            "stationB": "münchen",
+            "points": 12,
+            "isLong": false,
+            "completed": false
           }
         ],
         "wagonCards": [
           {
             "color": "GREEN"
-          },
-          {
-            "color": "BLACK"
           },
           {
             "color": "PINK"

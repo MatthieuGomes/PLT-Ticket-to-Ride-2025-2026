@@ -5,6 +5,7 @@
 #include <fstream>
 #include <limits>
 #include <map>
+#include <cstdlib>
 #include <sstream>
 #include <json/json.h>
 #include <string>
@@ -35,6 +36,7 @@ const int kFrameOffset = 1;
 const int kNoHighlight = -1;
 // Layout defaults.
 const char kDefaultLayoutPath[] = "static/europe_state.json";
+const char kLayoutPathEnv[] = "TUI_LAYOUT_PATH";
 // Map layout sizing.
 const int kMinMapWidth = 16;
 const int kMinDetailsWidth = 26;
@@ -437,6 +439,10 @@ GameView::GameView(int x, int y, int width, int height)
       searchQuery(),
       playerScrollIndex(0),
       localPlayerIndex(kDefaultLocalPlayerIndex) {
+  const char* layoutOverride = std::getenv(kLayoutPathEnv);
+  if (layoutOverride != nullptr && layoutOverride[0] != '\0') {
+    layoutPath = layoutOverride;
+  }
   requestRedraw();
 }
 

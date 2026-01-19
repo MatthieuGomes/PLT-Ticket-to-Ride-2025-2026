@@ -92,6 +92,15 @@ int main(int argc,char* argv[])
     if (strcmp(argv[1],"render")==0) {
         if (argc >= 4 && strcmp(argv[2], "--json") == 0) {
             setenv("RENDER_STATE_PATH", argv[3], 1);
+            setenv("TUI_LAYOUT_PATH", argv[3], 1);
+        } else if (argc >= 4 && strcmp(argv[2], "--state") == 0) {
+            if (strcmp(argv[3], "1") == 0) {
+                setenv("RENDER_STATE_PATH", "static/europe_state_1.json", 1);
+                setenv("TUI_LAYOUT_PATH", "static/europe_state_1.json", 1);
+            } else if (strcmp(argv[3], "2") == 0) {
+                setenv("RENDER_STATE_PATH", "static/europe_state_2.json", 1);
+                setenv("TUI_LAYOUT_PATH", "static/europe_state_2.json", 1);
+            }
         }
         client.callRender();
         return EXIT_SUCCESS;
