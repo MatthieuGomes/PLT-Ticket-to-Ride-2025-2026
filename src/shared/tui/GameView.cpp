@@ -58,7 +58,7 @@ const int kTableMinTypeWidth = 3;
 const int kTableMinEndpointsWidth = 5;
 const int kTableMinLengthWidth = 2;
 const int kTableMinColorWidth = 3;
-const int kTableMinOwnerWidth = 3;
+const int kTableMinOwnerWidth = 5;
 const int kTableMinLocsWidth = 4;
 
 Color roadColorToAnsi(mapState::RoadColor color) {
@@ -1369,9 +1369,13 @@ void GameView::drawContent(Terminal& term) {
           : toUpperShort(otherName);
 
       std::string ownerTag = "X";
-      if (road->getOwner() != nullptr) {
-        ownerTag = playerDisplayLabel(road->getOwner(), players, localIndex,
-                                      showLocalPlayerMarker, compactOtherPlayers);
+      if (road->getOwner() != nullptr && players != nullptr) {
+        int ownerIndex = findPlayerIndex(*players, road->getOwner());
+        if (ownerIndex >= 0) {
+          ownerTag = playerShortLabel(ownerIndex);
+        } else {
+          ownerTag = "PLYR?";
+        }
       }
       std::string locsText = "NONE";
       if (std::dynamic_pointer_cast<mapState::Ferry>(road)) {
