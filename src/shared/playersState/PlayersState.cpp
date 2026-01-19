@@ -59,6 +59,36 @@ std::string normalizeName(const std::string& value)
     return lower;
 }
 
+bool parseIntToken(const std::string& token, int& value)
+{
+    if (token.empty())
+    {
+        return false;
+    }
+    std::size_t start = 0;
+    int sign = 1;
+    if (token[0] == '-')
+    {
+        sign = -1;
+        start = 1;
+        if (start >= token.size())
+        {
+            return false;
+        }
+    }
+    int result = 0;
+    for (std::size_t i = start; i < token.size(); ++i)
+    {
+        if (!std::isdigit(static_cast<unsigned char>(token[i])))
+        {
+            return false;
+        }
+        result = result * 10 + (token[i] - '0');
+    }
+    value = result * sign;
+    return true;
+}
+
 bool parseRoot(const std::string& jsonText, Json::Value& root, std::string& error)
 {
     error.clear();
@@ -203,6 +233,49 @@ std::shared_ptr<mapState::Road> resolveRoadSpec(
     std::vector<std::shared_ptr<mapState::Road>>& usedRoads)
 {
     if (!mapState)
+    {
+        return nullptr;
+    }
+
+    int id = -1;
+    bool hasId = false;
+    if (spec.isInt())
+    {
+        id = spec.asInt();
+        hasId = true;
+    }
+    else if (spec.isString())
+    {
+        if (parseIntToken(spec.asString(), id))
+        {
+            hasId = true;
+        }
+    }
+    else if (spec.isObject())
+    {
+        id = readInt(spec, "id", -1);
+        if (id >= 0)
+        {
+            hasId = true;
+        }
+    }
+
+    if (hasId)
+    {
+        std::vector<std::shared_ptr<mapState::Road>> roads = mapState->getRoads();
+        for (std::size_t i = 0; i < roads.size(); ++i)
+        {
+            if (roads[i] && roads[i]->getId() == id)
+            {
+                return roads[i];
+            }
+        }
+        if (!spec.isObject())
+        {
+            return nullptr;
+        }
+    }
+    else if (!spec.isObject())
     {
         return nullptr;
     }
@@ -471,8 +544,7 @@ namespace playersState
 
         std::vector<std::shared_ptr<cardsState::PlayerCards>> parsedHands;
         parsedHands.resize(players.size());
-
-        std::vector<std::shared_ptr<mapState::Road>> usedRoads;
+        bool parsedLegacyHands = false;
 
         for (Json::ArrayIndex i = 0; i < playersArray->size(); ++i)
         {
@@ -493,7 +565,9 @@ namespace playersState
                 continue;
             }
 
-            // Owned roads / borrowed roads
+            std::vector<std::shared_ptr<mapState::Road>> usedRoads;
+
+            // Owned roads (legacy format)
             if (entry.isMember("roads") && entry["roads"].isArray())
             {
                 for (Json::ArrayIndex r = 0; r < entry["roads"].size(); ++r)
@@ -507,6 +581,7 @@ namespace playersState
                     }
                 }
             }
+            // Borrowed roads (by id or legacy object format)
             if (entry.isMember("borrowedRoads") && entry["borrowedRoads"].isArray())
             {
                 for (Json::ArrayIndex r = 0; r < entry["borrowedRoads"].size(); ++r)
@@ -515,7 +590,6 @@ namespace playersState
                     if (road)
                     {
                         player->borrowedRoads.push_back(road);
-                        road->setOwner(player);
                         usedRoads.push_back(road);
                     }
                 }
@@ -539,9 +613,91 @@ namespace playersState
                 }
             }
 
-            // Hand setup
+            // Hand setup (new JSON uses hand index into cardsState::playersCards)
+            bool handSet = false;
+            if (entry.isMember("hand") && entry["hand"].isInt() && cardState)
+            {
+                int handIndex = entry["hand"].asInt();
+                if (handIndex >= 0 && handIndex < static_cast<int>(cardState->playersCards.size()))
+                {
+                    player->setHand(cardState->playersCards[static_cast<std::size_t>(handIndex)]);
+                    handSet = true;
+
+                    if (root.isObject()
+                        && root.isMember("cards")
+                        && root["cards"].isObject()
+                        && root["cards"].isMember("playerCards")
+                        && root["cards"]["playerCards"].isArray()
+                        && handIndex < static_cast<int>(root["cards"]["playerCards"].size()))
+                    {
+                        const Json::Value& handEntry = root["cards"]["playerCards"][handIndex];
+                        if (handEntry.isObject()
+                            && handEntry.isMember("destinationCards")
+                            && handEntry["destinationCards"].isArray()
+                            && player->getHand()
+                            && player->getHand()->destinationCards)
+                        {
+                            const std::vector<std::shared_ptr<cardsState::DestinationCard>>& handCards =
+                                player->getHand()->destinationCards->getCards();
+                            for (Json::ArrayIndex d = 0; d < handEntry["destinationCards"].size(); ++d)
+                            {
+                                const Json::Value& dest = handEntry["destinationCards"][d];
+                                if (!dest.isObject())
+                                {
+                                    continue;
+                                }
+                                if (!readBool(dest, "completed", false))
+                                {
+                                    continue;
+                                }
+                                std::string from = readString(dest, "stationA");
+                                if (from.empty())
+                                {
+                                    from = readString(dest, "from");
+                                }
+                                std::string to = readString(dest, "stationB");
+                                if (to.empty())
+                                {
+                                    to = readString(dest, "to");
+                                }
+                                if (from.empty() || to.empty())
+                                {
+                                    continue;
+                                }
+                                std::string fromKey = normalizeName(from);
+                                std::string toKey = normalizeName(to);
+                                for (std::size_t c = 0; c < handCards.size(); ++c)
+                                {
+                                    if (!handCards[c])
+                                    {
+                                        continue;
+                                    }
+                                    std::shared_ptr<mapState::Station> stationA =
+                                        handCards[c]->getstationA();
+                                    std::shared_ptr<mapState::Station> stationB =
+                                        handCards[c]->getstationB();
+                                    if (!stationA || !stationB)
+                                    {
+                                        continue;
+                                    }
+                                    if (normalizeName(stationA->getName()) == fromKey
+                                        && normalizeName(stationB->getName()) == toKey)
+                                    {
+                                        DEBUG_PRINT("Completed destination: " << stationA->getName()
+                                                     << " -> " << stationB->getName());
+                                        player->completedDestinations.push_back(handCards[c]);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Hand setup (legacy destinationCards/wagonCards arrays)
             std::vector<std::shared_ptr<cardsState::DestinationCard>> destinationCards;
-            if (entry.isMember("destinationCards") && entry["destinationCards"].isArray() && mapState)
+            if (!handSet && entry.isMember("destinationCards") && entry["destinationCards"].isArray() && mapState)
             {
                 for (Json::ArrayIndex d = 0; d < entry["destinationCards"].size(); ++d)
                 {
@@ -571,7 +727,7 @@ namespace playersState
             }
 
             std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards;
-            if (entry.isMember("wagonCards") && entry["wagonCards"].isArray())
+            if (!handSet && entry.isMember("wagonCards") && entry["wagonCards"].isArray())
             {
                 for (Json::ArrayIndex w = 0; w < entry["wagonCards"].size(); ++w)
                 {
@@ -599,23 +755,22 @@ namespace playersState
                 {
                     parsedHands[i] = hand;
                 }
+                parsedLegacyHands = true;
             }
         }
 
-        if (cardState)
+        if (cardState && parsedLegacyHands)
         {
-            bool hasHands = false;
+            if (cardState->playersCards.size() < parsedHands.size())
+            {
+                cardState->playersCards.resize(parsedHands.size());
+            }
             for (std::size_t i = 0; i < parsedHands.size(); ++i)
             {
                 if (parsedHands[i])
                 {
-                    hasHands = true;
-                    break;
+                    cardState->playersCards[i] = parsedHands[i];
                 }
-            }
-            if (hasHands)
-            {
-                cardState->playersCards = parsedHands;
             }
         }
     }

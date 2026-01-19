@@ -1,0 +1,136 @@
+{
+  "outOfGame": {
+    "destinationCards": [],
+    "wagonCards": []
+  },
+  "faceUp": {
+    "destinationCards": [],
+    "wagonCards": [
+      {
+        "color": "RED"
+      },
+      {
+        "color": "BLUE"
+      },
+      {
+        "color": "GREEN"
+      },
+      {
+        "color": "LOCOMOTIVE"
+      },
+      {
+        "color": "YELLOW"
+      }
+    ]
+  },
+  "faceDown": {
+    "destinationCards": [
+      {
+        "stationA": "paris",
+        "stationB": "berlin",
+        "points": 7,
+        "isLong": false,
+        "completed": false
+      },
+      {
+        "stationA": "madrid",
+        "stationB": "roma",
+        "points": 10,
+        "isLong": false,
+        "completed": false
+      }
+    ],
+    "wagonCards": [
+      {
+        "color": "BLACK"
+      },
+      {
+        "color": "WHITE"
+      },
+      {
+        "color": "ORANGE"
+      },
+      {
+        "color": "PINK"
+      }
+    ]
+  },
+  "playerCards": [
+    {
+      "destinationCards": [
+        {
+          "stationA": "lisboa",
+          "stationB": "frankfurt",
+          "points": 20,
+          "isLong": true,
+          "completed": true
+        },
+        {
+          "stationA": "roma",
+          "stationB": "athina",
+          "points": 5,
+          "isLong": false,
+          "completed": false
+        }
+      ],
+      "wagonCards": [
+        {
+          "color": "RED"
+        },
+        {
+          "color": "RED"
+        },
+        {
+          "color": "LOCOMOTIVE"
+        },
+        {
+          "color": "WHITE"
+        }
+      ]
+    },
+    {
+      "destinationCards": [
+        {
+          "stationA": "berlin",
+          "stationB": "danzig",
+          "points": 7,
+          "isLong": false,
+          "completed": false
+        }
+      ],
+      "wagonCards": [
+        {
+          "color": "BLUE"
+        },
+        {
+          "color": "GREEN"
+        },
+        {
+          "color": "YELLOW"
+        }
+      ]
+    },
+    {
+      "destinationCards": [
+        {
+          "stationA": "madrid",
+          "stationB": "paris",
+          "points": 10,
+          "isLong": false,
+          "completed": false
+        }
+      ],
+      "wagonCards": [
+        {
+          "color": "GREEN"
+        },
+        {
+          "color": "BLACK"
+        },
+        {
+          "color": "PINK"
+        }
+      ]
+    }
+  ]
+}

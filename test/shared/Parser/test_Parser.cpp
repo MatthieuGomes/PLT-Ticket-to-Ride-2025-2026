@@ -42,7 +42,7 @@ std::string fixturePath(const std::string& filename)
   {
     return filename;
   }
-  return path.substr(0, pos) + "/fixtures/" + filename;
+  return path.substr(0, pos) + "/" + filename;
 }
 
 std::string loadFile(const std::string& path)
@@ -97,6 +97,7 @@ TEST(TestStaticAssert)
 SUITE_START(Parser)
 
 // Verifies full state construction via InitFromJSON/ParseFromJSON/setupFromJSON.
+// Covers borrowedRoads by id, station ownership, playerCards hand indexing, and completed destinations.
 TEST(ParseInitStateFixture)
 {
   ANN_START("ParseInitStateFixture")
@@ -124,7 +125,7 @@ TEST(ParseInitStateFixture)
   playersState::PlayersState players = playersState::PlayersState::InitFromJSON(jsonPlayers);
   mapState::MapState map = mapState::MapState::ParseFromJSON(jsonMap, std::make_shared<playersState::PlayersState>(players));
   cardsState::CardsState cards = cardsState::CardsState::ParseFromJSON(jsonCards, std::make_shared<mapState::MapState>(map));
-  players.setupFromJSON(jsonPlayers, std::make_shared<mapState::MapState>(map), std::make_shared<cardsState::CardsState>(cards));
+  players.setupFromJSON(jsonContent, std::make_shared<mapState::MapState>(map), std::make_shared<cardsState::CardsState>(cards));
 
   DEBUG_PRINT("Players count: " << players.getPlayers().size());
   DEBUG_PRINT("Stations count: " << map.getStations().size());
@@ -209,6 +210,162 @@ TEST(ParseInitStateFixture)
   CHECK_EQ(ferryCount, 1);
   CHECK_EQ(tunnelCount, 1);
   ANN_END("ParseInitStateFixture")
+}
+
+// Exercises alternative JSON shapes to hit parser helpers and fallbacks.
+// Covers numeric colors, roadType fallback, locos alias, mixed station definitions, and bad road ids.
+TEST(ParseInitStateVariantInputs)
+{
+  ANN_START("ParseInitStateVariantInputs")
+  Json::Value root(Json::objectValue);
+
+  Json::Value players(Json::arrayValue);
+  Json::Value player0(Json::objectValue);
+  player0["name"] = "NumId";
+  player0["color"] = 1;
+  player0["score"] = 12;
+  player0["wagons"] = 30;
+  player0["stations"] = 1;
+  player0["hand"] = 0;
+  Json::Value borrowed(Json::arrayValue);
+  borrowed.append("0");
+  borrowed.append(2);
+  borrowed.append("bad");
+  player0["borrowedRoads"] = borrowed;
+  players.append(player0);
+
+  Json::Value player1(Json::objectValue);
+  player1["name"] = "TxtId";
+  player1["color"] = "RED";
+  player1["score"] = 1;
+  player1["nbWagons"] = 40;
+  player1["nbStations"] = 2;
+  player1["hand"] = 1;
+  players.append(player1);
+
+  root["players"] = players;
+
+  Json::Value map(Json::objectValue);
+  Json::Value stations(Json::arrayValue);
+  Json::Value alphaObj(Json::objectValue);
+  alphaObj["name"] = "alpha";
+  alphaObj["TUIrow"] = 0;
+  alphaObj["TUIcolumn"] = 0;
+  stations.append(alphaObj);
+  Json::Value stationObj(Json::objectValue);
+  stationObj["name"] = "beta";
+  stationObj["owner"] = "NumId";
+  stationObj["TUIrow"] = 1;
+  stationObj["TUIcolumn"] = 4;
+  stations.append(stationObj);
+  Json::Value stationObj2(Json::objectValue);
+  stationObj2["name"] = "gamma";
+  stationObj2["owner"] = Json::Value(Json::nullValue);
+  stationObj2["TUIrow"] = 2;
+  stationObj2["TUIcolumn"] = 8;
+  stations.append(stationObj2);
+  map["stations"] = stations;
+
+  Json::Value roads(Json::arrayValue);
+  Json::Value road0(Json::objectValue);
+  road0["id"] = 0;
+  road0["from"] = "alpha";
+  road0["to"] = "beta";
+  road0["length"] = 2;
+  road0["color"] = 2;
+  road0["roadType"] = "ROAD";
+  road0["owner"] = "NumId";
+  roads.append(road0);
+
+  Json::Value road1(Json::objectValue);
+  road1["id"] = 1;
+  road1["stationA"] = "beta";
+  road1["stationB"] = "gamma";
+  road1["length"] = 3;
+  road1["color"] = "GREEN";
+  road1["type"] = "TUNNEL";
+  roads.append(road1);
+
+  Json::Value road2(Json::objectValue);
+  road2["id"] = 2;
+  road2["stationA"] = "alpha";
+  road2["stationB"] = "gamma";
+  road2["length"] = 4;
+  road2["locos"] = 1;
+  road2["type"] = "FERRY";
+  roads.append(road2);
+
+  map["roads"] = roads;
+  root["map"] = map;
+
+  Json::Value cards(Json::objectValue);
+  Json::Value outOfGame(Json::objectValue);
+  outOfGame["destinationCards"] = Json::Value(Json::arrayValue);
+  outOfGame["wagonCards"] = Json::Value(Json::arrayValue);
+  cards["outOfGame"] = outOfGame;
+
+  Json::Value faceUp(Json::objectValue);
+  faceUp["destinationCards"] = Json::Value(Json::arrayValue);
+  faceUp["wagonCards"] = Json::Value(Json::arrayValue);
+  cards["faceUp"] = faceUp;
+
+  Json::Value faceDown(Json::objectValue);
+  Json::Value dests(Json::arrayValue);
+  Json::Value dest(Json::objectValue);
+  dest["from"] = "alpha";
+  dest["to"] = "gamma";
+  dest["points"] = 5;
+  dest["isLong"] = false;
+  dests.append(dest);
+  faceDown["destinationCards"] = dests;
+  Json::Value wagons(Json::arrayValue);
+  wagons.append("BLUE");
+  Json::Value wagonObj(Json::objectValue);
+  wagonObj["color"] = 3;
+  wagons.append(wagonObj);
+  faceDown["wagonCards"] = wagons;
+  cards["faceDown"] = faceDown;
+
+  Json::Value playerCards(Json::arrayValue);
+  Json::Value p0(Json::objectValue);
+  p0["destinationCards"] = dests;
+  p0["wagonCards"] = wagons;
+  playerCards.append(p0);
+  Json::Value p1(Json::objectValue);
+  p1["destinationCards"] = Json::Value(Json::arrayValue);
+  p1["wagonCards"] = Json::Value(Json::arrayValue);
+  playerCards.append(p1);
+  cards["playerCards"] = playerCards;
+
+  root["cards"] = cards;
+
+  std::string jsonPlayers = jsonSection(root, "players");
+  std::string jsonMap = jsonSection(root, "map");
+  std::string jsonCards = jsonSection(root, "cards");
+
+  playersState::PlayersState playersState = playersState::PlayersState::InitFromJSON(jsonPlayers);
+  mapState::MapState mapState = mapState::MapState::ParseFromJSON(jsonMap, std::make_shared<playersState::PlayersState>(playersState));
+  cardsState::CardsState cardsState = cardsState::CardsState::ParseFromJSON(jsonCards, std::make_shared<mapState::MapState>(mapState));
+  std::string jsonFull = writeJson(root);
+  playersState.setupFromJSON(jsonFull, std::make_shared<mapState::MapState>(mapState), std::make_shared<cardsState::CardsState>(cardsState));
+
+  CHECK_EQ(playersState.getPlayers().size(), 2);
+  CHECK_EQ(mapState.getStations().size(), 3);
+  CHECK_EQ(mapState.getRoads().size(), 3);
+
+  std::shared_ptr<playersState::Player> numId = playersState.getPlayerByName("NumId");
+  REQUIRE(numId);
+  CHECK_EQ(numId->getBorrowedRoads().size(), 2);
+
+  std::shared_ptr<mapState::Station> beta = mapState.getStationByName("beta");
+  REQUIRE(beta);
+  REQUIRE(beta->getOwner());
+  CHECK_EQ(beta->getOwner()->getName(), "NumId");
+
+  REQUIRE(numId->getHand());
+  REQUIRE(numId->getHand()->wagonCards);
+  CHECK_EQ(numId->getHand()->wagonCards->countCards(), 2);
+  ANN_END("ParseInitStateVariantInputs")
 }
 
 // Ensures command JSON survives a serialize/parse round-trip.

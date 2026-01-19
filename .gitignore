@@ -18,3 +18,5 @@ compile_commands.json
 CTestTestfile.cmake
 .vscode
 compile_log_latest.txt
+.gcov
+.gcda

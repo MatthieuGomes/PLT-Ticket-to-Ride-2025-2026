@@ -106,6 +106,73 @@ namespace cardsState
       return cardsState::ColorCard::UNKNOWN;
     }
 
+    std::vector<std::shared_ptr<DestinationCard>> parseDestinationCardsArray(
+        const Json::Value& array,
+        const std::shared_ptr<mapState::MapState>& mapState)
+    {
+      std::vector<std::shared_ptr<DestinationCard>> cards;
+      if (!array.isArray() || !mapState)
+      {
+        return cards;
+      }
+      for (Json::ArrayIndex i = 0; i < array.size(); ++i)
+      {
+        const Json::Value& dest = array[i];
+        if (!dest.isObject())
+        {
+          continue;
+        }
+        std::string from = readString(dest, "stationA");
+        if (from.empty())
+        {
+          from = readString(dest, "from");
+        }
+        std::string to = readString(dest, "stationB");
+        if (to.empty())
+        {
+          to = readString(dest, "to");
+        }
+        if (from.empty() || to.empty())
+        {
+          continue;
+        }
+        int points = readInt(dest, "points", 0);
+        bool isLong = readBool(dest, "isLong", false);
+        std::shared_ptr<mapState::Station> stationA = mapState->getStationByName(normalizeName(from));
+        std::shared_ptr<mapState::Station> stationB = mapState->getStationByName(normalizeName(to));
+        if (!stationA || !stationB)
+        {
+          continue;
+        }
+        cards.push_back(std::make_shared<DestinationCard>(stationA, stationB, points, isLong));
+      }
+      return cards;
+    }
+
+    std::vector<std::shared_ptr<WagonCard>> parseWagonCardsArray(const Json::Value& array)
+    {
+      std::vector<std::shared_ptr<WagonCard>> cards;
+      if (!array.isArray())
+      {
+        return cards;
+      }
+      for (Json::ArrayIndex i = 0; i < array.size(); ++i)
+      {
+        const Json::Value& cardValue = array[i];
+        cardsState::ColorCard color = cardsState::ColorCard::UNKNOWN;
+        if (cardValue.isObject() && cardValue.isMember("color"))
+        {
+          color = parseCardColorValue(cardValue["color"]);
+        }
+        else
+        {
+          color = parseCardColorValue(cardValue);
+        }
+        cards.push_back(std::make_shared<WagonCard>(color));
+      }
+      return cards;
+    }
+
   } // namespace
 
   /// class CardsState -
@@ -209,6 +276,61 @@ namespace cardsState
 
     CardsState cardsState;
     cardsState.outOfGameCards = std::make_shared<OutOfGame<DestinationCard>>();
+
+    bool hasDeckSections = root.isMember("outOfGame")
+                           || root.isMember("faceUp")
+                           || root.isMember("faceDown")
+                           || root.isMember("playerCards");
+
+    if (hasDeckSections)
+    {
+      Json::Value empty(Json::arrayValue);
+      Json::Value outOfGame = root.isMember("outOfGame") ? root["outOfGame"] : Json::Value(Json::objectValue);
+      Json::Value faceUp = root.isMember("faceUp") ? root["faceUp"] : Json::Value(Json::objectValue);
+      Json::Value faceDown = root.isMember("faceDown") ? root["faceDown"] : Json::Value(Json::objectValue);
+
+      std::vector<std::shared_ptr<DestinationCard>> outDest =
+          parseDestinationCardsArray(outOfGame.isObject() ? outOfGame["destinationCards"] : empty, mapState);
+      std::vector<std::shared_ptr<WagonCard>> outWagons =
+          parseWagonCardsArray(outOfGame.isObject() ? outOfGame["wagonCards"] : empty);
+
+      std::vector<std::shared_ptr<DestinationCard>> faceUpDest =
+          parseDestinationCardsArray(faceUp.isObject() ? faceUp["destinationCards"] : empty, mapState);
+      std::vector<std::shared_ptr<WagonCard>> faceUpWagons =
+          parseWagonCardsArray(faceUp.isObject() ? faceUp["wagonCards"] : empty);
+
+      std::vector<std::shared_ptr<DestinationCard>> faceDownDest =
+          parseDestinationCardsArray(faceDown.isObject() ? faceDown["destinationCards"] : empty, mapState);
+      std::vector<std::shared_ptr<WagonCard>> faceDownWagons =
+          parseWagonCardsArray(faceDown.isObject() ? faceDown["wagonCards"] : empty);
+
+      cardsState.outOfGameCards = std::make_shared<OutOfGame<DestinationCard>>(outDest);
+      cardsState.gameDestinationCards = std::make_shared<SharedDeck<DestinationCard>>(
+          std::vector<std::shared_ptr<DestinationCard>>(), faceUpDest, faceDownDest);
+      cardsState.gameWagonCards = std::make_shared<SharedDeck<WagonCard>>(
+          outWagons, faceUpWagons, faceDownWagons);
+
+      if (root.isMember("playerCards") && root["playerCards"].isArray())
+      {
+        for (Json::ArrayIndex i = 0; i < root["playerCards"].size(); ++i)
+        {
+          const Json::Value& entry = root["playerCards"][i];
+          if (!entry.isObject())
+          {
+            continue;
+          }
+          std::vector<std::shared_ptr<DestinationCard>> playerDestinations =
+              parseDestinationCardsArray(entry["destinationCards"], mapState);
+          std::vector<std::shared_ptr<WagonCard>> playerWagons =
+              parseWagonCardsArray(entry["wagonCards"]);
+          std::shared_ptr<PlayerCards> hand =
+              std::make_shared<PlayerCards>(playerDestinations, playerWagons);
+          cardsState.playersCards.push_back(hand);
+        }
+      }
+
+      return cardsState;
+    }
 
     std::vector<std::shared_ptr<DestinationCard>> destinationCards;
     if (root.isMember("destinationCards") && root["destinationCards"].isArray() && mapState)

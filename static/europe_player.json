@@ -1,0 +1,31 @@
+[
+  {
+    "name": "Player1",
+    "color": "RED",
+    "score": 10,
+    "nbWagons": 40,
+    "nbStations": 3,
+    "borrowedRoads": [],
+    "hand": 0
+  },
+  {
+    "name": "Player2",
+    "color": "BLUE",
+    "score": 5,
+    "nbWagons": 38,
+    "nbStations": 2,
+    "borrowedRoads": [
+      1
+    ],
+    "hand": 1
+  },
+  {
+    "name": "Player3",
+    "color": "GREEN",
+    "score": 7,
+    "nbWagons": 39,
+    "nbStations": 2,
+    "borrowedRoads": [],
+    "hand": 2
+  }
+]

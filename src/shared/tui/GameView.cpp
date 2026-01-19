@@ -6,6 +6,7 @@
 #include <limits>
 #include <map>
 #include <sstream>
+#include <json/json.h>
 #include <string>
 #include <vector>
 
@@ -33,7 +34,7 @@ const int kFrameOffset = 1;
 // Sentinel used when no station is highlighted.
 const int kNoHighlight = -1;
 // Layout defaults.
-const char kDefaultLayoutPath[] = "ressources/europe_layout.txt";
+const char kDefaultLayoutPath[] = "static/europe_state.json";
 // Map layout sizing.
 const int kMinMapWidth = 16;
 const int kMinDetailsWidth = 26;
@@ -1488,51 +1489,129 @@ bool GameView::loadLayout(const std::string& path) {
     return false;
   }
 
-  std::string line;
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  std::string content = buffer.str();
+  std::string trimmed = trim(content);
+  bool hasJson = false;
+  if (!path.empty()) {
+    std::string lower = path;
+    std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) {
+      return static_cast<char>(std::tolower(c));
+    });
+    if (lower.size() >= 5 && lower.substr(lower.size() - 5) == ".json") {
+      hasJson = true;
+    }
+  }
+  if (!trimmed.empty() && (trimmed[0] == '{' || trimmed[0] == '[')) {
+    hasJson = true;
+  }
+
   bool firstEntry = true;
-  while (std::getline(file, line)) {
-    std::string trimmed = trim(line);
-    if (trimmed.empty() || trimmed[0] == '#') {
-      continue;
+  if (hasJson) {
+    Json::Value root;
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+    std::string error;
+    std::istringstream input(content);
+    if (!Json::parseFromStream(builder, input, &root, &error)) {
+      return false;
     }
-
-    std::istringstream stream(trimmed);
-    std::string name;
-    std::string label;
-    std::string rowStr;
-    std::string colStr;
-
-    if (!std::getline(stream, name, ',')) {
-      continue;
-    }
-    if (!std::getline(stream, label, ',')) {
-      continue;
-    }
-    if (!std::getline(stream, rowStr, ',')) {
-      continue;
-    }
-    if (!std::getline(stream, colStr)) {
-      continue;
-    }
-
-    StationLayout entry;
-    entry.name = trim(name);
-    entry.label = trim(label);
-    entry.row = std::atoi(trim(rowStr).c_str());
-    entry.col = std::atoi(trim(colStr).c_str());
-    layoutEntries.push_back(entry);
-
-    if (firstEntry) {
-      layoutMinRow = entry.row;
-      layoutMaxRow = entry.row;
-      layoutMinCol = entry.col;
-      layoutMaxCol = entry.col;
-      firstEntry = false;
+    Json::Value mapNode;
+    if (root.isObject() && root.isMember("map")) {
+      mapNode = root["map"];
     } else {
-      layoutMinRow = std::min(layoutMinRow, entry.row);
-      layoutMaxRow = std::max(layoutMaxRow, entry.row);
-      layoutMinCol = std::min(layoutMinCol, entry.col);
-      layoutMaxCol = std::max(layoutMaxCol, entry.col);
+      mapNode = root;
+    }
+    if (!mapNode.isObject() || !mapNode.isMember("stations") || !mapNode["stations"].isArray()) {
+      return false;
+    }
+    const Json::Value& stations = mapNode["stations"];
+    for (Json::ArrayIndex i = 0; i < stations.size(); ++i) {
+      const Json::Value& station = stations[i];
+      if (!station.isObject()) {
+        continue;
+      }
+      if (!station.isMember("name") || !station["name"].isString()) {
+        continue;
+      }
+      if (!station.isMember("TUIrow") || !station.isMember("TUIcolumn")) {
+        continue;
+      }
+      if (!station["TUIrow"].isInt() || !station["TUIcolumn"].isInt()) {
+        continue;
+      }
+      StationLayout entry;
+      entry.name = station["name"].asString();
+      if (station.isMember("TUIlabel") && station["TUIlabel"].isString()) {
+        entry.label = station["TUIlabel"].asString();
+      } else {
+        entry.label = toUpperShort(entry.name);
+      }
+      entry.row = station["TUIrow"].asInt();
+      entry.col = station["TUIcolumn"].asInt();
+      layoutEntries.push_back(entry);
+
+      if (firstEntry) {
+        layoutMinRow = entry.row;
+        layoutMaxRow = entry.row;
+        layoutMinCol = entry.col;
+        layoutMaxCol = entry.col;
+        firstEntry = false;
+      } else {
+        layoutMinRow = std::min(layoutMinRow, entry.row);
+        layoutMaxRow = std::max(layoutMaxRow, entry.row);
+        layoutMinCol = std::min(layoutMinCol, entry.col);
+        layoutMaxCol = std::max(layoutMaxCol, entry.col);
+      }
+    }
+  } else {
+    std::istringstream stream(content);
+    std::string line;
+    while (std::getline(stream, line)) {
+      std::string trimmedLine = trim(line);
+      if (trimmedLine.empty() || trimmedLine[0] == '#') {
+        continue;
+      }
+
+      std::istringstream rowStream(trimmedLine);
+      std::string name;
+      std::string label;
+      std::string rowStr;
+      std::string colStr;
+
+      if (!std::getline(rowStream, name, ',')) {
+        continue;
+      }
+      if (!std::getline(rowStream, label, ',')) {
+        continue;
+      }
+      if (!std::getline(rowStream, rowStr, ',')) {
+        continue;
+      }
+      if (!std::getline(rowStream, colStr)) {
+        continue;
+      }
+
+      StationLayout entry;
+      entry.name = trim(name);
+      entry.label = trim(label);
+      entry.row = std::atoi(trim(rowStr).c_str());
+      entry.col = std::atoi(trim(colStr).c_str());
+      layoutEntries.push_back(entry);
+
+      if (firstEntry) {
+        layoutMinRow = entry.row;
+        layoutMaxRow = entry.row;
+        layoutMinCol = entry.col;
+        layoutMaxCol = entry.col;
+        firstEntry = false;
+      } else {
+        layoutMinRow = std::min(layoutMinRow, entry.row);
+        layoutMaxRow = std::max(layoutMaxRow, entry.row);
+        layoutMinCol = std::min(layoutMinCol, entry.col);
+        layoutMaxCol = std::max(layoutMaxCol, entry.col);
+      }
     }
   }
 

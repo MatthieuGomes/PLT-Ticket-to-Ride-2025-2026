@@ -189,11 +189,15 @@ namespace mapState
             }
 
             int length = readInt(entry, "length", 0);
-            int id = readInt(entry, "id", 0);
-            if (id == 0)
+            bool hasId = entry.isMember("id") && entry["id"].isInt();
+            int id = hasId ? entry["id"].asInt() : nextId;
+            if (!hasId)
             {
-                id = nextId;
                 ++nextId;
+            }
+            else if (id >= nextId)
+            {
+                nextId = id + 1;
             }
 
             std::shared_ptr<playersState::Player> owner = resolveOwner(entry, playersState);

@@ -101,7 +101,12 @@ namespace state
         }
         if (!jsonPlayers.empty())
         {
-            this->players.setupFromJSON(jsonPlayers,
+            std::string setupJson = jsonPlayers;
+            if (root.isObject())
+            {
+                setupJson = jsonContent;
+            }
+            this->players.setupFromJSON(setupJson,
                 std::make_shared<mapState::MapState>(map),
                 std::make_shared<cardsState::CardsState>(cards));
         }
