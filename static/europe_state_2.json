@@ -15,9 +15,7 @@
       "score": 5,
       "nbWagons": 38,
       "nbStations": 2,
-      "borrowedRoads": [
-        1
-      ],
+      "borrowedRoads": [],
       "hand": 1
     },
     {
@@ -369,8 +367,7 @@
         "stationB": "madrid",
         "length": 3,
         "color": "PINK",
-        "type": "ROAD",
-        "owner": "Player2"
+        "type": "ROAD"
       },
       {
         "id": 2,
@@ -426,7 +423,8 @@
         "stationB": "paris",
         "length": 4,
         "color": "GREEN",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player3"
       },
       {
         "id": 9,
@@ -498,7 +496,8 @@
         "stationB": "dieppe",
         "length": 1,
         "color": "PINK",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player3"
       },
       {
         "id": 18,
@@ -810,7 +809,8 @@
         "stationB": "warszawa",
         "length": 3,
         "color": "RED",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player2"
       },
       {
         "id": 57,
@@ -818,7 +818,8 @@
         "stationB": "moskva",
         "length": 3,
         "color": "YELLOW",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player2"
       },
       {
         "id": 58,
@@ -850,7 +851,8 @@
         "stationB": "berlin",
         "length": 4,
         "color": "PINK",
-        "type": "ROAD"
+        "type": "ROAD",
+        "owner": "Player2"
       },
       {
         "id": 62,
@@ -930,7 +932,8 @@
         "stationB": "pamplona",
         "length": 3,
         "color": "BLACK",
-        "type": "TUNNEL"
+        "type": "TUNNEL",
+        "owner": "Player3"
       },
       {
         "id": 72,
@@ -1066,7 +1069,8 @@
         "stationB": "dieppe",
         "length": 2,
         "locomotives": 1,
-        "type": "FERRY"
+        "type": "FERRY",
+        "owner": "Player3"
       },
       {
         "id": 89,
@@ -1263,7 +1267,7 @@
             "stationB": "moskva",
             "points": 7,
             "isLong": false,
-            "completed": false
+            "completed": true
           }
         ],
         "wagonCards": [
@@ -1285,7 +1289,7 @@
             "stationB": "london",
             "points": 10,
             "isLong": false,
-            "completed": false
+            "completed": true
           }
         ],
         "wagonCards": [

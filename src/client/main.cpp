@@ -90,6 +90,9 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"render")==0) {
+        if (argc >= 4 && strcmp(argv[2], "--json") == 0) {
+            setenv("RENDER_STATE_PATH", argv[3], 1);
+        }
         client.callRender();
         return EXIT_SUCCESS;
     }

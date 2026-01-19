@@ -22,6 +22,8 @@ const char kGcovPrefixStripEnv[] = "GCOV_PREFIX_STRIP";
 const char kGcovPrefixDir[] = ".gcov";
 const int kGcovDirMode = 0755;
 const int kMinPlayers = 1;
+const char kDefaultStatePath[] = "static/europe_state.json";
+const char kRenderStatePathEnv[] = "RENDER_STATE_PATH";
 
 void getTerminalSize(int& cols, int& rows) {
   cols = kDefaultCols;
@@ -68,36 +70,15 @@ namespace render
     }
     this->playerCount = playerCount;
 
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
-
-    std::vector<playersState::PlayerColor> colors;
-    colors.push_back(playersState::PlayerColor::RED);
-    colors.push_back(playersState::PlayerColor::BLUE);
-    colors.push_back(playersState::PlayerColor::GREEN);
-    colors.push_back(playersState::PlayerColor::BLACK);
-    colors.push_back(playersState::PlayerColor::YELLOW);
-
-    for (int i = static_cast<int>(colors.size()) - 1; i > 0; --i) {
-      int j = std::rand() % (i + 1);
-      playersState::PlayerColor tmp = colors[static_cast<std::size_t>(i)];
-      colors[static_cast<std::size_t>(i)] = colors[static_cast<std::size_t>(j)];
-      colors[static_cast<std::size_t>(j)] = tmp;
+    const char* pathOverride = std::getenv(kRenderStatePathEnv);
+    std::string statePath = kDefaultStatePath;
+    if (pathOverride != nullptr && pathOverride[0] != '\0') {
+      statePath = pathOverride;
     }
 
-    std::vector<std::tuple<std::string, playersState::PlayerColor,
-                           std::shared_ptr<cardsState::PlayerCards>>> playersInfos;
-    for (int i = 0; i < playerCount; ++i) {
-      std::string name = std::string("Player ") + std::to_string(i + 1);
-      playersInfos.push_back(std::make_tuple(
-          name,
-          colors[static_cast<std::size_t>(i % static_cast<int>(colors.size()))],
-          std::shared_ptr<cardsState::PlayerCards>()));
-    }
-
-    state::State debugState;
-    debugState.map = mapState::MapState::Europe();
-    debugState.cards = cardsState::CardsState::Europe(debugState.map.getStations(), playerCount);
-    debugState.players = playersState::PlayersState(playersInfos, debugState.cards.playersCards);
+    state::State debugState(statePath);
+    playersState::PlayersState::nbPlayers =
+        static_cast<int>(debugState.players.getPlayers().size());
 
     tui::Terminal term;
     tui::TUIManager manager(&term, cols, rows,
