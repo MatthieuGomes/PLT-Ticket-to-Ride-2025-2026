@@ -146,8 +146,7 @@ namespace cardsState
         }
         cards.push_back(std::make_shared<DestinationCard>(stationA, stationB, points, isLong));
       }
-      return cards;
-    }
+      return cards;}
 
     std::vector<std::shared_ptr<WagonCard>> parseWagonCardsArray(const Json::Value& array)
     {
@@ -170,8 +169,7 @@ namespace cardsState
         }
         cards.push_back(std::make_shared<WagonCard>(color));
       }
-      return cards;
-    }
+      return cards;}
 
   } // namespace
 
@@ -189,8 +187,7 @@ namespace cardsState
     cardsState.playersCards = PlayerCards::BatchStartHand(cardsState.gameDestinationCards, cardsState.gameWagonCards, nbPlayers);
     cardsState.gameDestinationCards->Setup(cardsState.outOfGameCards);
     cardsState.gameWagonCards->Setup();
-    return cardsState;
-  }
+    return cardsState;}
   // TODO: Parameterized constructor
   void CardsState::display(int indent)
   {
@@ -271,8 +268,7 @@ namespace cardsState
           playersCount = readInt(root, "nbPlayers", 0);
         }
         return CardsState::Europe(mapState->getStations(), playersCount);
-      }
-    }
+      } }
 
     CardsState cardsState;
     cardsState.outOfGameCards = std::make_shared<OutOfGame<DestinationCard>>();

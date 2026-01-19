@@ -73,8 +73,7 @@ namespace cardsState
         {
             wagonCards.push_back(std::make_shared<WagonCard>(info));
         }
-        return wagonCards;
-    }
+        return wagonCards;}
     std::vector<std::shared_ptr<WagonCard>> WagonCard::OrderedBatch(ColorCardCount (&infos)[9])
     {
 
@@ -88,8 +87,7 @@ namespace cardsState
                 wagonCards.push_back(std::make_shared<WagonCard>(color));
             }
         }
-        return wagonCards;
-    }
+        return wagonCards;}
     
     std::vector<std::shared_ptr<WagonCard>> WagonCard::StartCards()
     {

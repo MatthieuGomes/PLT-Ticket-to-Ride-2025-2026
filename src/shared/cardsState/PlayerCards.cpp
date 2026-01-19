@@ -76,8 +76,7 @@ namespace cardsState
       PlayerCards playerHand = PlayerCards::StartHand(sharedDestinationDecks, sharedWagonDecks);
       playersHands.push_back(std::make_shared<PlayerCards>(playerHand));
     }
-    return playersHands;
-  }
+    return playersHands;}
 
   template <>
   void PlayerCards::_takeCard<DestinationCard>(std::shared_ptr<SharedDeck<DestinationCard>> sharedDeck, std::shared_ptr<DestinationCard> card, int number)
