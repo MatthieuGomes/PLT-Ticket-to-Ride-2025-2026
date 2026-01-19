@@ -277,6 +277,7 @@ namespace playersState
                         << length << " wagons, you have: " << this->nbWagons << " remaining\n");
             return false;
          }
+
          RoadColor requiredColor = road->getColor();
 
          std::vector<std::shared_ptr<cardsState::WagonCard>> cardsCorrectColor;
@@ -298,21 +299,9 @@ namespace playersState
                colorMap[color].push_back(card);
             }
 
-            // TODO : get rid of it
-            std::vector<cardsState::ColorCard> colorsOrder = {
-                cardsState::ColorCard::RED,
-                cardsState::ColorCard::BLUE,
-                cardsState::ColorCard::GREEN,
-                cardsState::ColorCard::WHITE,
-                cardsState::ColorCard::BLACK,
-                cardsState::ColorCard::YELLOW,
-                cardsState::ColorCard::PINK,
-                cardsState::ColorCard::ORANGE,
-                cardsState::ColorCard::LOCOMOTIVE};
-
-            for (cardsState::ColorCard color : colorsOrder /*cardsState::DestinationCard::possibleColors*/)
+            for ( PlayerColor color : possibleColors /*cardsState::DestinationCard::possibleColors*/)
             {
-               std::vector<std::shared_ptr<cardsState::WagonCard>> cardsOfOneColor = colorMap[color];
+               std::vector<std::shared_ptr<cardsState::WagonCard>> cardsOfOneColor = colorMap[static_cast<cardsState::ColorCard>(color)];
                if (static_cast<int>(cardsOfOneColor.size()) > static_cast<int>(longestSet.size()))
                {
                   longestSet = cardsOfOneColor;

@@ -1,7 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/shared/playersState/Player.h"
-
+#include "../../src/shared/mapState/Tunnel.h"
+#include "../../src/shared/mapState/Ferry.h"
 #include <algorithm>
 
 #define DEBUG_MODE false
@@ -38,6 +39,7 @@ std::shared_ptr<mapState::Station> test_init_stationB = std::make_shared<mapStat
 
 std::string test_init_player_name = "yosra";
 PlayerColor test_init_player_color = PlayerColor::RED;
+cardsState::ColorCard test_init_player_color_loco = cardsState::LOCOMOTIVE;
 int test_init_player_score = 23;
 int test_init_player_nbWagons = 21;
 int test_init_player_nbStations = 10;
@@ -407,7 +409,9 @@ std::shared_ptr<mapState::MapState> test_interact_map = std::make_shared<mapStat
 cardsState::DestinationCard test_interact_dest_card(test_init_stationA, test_init_stationB, test_init_destination_points, false);
 cardsState::WagonCard test_interact_wagon_card(test_init_wagon_color);
 std::vector<std::shared_ptr<cardsState::DestinationCard>> test_interact_dest_cards = {std::make_shared<cardsState::DestinationCard>(test_init_stationA, test_init_stationB, test_init_destination_points,false)};
-std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = {std::make_shared<cardsState::WagonCard>(test_init_wagon_color)};
+std::vector<std::shared_ptr<cardsState::WagonCard>> test_interact_wagon_cards = {
+    std::make_shared<cardsState::WagonCard>(test_init_wagon_color), std::make_shared<cardsState::WagonCard>(test_init_player_color_loco)
+};
 std::shared_ptr<cardsState::PlayerCards> test_interact_hand = std::make_shared<cardsState::PlayerCards>(test_interact_dest_cards, test_interact_wagon_cards);
 
 
@@ -638,6 +642,7 @@ TEST(isRoadBuildable)
     REQUIRE(test_stationA);
     REQUIRE(test_stationB);
     int test_nb_wagons_insufficient = 1;
+
     {
         ANN_START("not enough trains case")
         playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_nb_wagons_insufficient, test_init_player_nbStations, {}, test_interact_hand);
@@ -664,10 +669,101 @@ TEST(isRoadBuildable)
         CHECK_EQ(player.isRoadBuildable(test_interact_map, road), false);
         ANN_END("already owned case")
     }
+
+    {
+        ANN_START("Tunnel case")
+        std::shared_ptr<mapState::Station> test_stationAA = test_interact_map->getStationByName("A");
+        std::shared_ptr<mapState::Station> test_stationI = test_interact_map->getStationByName("I");
+        std::vector<std::shared_ptr<mapState::Road>> tunnels = test_interact_map->getRoadsBetweenStations(test_stationAA, test_stationI);
+        playersState::Player player(test_init_player_name, test_init_player_color, test_init_player_score, test_nb_wagons_insufficient, test_init_player_nbStations, {}, test_interact_hand);
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, tunnels[0]), true);
+        ANN_END("Tunnel case")
+    }
+
+    {
+        ANN_START("Ferry not enough locomotives case")
+
+        auto stationA = test_interact_map->getStationByName("B");
+        auto stationB = test_interact_map->getStationByName("H");
+
+        auto ferries = test_interact_map->getRoadsBetweenStations(stationA, stationB);
+        auto ferry = std::dynamic_pointer_cast<mapState::Ferry>(ferries[0]);
+
+        std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards = {
+            std::make_shared<cardsState::WagonCard>(test_init_wagon_color),
+            std::make_shared<cardsState::WagonCard>(test_init_wagon_color),
+            std::make_shared<cardsState::WagonCard>(test_init_wagon_color),
+            std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::LOCOMOTIVE)
+        };
+
+        auto hand = std::make_shared<cardsState::PlayerCards>(
+            std::vector<std::shared_ptr<cardsState::DestinationCard>>{},
+            wagonCards
+        );
+
+        playersState::Player player(
+            test_init_player_name,
+            test_init_player_color,
+            test_init_player_score,
+            test_init_player_nbWagons,
+            test_init_player_nbStations,
+            {},
+            hand
+        );
+
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, ferry), false);
+        ANN_END("Ferry not enough locomotives case")
+    }
+
+    {
+        ANN_START("Ferry enough locomotives case")
+
+        auto stationA = test_interact_map->getStationByName("B");
+        auto stationB = test_interact_map->getStationByName("H");
+
+        auto ferries = test_interact_map->getRoadsBetweenStations(stationA, stationB);
+        auto ferry = std::dynamic_pointer_cast<mapState::Ferry>(ferries[0]);
+        REQUIRE(ferry);
+
+        ferry->setOwner(nullptr);
+
+        int length = ferry->getLength();
+        int requiredLocos = ferry->getLocomotives();
+
+        std::vector<std::shared_ptr<cardsState::WagonCard>> cards;
+
+        for (int i = 0; i < length + requiredLocos; ++i)
+        {
+            cards.push_back(
+                std::make_shared<cardsState::WagonCard>(
+                    cardsState::ColorCard::LOCOMOTIVE
+                )
+            );
+        }
+
+        auto hand = std::make_shared<cardsState::PlayerCards>(
+            std::vector<std::shared_ptr<cardsState::DestinationCard>>{},
+            cards
+        );
+
+        playersState::Player player(
+            test_init_player_name,
+            test_init_player_color,
+            test_init_player_score,
+            50,
+            test_init_player_nbStations,
+            {},
+            hand
+        );
+
+        CHECK(player.isRoadBuildable(test_interact_map, ferry));
+        ANN_END("Ferry enough locomotives case")
+    }
+
+
     ANN_END("isRoadBuildable")
 }
 // TODO : complete tests (need mapstate methods) + restructure (testing ferries & roads => different map state)
-
 TEST(getClaimableRoads)
 {
     ANN_START("getClaimableRoads")
@@ -808,6 +904,7 @@ TEST(display_player) {
 
         ANN_START("well initialized player - no roads")
         {
+
             std::shared_ptr<mapState::Station> test_stationA = test_interact_map->getStationByName(test_interract_stationA_name);
             std::shared_ptr<mapState::Station> test_stationB = test_interact_map->getStationByName(test_interract_stationB_name);
             auto dest = std::make_shared<cardsState::DestinationCard>(test_stationA,test_stationB, 12, false);
@@ -816,11 +913,15 @@ TEST(display_player) {
             std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards = {wagon};
             auto hand = std::make_shared<cardsState::PlayerCards>(destCards, wagonCards);
 
-            Player p("Sophie", PlayerColor::GREEN, 142, 38, 2, {}, hand);
+            std::shared_ptr<playersState::Player> p = std::make_shared<playersState::Player>("Sophie", PlayerColor::GREEN, 142, 38, 2, std::vector<std::shared_ptr<mapState::Road>>(), hand);
+
+            std::shared_ptr<mapState::Station> stationA = test_interact_map->getStationByName(test_interract_stationA_name);
+            std::shared_ptr<mapState::Station> stationB = test_interact_map->getStationByName(test_interract_stationB_name);
+            auto road = std::make_shared<mapState::Road>(2,nullptr, stationA, stationB, mapState::RoadColor::GREEN, 4, nullptr);
 
             std::stringstream buffer;
             std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-            p.display(1);
+            p->display(1);
             std::cout.rdbuf(old);
             std::string out = buffer.str();
 
@@ -833,9 +934,46 @@ TEST(display_player) {
             CHECK(out.find("\t===== BORROWED ROADS =====") != std::string::npos);
             CHECK(out.find("\t\tno roads borrowed yet") != std::string::npos);
             CHECK(out.find("\t#####################") != std::string::npos);
+
         }
         ANN_END("well initialized player - no roads")
+
+        ANN_START("well initialized player")
+        {
+            std::shared_ptr<mapState::Station> test_stationA = test_interact_map->getStationByName(test_interract_stationA_name);
+            std::shared_ptr<mapState::Station> test_stationB = test_interact_map->getStationByName(test_interract_stationB_name);
+            auto dest = std::make_shared<cardsState::DestinationCard>(test_stationA,test_stationB, 12, false);
+            auto wagon = std::make_shared<cardsState::WagonCard>(cardsState::ColorCard::GREEN);
+            std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards = {dest};
+            std::vector<std::shared_ptr<cardsState::WagonCard>> wagonCards = {wagon};
+            auto hand = std::make_shared<cardsState::PlayerCards>(destCards, wagonCards);
+
+            std::shared_ptr<playersState::Player> p = std::make_shared<playersState::Player>("Sophie", PlayerColor::GREEN, 142, 38, 2, std::vector<std::shared_ptr<mapState::Road>>(), hand);
+
+            std::shared_ptr<mapState::Station> stationA = test_interact_map->getStationByName(test_interract_stationA_name);
+            std::shared_ptr<mapState::Station> stationB = test_interact_map->getStationByName(test_interract_stationB_name);
+            auto road = std::make_shared<mapState::Road>(2,nullptr, stationA, stationB, mapState::RoadColor::GREEN, 4, nullptr);
+            road->setOwner(p);
+            std::vector<std::shared_ptr<mapState::Road>> borrowedRoads={road};
+            p->borrowedRoads=borrowedRoads;
+            std::stringstream buffer;
+            std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+            p->display(1);
+            std::cout.rdbuf(old);
+            std::string out = buffer.str();
+
+            CHECK(out.find("\t##### PLAYER #####") != std::string::npos);
+            CHECK(out.find("\tName: Sophie") != std::string::npos);
+            CHECK(out.find("\tColor: GREEN") != std::string::npos);
+            CHECK(out.find("\tScore: 142") != std::string::npos);
+            CHECK(out.find("\tNbWagons: 38") != std::string::npos);
+            CHECK(out.find("\tNbStations: 2") != std::string::npos);
+            CHECK(out.find("\t===== BORROWED ROADS =====") != std::string::npos);
+            CHECK(out.find("\t#####################") != std::string::npos);
+        }
+        ANN_END("well initialized player")
     }
+
     ANN_END("display")
 }
 

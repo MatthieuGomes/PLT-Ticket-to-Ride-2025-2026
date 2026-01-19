@@ -140,7 +140,7 @@ TEST(NamedMapState)
   {
     MapState mapState = MapState::NamedMapState("test");
     CHECK_EQ(mapState.stations.size(), 9); 
-    CHECK_EQ(mapState.roads.size(), 12);
+    CHECK_EQ(mapState.roads.size(), 14);
   }
   {
     MapState mapState = MapState::NamedMapState("europe");
@@ -166,7 +166,7 @@ TEST(Test)
   ANN_START("Test Constructor")
   MapState mapState = MapState::Test();
   CHECK_EQ(mapState.stations.size(), 9); 
-  CHECK_EQ(mapState.roads.size(), 12); 
+  CHECK_EQ(mapState.roads.size(), 14);
   ANN_END("Test Constructor")
 }
 
@@ -387,7 +387,7 @@ TEST(getRoads)
   test_map_state.display();
 #endif
   std::vector<std::shared_ptr<mapState::Road>> roads = test_map_state.getRoads();
-  CHECK_EQ(roads.size(), 12); // As per the default constructor in MapState
+  CHECK_EQ(roads.size(), 14); // As per the default constructor in MapState
   ANN_END("getRoads")
 }
 TEST(getStationByName)
@@ -463,7 +463,7 @@ TEST(getAdjacentStations)
 #endif
     std::shared_ptr<mapState::Station> station = test_map_state.getStationByName("B");
     std::vector<std::shared_ptr<mapState::Station>> adjacentStations = test_map_state.getAdjacentStations(station);
-    CHECK_EQ(adjacentStations.size(), 5); // paris is connected to berlin and madrid
+    CHECK_EQ(adjacentStations.size(), 6); // paris is connected to berlin and madrid
     ANN_END("defined case")
   }
   {

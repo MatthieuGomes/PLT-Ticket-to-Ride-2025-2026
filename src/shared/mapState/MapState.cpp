@@ -554,7 +554,13 @@ namespace mapState
             Road::initDataByName(stationsObject, "F", "H", 11, RoadColor::GREEN, 3),
             Road::genDataByName(stationsObject, "F", "I", 12, roadOwnerBC_1_n_FI, RoadColor::RED, 4),
         };
-        mapState.fillMapWithInfos(stationsInfos, roadsInfos, {}, {}, mapState.gameGraph);
+        std::vector<TunnelInfo> tunnelsInfos = {
+            Tunnel::initDataByName(stationsObject,"A","I", 13,RoadColor::BLACK,7),
+        };
+        std::vector<FerryInfo> ferryInfos = {
+            Ferry::initDataByName(stationsObject,"B","H",14,2,8)
+        };
+        mapState.fillMapWithInfos(stationsInfos, roadsInfos, tunnelsInfos, ferryInfos, mapState.gameGraph);
         DEBUG_PRINT("Test MapState creation finished !");
         return mapState;
     }
@@ -941,7 +947,17 @@ namespace mapState
         std::cout << "Roads:\n";
         for (const std::shared_ptr<Road> &road : roads)
         {
-            road->display();
+            if (typeid(*road)==typeid(Tunnel))
+            {
+                std::dynamic_pointer_cast<Tunnel>(road)->display();
+            }else if (typeid(*road)==typeid(Ferry))
+            {
+                std::dynamic_pointer_cast<Ferry>(road)->display();
+            }
+            else
+            {
+                road->display();
+            }
             std::cout << "------------------\n";
         }
         out << "==========================\n";
