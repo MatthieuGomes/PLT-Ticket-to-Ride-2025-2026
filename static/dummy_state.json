@@ -127,7 +127,15 @@
         ]
       },
       {
-        "destinationCards": [],
+        "destinationCards": [
+          {
+            "stationA": "alpha",
+            "stationB": "gamma",
+            "points": 8,
+            "isLong": false,
+            "completed": false
+          }
+        ],
         "wagonCards": [
           {
             "color": "BLUE"

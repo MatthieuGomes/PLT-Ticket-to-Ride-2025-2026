@@ -1270,6 +1270,13 @@
             "points": 12,
             "isLong": false,
             "completed": true
+          },
+                    {
+            "stationA": "paris",
+            "stationB": "roma",
+            "points": 10,
+            "isLong": false,
+            "completed": false
           }
         ],
         "wagonCards": [
