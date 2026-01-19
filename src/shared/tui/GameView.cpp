@@ -925,11 +925,14 @@ void GameView::drawContent(Terminal& term) {
             }
           }
           std::ostringstream line;
-          line << a << "-" << b << " " << (completed ? "V" : "X");
+          line << a << "-" << b;
           std::string lineText = line.str();
           writeClampedLine(term, currentRow, col, columnWidth, lineText);
-          int markerOffset = static_cast<int>(lineText.size()) - 1;
-          if (markerOffset >= 0 && markerOffset < columnWidth) {
+          int markerOffset = static_cast<int>(lineText.size());
+          if (markerOffset >= columnWidth) {
+            markerOffset = columnWidth - 1;
+          }
+          if (markerOffset >= 0) {
             term.setBg(bgColor);
             term.setFg(completed ? Color::BrightGreen : Color::BrightRed);
             term.moveTo(currentRow, col + markerOffset);
@@ -1270,6 +1273,8 @@ void GameView::drawContent(Terminal& term) {
     term.moveTo(drawRow, drawCol);
     term.write(label);
   }
+  term.setBg(bgColor);
+  term.setFg(fgColor);
 
   if (detailsWidth > 0) {
     int detailsRow = row;
