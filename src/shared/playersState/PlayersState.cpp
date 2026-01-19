@@ -432,8 +432,7 @@ namespace playersState
         }
         state.players = Player::BatchFromInitInfos(infos);
         PlayersState::nbPlayers = static_cast<int>(state.players.size());   
-        return state;
-    }
+        return state;}
 
     PlayersState::PlayersState(std::vector<PlayersInitInfos> infos, std::vector<std::shared_ptr<cardsState::PlayerCards>> hands)
     {

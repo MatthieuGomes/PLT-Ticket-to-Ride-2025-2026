@@ -101,16 +101,13 @@ namespace playersState
    {
       Player player;
       player.fillFromInfos(info);
-      return player;
-   }
+      return player;}
 
    Player Player::PlayerFromInitInfos(PlayersInitInfos info)
    {
       Player player;
       player.fillFromInitInfos(info);
-      return player;
-   }
-
+      return player;}
    std::vector<std::shared_ptr<Player>> Player::BatchFromInfos(std::vector<PlayersInfos> infos)
    {
       std::vector<std::shared_ptr<Player>> players;
@@ -118,8 +115,7 @@ namespace playersState
       {
          players.push_back(std::make_shared<Player>(Player::PlayerFromInfos(info)));
       }
-      return players;
-   }
+      return players;}
    std::vector<std::shared_ptr<Player>> Player::BatchFromInitInfos(std::vector<PlayersInitInfos> infos)
    {
       std::vector<std::shared_ptr<Player>> players;
@@ -127,8 +123,7 @@ namespace playersState
       {
          players.push_back(std::make_shared<Player>(Player::PlayerFromInitInfos(info)));
       }
-      return players;
-   }
+      return players;}
 
    std::string Player::getName()
    {

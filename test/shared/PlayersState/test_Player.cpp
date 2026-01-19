@@ -760,6 +760,182 @@ TEST(isRoadBuildable)
         ANN_END("Ferry enough locomotives case")
     }
 
+    {
+        ANN_START("Colored road with locomotive boost case")
+
+        auto stationA = test_interact_map->getStationByName("A");
+        auto stationB = test_interact_map->getStationByName("B");
+
+        auto roads = test_interact_map->getRoadsBetweenStations(stationA, stationB);
+        auto road = roads[0];
+        REQUIRE(road);
+
+        REQUIRE(road->getColor() != mapState::RoadColor::NONE);
+        road->setOwner(nullptr);
+
+        int length = road->getLength();
+        auto color = static_cast<cardsState::ColorCard>(road->getColor());
+
+        std::vector<std::shared_ptr<cardsState::WagonCard>> cards;
+
+        for (int i = 0; i < length - 1; ++i)
+        {
+            cards.push_back(
+                std::make_shared<cardsState::WagonCard>(color)
+            );
+        }
+
+        cards.push_back(
+            std::make_shared<cardsState::WagonCard>(
+                cardsState::ColorCard::LOCOMOTIVE
+            )
+        );
+
+        auto hand = std::make_shared<cardsState::PlayerCards>(
+            std::vector<std::shared_ptr<cardsState::DestinationCard>>{},
+            cards
+        );
+
+        playersState::Player player(
+            test_init_player_name,
+            test_init_player_color,
+            test_init_player_score,
+            50,
+            test_init_player_nbStations,
+            {},
+            hand
+        );
+
+        CHECK(player.isRoadBuildable(test_interact_map, road));
+        ANN_END("Colored road with locomotive boost case")
+    }
+
+    {
+        ANN_START("Break when enough color cards case")
+        auto stationA = test_interact_map->getStationByName("A");
+        auto stationB = test_interact_map->getStationByName("B");
+
+        auto roads = test_interact_map->getRoadsBetweenStations(stationA, stationB);
+        auto road = roads[0];
+        REQUIRE(road);
+        road->setOwner(nullptr);
+
+        int length = road->getLength();
+        auto color = static_cast<cardsState::ColorCard>(road->getColor());
+
+        std::vector<std::shared_ptr<cardsState::WagonCard>> cards;
+
+        for (int i = 0; i < length + 2; ++i)
+        {
+            cards.push_back(std::make_shared<cardsState::WagonCard>(color));
+        }
+
+        auto hand = std::make_shared<cardsState::PlayerCards>(
+            std::vector<std::shared_ptr<cardsState::DestinationCard>>{}, cards);
+
+        playersState::Player player(
+            test_init_player_name,
+            test_init_player_color,
+            test_init_player_score,
+            50,
+            test_init_player_nbStations,
+            {},
+            hand
+        );
+
+        CHECK(player.isRoadBuildable(test_interact_map, road));
+        ANN_END("Break when enough color cards case")
+    }
+
+    {
+        ANN_START("Not enough wagons but enough cards case")
+
+        auto stationA = test_interact_map->getStationByName("A");
+        auto stationB = test_interact_map->getStationByName("B");
+
+        auto roads = test_interact_map->getRoadsBetweenStations(stationA, stationB);
+        auto road = roads[0];
+        REQUIRE(road);
+        road->setOwner(nullptr);
+
+        int length = road->getLength();
+        auto color = static_cast<cardsState::ColorCard>(road->getColor());
+
+        std::vector<std::shared_ptr<cardsState::WagonCard>> cards;
+        for (int i = 0; i < length; ++i)
+        {
+            cards.push_back(std::make_shared<cardsState::WagonCard>(color));
+        }
+
+        auto hand = std::make_shared<cardsState::PlayerCards>(
+            std::vector<std::shared_ptr<cardsState::DestinationCard>>{}, cards);
+
+        playersState::Player player(
+            test_init_player_name,
+            test_init_player_color,
+            test_init_player_score,
+            length - 1,
+            test_init_player_nbStations,
+            {},
+            hand
+        );
+
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, road),false);
+
+        ANN_END("Not enough wagons but enough cards case")
+    }
+
+    {
+        ANN_START("Ferry locomotives consumed before ferry check case")
+
+        auto stationA = test_interact_map->getStationByName("B");
+        auto stationB = test_interact_map->getStationByName("H");
+
+        auto ferries = test_interact_map->getRoadsBetweenStations(stationA, stationB);
+        auto ferry = std::dynamic_pointer_cast<mapState::Ferry>(ferries[0]);
+        REQUIRE(ferry);
+        ferry->setOwner(nullptr);
+
+        int length = ferry->getLength();
+        int requiredLocos = ferry->getLocomotives();
+
+        std::vector<std::shared_ptr<cardsState::WagonCard>> cards;
+
+        for (int i = 0; i < length; ++i)
+        {
+            cards.push_back(
+                std::make_shared<cardsState::WagonCard>(
+                    cardsState::ColorCard::LOCOMOTIVE
+                )
+            );
+        }
+
+        for (int i = 0; i < requiredLocos - 1; ++i)
+        {
+            cards.push_back(
+                std::make_shared<cardsState::WagonCard>(
+                    cardsState::ColorCard::LOCOMOTIVE
+                )
+            );
+        }
+
+        auto hand = std::make_shared<cardsState::PlayerCards>(
+            std::vector<std::shared_ptr<cardsState::DestinationCard>>{}, cards);
+
+        playersState::Player player(
+            test_init_player_name,
+            test_init_player_color,
+            test_init_player_score,
+            50,
+            test_init_player_nbStations,
+            {},
+            hand
+        );
+
+        CHECK_EQ(player.isRoadBuildable(test_interact_map, ferry),false);
+
+        ANN_END("Ferry locomotives consumed before ferry check case")
+    }
 
     ANN_END("isRoadBuildable")
 }
