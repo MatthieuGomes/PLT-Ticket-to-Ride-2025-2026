@@ -251,18 +251,21 @@ TEST(ParseInitStateVariantInputs)
   alphaObj["name"] = "alpha";
   alphaObj["TUIrow"] = 0;
   alphaObj["TUIcolumn"] = 0;
+  alphaObj["TUInickname"] = "ALP";
   stations.append(alphaObj);
   Json::Value stationObj(Json::objectValue);
   stationObj["name"] = "beta";
   stationObj["owner"] = "NumId";
   stationObj["TUIrow"] = 1;
   stationObj["TUIcolumn"] = 4;
+  stationObj["TUInickname"] = "BET";
   stations.append(stationObj);
   Json::Value stationObj2(Json::objectValue);
   stationObj2["name"] = "gamma";
   stationObj2["owner"] = Json::Value(Json::nullValue);
   stationObj2["TUIrow"] = 2;
   stationObj2["TUIcolumn"] = 8;
+  stationObj2["TUInickname"] = "GAM";
   stations.append(stationObj2);
   map["stations"] = stations;
 

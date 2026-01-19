@@ -30,19 +30,22 @@
         "name": "alpha",
         "owner": "Alice",
         "TUIrow": 0,
-        "TUIcolumn": 0
+        "TUIcolumn": 0,
+        "TUInickname": "ALP"
       },
       {
         "name": "beta",
         "owner": null,
         "TUIrow": 1,
-        "TUIcolumn": 4
+        "TUIcolumn": 4,
+        "TUInickname": "BET"
       },
       {
         "name": "gamma",
         "owner": null,
         "TUIrow": 2,
-        "TUIcolumn": 8
+        "TUIcolumn": 8,
+        "TUInickname": "GAM"
       }
     ],
     "roads": [

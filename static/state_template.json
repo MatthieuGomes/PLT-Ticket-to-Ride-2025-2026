@@ -18,7 +18,8 @@
         "name": "station_name",
         "owner": "player_name/null",
         "TUIrow": 0,
-        "TUIcolumn": 0
+        "TUIcolumn": 0,
+        "TUInickname": "ABC"
       }
     ],
     "roads": [

@@ -1543,7 +1543,9 @@ bool GameView::loadLayout(const std::string& path) {
       }
       StationLayout entry;
       entry.name = station["name"].asString();
-      if (station.isMember("TUIlabel") && station["TUIlabel"].isString()) {
+      if (station.isMember("TUInickname") && station["TUInickname"].isString()) {
+        entry.label = station["TUInickname"].asString();
+      } else if (station.isMember("TUIlabel") && station["TUIlabel"].isString()) {
         entry.label = station["TUIlabel"].asString();
       } else {
         entry.label = toUpperShort(entry.name);

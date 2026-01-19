@@ -36,283 +36,330 @@
         "name": "amsterdam",
         "owner": null,
         "TUIrow": 3,
-        "TUIcolumn": 24
+        "TUIcolumn": 24,
+        "TUInickname": "AMS"
       },
       {
         "name": "angora",
         "owner": null,
         "TUIrow": 11,
-        "TUIcolumn": 79
+        "TUIcolumn": 79,
+        "TUInickname": "ANG"
       },
       {
         "name": "athina",
         "owner": null,
         "TUIrow": 11,
-        "TUIcolumn": 59
+        "TUIcolumn": 59,
+        "TUInickname": "ATH"
       },
       {
         "name": "barcelona",
         "owner": null,
         "TUIrow": 10,
-        "TUIcolumn": 19
+        "TUIcolumn": 19,
+        "TUInickname": "BAR"
       },
       {
         "name": "berlin",
         "owner": null,
         "TUIrow": 3,
-        "TUIcolumn": 46
+        "TUIcolumn": 46,
+        "TUInickname": "BER"
       },
       {
         "name": "brest",
         "owner": null,
         "TUIrow": 6,
-        "TUIcolumn": 7
+        "TUIcolumn": 7,
+        "TUInickname": "BRE"
       },
       {
         "name": "brindisi",
         "owner": null,
         "TUIrow": 10,
-        "TUIcolumn": 48
+        "TUIcolumn": 48,
+        "TUInickname": "BRN"
       },
       {
         "name": "bruxelles",
         "owner": null,
         "TUIrow": 4,
-        "TUIcolumn": 22
+        "TUIcolumn": 22,
+        "TUInickname": "BRX"
       },
       {
         "name": "bucuresti",
         "owner": null,
         "TUIrow": 7,
-        "TUIcolumn": 66
+        "TUIcolumn": 66,
+        "TUInickname": "BUC"
       },
       {
         "name": "budapest",
         "owner": null,
         "TUIrow": 6,
-        "TUIcolumn": 56
+        "TUIcolumn": 56,
+        "TUInickname": "BUD"
       },
       {
         "name": "cadiz",
         "owner": null,
         "TUIrow": 12,
-        "TUIcolumn": 10
+        "TUIcolumn": 10,
+        "TUInickname": "CAD"
       },
       {
         "name": "constantinople",
         "owner": null,
         "TUIrow": 10,
-        "TUIcolumn": 73
+        "TUIcolumn": 73,
+        "TUInickname": "CON"
       },
       {
         "name": "danzig",
         "owner": null,
         "TUIrow": 2,
-        "TUIcolumn": 56
+        "TUIcolumn": 56,
+        "TUInickname": "DAN"
       },
       {
         "name": "dieppe",
         "owner": null,
         "TUIrow": 4,
-        "TUIcolumn": 11
+        "TUIcolumn": 11,
+        "TUInickname": "DIE"
       },
       {
         "name": "edinburgh",
         "owner": null,
         "TUIrow": 0,
-        "TUIcolumn": 16
+        "TUIcolumn": 16,
+        "TUInickname": "EDB"
       },
       {
         "name": "erzurum",
         "owner": null,
         "TUIrow": 10,
-        "TUIcolumn": 87
+        "TUIcolumn": 87,
+        "TUInickname": "ERZ"
       },
       {
         "name": "essen",
         "owner": null,
         "TUIrow": 3,
-        "TUIcolumn": 36
+        "TUIcolumn": 36,
+        "TUInickname": "ESE"
       },
       {
         "name": "frankfurt",
         "owner": null,
         "TUIrow": 4,
-        "TUIcolumn": 30
+        "TUIcolumn": 30,
+        "TUInickname": "FRA"
       },
       {
         "name": "kharkov",
         "owner": null,
         "TUIrow": 4,
-        "TUIcolumn": 78
+        "TUIcolumn": 78,
+        "TUInickname": "KHA"
       },
       {
         "name": "kobenhavn",
         "owner": null,
         "TUIrow": 1,
-        "TUIcolumn": 46
+        "TUIcolumn": 46,
+        "TUInickname": "KOP"
       },
       {
         "name": "kyiv",
         "owner": null,
         "TUIrow": 5,
-        "TUIcolumn": 70
+        "TUIcolumn": 70,
+        "TUInickname": "KIE"
       },
       {
         "name": "lisboa",
         "owner": null,
         "TUIrow": 11,
-        "TUIcolumn": 3
+        "TUIcolumn": 3,
+        "TUInickname": "LIS"
       },
       {
         "name": "london",
         "owner": null,
         "TUIrow": 3,
-        "TUIcolumn": 15
+        "TUIcolumn": 15,
+        "TUInickname": "LON"
       },
       {
         "name": "madrid",
         "owner": null,
         "TUIrow": 10,
-        "TUIcolumn": 10
+        "TUIcolumn": 10,
+        "TUInickname": "MAD"
       },
       {
         "name": "marseille",
         "owner": null,
         "TUIrow": 8,
-        "TUIcolumn": 27
+        "TUIcolumn": 27,
+        "TUInickname": "MSL"
       },
       {
         "name": "moskva",
         "owner": null,
         "TUIrow": 2,
-        "TUIcolumn": 90
+        "TUIcolumn": 90,
+        "TUInickname": "MOS"
       },
       {
         "name": "münchen",
         "owner": null,
         "TUIrow": 5,
-        "TUIcolumn": 37
+        "TUIcolumn": 37,
+        "TUInickname": "MUN"
       },
       {
         "name": "palermo",
         "owner": null,
         "TUIrow": 12,
-        "TUIcolumn": 48
+        "TUIcolumn": 48,
+        "TUInickname": "PAL"
       },
       {
         "name": "pamplona",
         "owner": null,
         "TUIrow": 8,
-        "TUIcolumn": 15
+        "TUIcolumn": 15,
+        "TUInickname": "PNA"
       },
       {
         "name": "paris",
         "owner": null,
         "TUIrow": 6,
-        "TUIcolumn": 20
+        "TUIcolumn": 20,
+        "TUInickname": "PAR"
       },
       {
         "name": "petrograd",
         "owner": null,
         "TUIrow": 0,
-        "TUIcolumn": 87
+        "TUIcolumn": 87,
+        "TUInickname": "PET"
       },
       {
         "name": "riga",
         "owner": null,
         "TUIrow": 1,
-        "TUIcolumn": 67
+        "TUIcolumn": 67,
+        "TUInickname": "RIG"
       },
       {
         "name": "roma",
         "owner": null,
         "TUIrow": 9,
-        "TUIcolumn": 43
+        "TUIcolumn": 43,
+        "TUInickname": "ROM"
       },
       {
         "name": "rostov",
         "owner": null,
         "TUIrow": 6,
-        "TUIcolumn": 86
+        "TUIcolumn": 86,
+        "TUInickname": "ROS"
       },
       {
         "name": "sarajevo",
         "owner": null,
         "TUIrow": 8,
-        "TUIcolumn": 57
+        "TUIcolumn": 57,
+        "TUInickname": "SAR"
       },
       {
         "name": "sevastopol",
         "owner": null,
         "TUIrow": 7,
-        "TUIcolumn": 77
+        "TUIcolumn": 77,
+        "TUInickname": "SEV"
       },
       {
         "name": "smolensk",
         "owner": null,
         "TUIrow": 2,
-        "TUIcolumn": 76
+        "TUIcolumn": 76,
+        "TUInickname": "SMO"
       },
       {
         "name": "smyrna",
         "owner": null,
         "TUIrow": 12,
-        "TUIcolumn": 67
+        "TUIcolumn": 67,
+        "TUInickname": "SMY"
       },
       {
         "name": "sochi",
         "owner": null,
         "TUIrow": 8,
-        "TUIcolumn": 86
+        "TUIcolumn": 86,
+        "TUInickname": "SOC"
       },
       {
         "name": "sofia",
         "owner": null,
         "TUIrow": 9,
-        "TUIcolumn": 64
+        "TUIcolumn": 64,
+        "TUInickname": "SOF"
       },
       {
         "name": "stockholm",
         "owner": null,
         "TUIrow": 0,
-        "TUIcolumn": 60
+        "TUIcolumn": 60,
+        "TUInickname": "STO"
       },
       {
         "name": "venizia",
         "owner": null,
         "TUIrow": 7,
-        "TUIcolumn": 47
+        "TUIcolumn": 47,
+        "TUInickname": "VEN"
       },
       {
         "name": "warszawa",
         "owner": null,
         "TUIrow": 4,
-        "TUIcolumn": 60
+        "TUIcolumn": 60,
+        "TUInickname": "WAR"
       },
       {
         "name": "wien",
         "owner": null,
         "TUIrow": 5,
-        "TUIcolumn": 45
+        "TUIcolumn": 45,
+        "TUInickname": "WIE"
       },
       {
         "name": "wilno",
         "owner": null,
         "TUIrow": 3,
-        "TUIcolumn": 65
+        "TUIcolumn": 65,
+        "TUInickname": "WIL"
       },
       {
         "name": "zagrab",
         "owner": null,
         "TUIrow": 7,
-        "TUIcolumn": 55
+        "TUIcolumn": 55,
+        "TUInickname": "ZAG"
       },
       {
         "name": "zürich",
         "owner": null,
         "TUIrow": 7,
-        "TUIcolumn": 31
+        "TUIcolumn": 31,
+        "TUInickname": "ZUR"
       }
     ],
     "roads": [
