@@ -55,7 +55,8 @@ const int kPlayerColorBlockWidth = 3;
 const int kPlayerColumnGap = 2;
 const int kMinPlayerColumnWidth = 18;
 const int kDefaultLocalPlayerIndex = 0;
-const int kTableColumnCount = 6;
+const int kTableColumnCount = 7;
+const int kTableMinIdWidth = 2;
 const int kTableMinTypeWidth = 3;
 const int kTableMinEndpointsWidth = 5;
 const int kTableMinLengthWidth = 2;
@@ -1302,6 +1303,7 @@ void GameView::drawContent(Terminal& term) {
     writeClampedLine(term, detailsRow, detailsX, detailsWidth, selectedLine.str());
     detailsRow += 2;
 
+    const std::string headerId = "ID";
     const std::string headerType = "RoadType";
     const std::string headerEndpoints = "Endpoints";
     const std::string headerLength = "Length";
@@ -1309,6 +1311,7 @@ void GameView::drawContent(Terminal& term) {
     const std::string headerOwner = "Owner";
     const std::string headerLocs = "Locs";
     std::vector<int> columnWidths;
+    columnWidths.push_back(static_cast<int>(headerId.size()));
     columnWidths.push_back(static_cast<int>(headerType.size()));
     columnWidths.push_back(static_cast<int>(headerEndpoints.size()));
     columnWidths.push_back(static_cast<int>(headerLength.size()));
@@ -1321,6 +1324,7 @@ void GameView::drawContent(Terminal& term) {
       totalWidth += columnWidths[i];
     }
     const int minWidths[kTableColumnCount] = {
+      kTableMinIdWidth,
       kTableMinTypeWidth,
       kTableMinEndpointsWidth,
       kTableMinLengthWidth,
@@ -1328,7 +1332,7 @@ void GameView::drawContent(Terminal& term) {
       kTableMinOwnerWidth,
       kTableMinLocsWidth
     };
-    const int shrinkOrder[kTableColumnCount] = {1, 4, 5, 0, 3, 2};
+    const int shrinkOrder[kTableColumnCount] = {2, 5, 6, 1, 4, 3, 0};
     while (totalWidth > detailsWidth) {
       bool reduced = false;
       for (int idx = 0; idx < kTableColumnCount && totalWidth > detailsWidth; ++idx) {
@@ -1345,6 +1349,7 @@ void GameView::drawContent(Terminal& term) {
     }
     if (detailsRow < endRow) {
       std::vector<std::string> headerCells;
+      headerCells.push_back(headerId);
       headerCells.push_back(headerType);
       headerCells.push_back(headerEndpoints);
       headerCells.push_back(headerLength);
@@ -1400,6 +1405,7 @@ void GameView::drawContent(Terminal& term) {
       const std::string endpointText = selected.label + "<->" + otherLabel;
       const std::string lengthText = std::to_string(road->getLength());
       std::vector<std::string> rowCells;
+      rowCells.push_back(std::to_string(road->getId()));
       rowCells.push_back(roadTypeName(road));
       rowCells.push_back(endpointText);
       rowCells.push_back(lengthText);
