@@ -101,6 +101,10 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"render")==0) {
+        if (argc < 3) {
+            std::cerr << "Missing render option. Use --json or --custom." << std::endl;
+            return EXIT_FAILURE;
+        }
         if (argc >= 3 && (strcmp(argv[2], "--custom") == 0 || strcmp(argv[2], "--json") == 0) &&
             argc < 4) {
             std::cerr << "Missing argument for " << argv[2] << std::endl;
