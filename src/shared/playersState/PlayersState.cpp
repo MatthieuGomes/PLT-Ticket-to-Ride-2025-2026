@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <json/json.h>
 
 #include "mapState/MapState.h"
@@ -24,6 +25,8 @@
 using namespace std;
 
 namespace {
+
+const int kMaxPlayers = 5;
 
 std::string trimString(const std::string& value)
 {
@@ -57,6 +60,11 @@ std::string normalizeName(const std::string& value)
         return static_cast<char>(std::tolower(c));
     });
     return lower;
+}
+
+bool exceedsMaxPlayers(std::size_t count)
+{
+    return count > static_cast<std::size_t>(kMaxPlayers);
 }
 
 bool parseIntToken(const std::string& token, int& value)
@@ -391,12 +399,24 @@ namespace playersState
 
     PlayersState::PlayersState(std::vector<std::shared_ptr<Player>> players)
     {
+        if (exceedsMaxPlayers(players.size()))
+        {
+            std::cerr << "Error: too many players (" << players.size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         this->players = players;
         PlayersState::nbPlayers = static_cast<int>(players.size());   
     }
 
     PlayersState::PlayersState(std::vector<PlayersInfos> infos)
     {
+        if (exceedsMaxPlayers(infos.size()))
+        {
+            std::cerr << "Error: too many players (" << infos.size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         this->players = Player::BatchFromInfos(infos);
         PlayersState::nbPlayers = static_cast<int>(this->players.size());   
     }
@@ -404,6 +424,12 @@ namespace playersState
     PlayersState PlayersState::InitFromInfos(std::vector<PlayersInitInfos> infos)
     {
         PlayersState state;
+        if (exceedsMaxPlayers(infos.size()))
+        {
+            std::cerr << "Error: too many players (" << infos.size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         state.players = Player::BatchFromInitInfos(infos);
         PlayersState::nbPlayers = static_cast<int>(state.players.size());   
         return state;
@@ -411,6 +437,12 @@ namespace playersState
 
     PlayersState::PlayersState(std::vector<PlayersInitInfos> infos, std::vector<std::shared_ptr<cardsState::PlayerCards>> hands)
     {
+        if (exceedsMaxPlayers(infos.size()))
+        {
+            std::cerr << "Error: too many players (" << infos.size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         this->players = Player::BatchFromInitInfos(infos);
         PlayersState::nbPlayers = static_cast<int>(this->players.size());  
         this->setupPlayersHand(hands);
@@ -422,6 +454,12 @@ namespace playersState
     }
     void PlayersState::setPlayers(std::vector<std::shared_ptr<Player>> players)
     {
+        if (exceedsMaxPlayers(players.size()))
+        {
+            std::cerr << "Error: too many players (" << players.size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         this->players = players;
         PlayersState::nbPlayers = static_cast<int>(players.size());
     }
@@ -486,6 +524,12 @@ namespace playersState
         {
             return PlayersState();
         }
+        if (exceedsMaxPlayers(playersArray->size()))
+        {
+            std::cerr << "Error: too many players (" << playersArray->size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
 
         std::vector<PlayersInfos> infos;
         for (Json::ArrayIndex i = 0; i < playersArray->size(); ++i)
@@ -540,6 +584,12 @@ namespace playersState
         if (!playersArray)
         {
             return;
+        }
+        if (exceedsMaxPlayers(playersArray->size()))
+        {
+            std::cerr << "Error: too many players (" << playersArray->size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
         }
 
         std::vector<std::shared_ptr<cardsState::PlayerCards>> parsedHands;

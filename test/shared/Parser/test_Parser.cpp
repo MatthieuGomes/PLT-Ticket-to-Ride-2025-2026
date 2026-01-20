@@ -11,6 +11,7 @@
 #include <json/json.h>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 
 #define DEBUG_MODE true
 #if DEBUG_MODE == true

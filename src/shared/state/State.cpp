@@ -2,10 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 #include <json/json.h>
 
 namespace state
 {
+    namespace {
+        const int kMaxPlayers = 5;
+    }
     using playersInitInfos = std::tuple<std::string, playersState::PlayerColor, std::shared_ptr<cardsState::PlayerCards>>;
     State::State()
     {
@@ -16,6 +20,12 @@ namespace state
         // Initialize state variables here
     }
     State::State(std::string mapName, std::vector<playersInitInfos> playersInfos){
+        if (playersInfos.size() > static_cast<std::size_t>(kMaxPlayers))
+        {
+            std::cerr << "Error: too many players (" << playersInfos.size()
+                      << "). Maximum is " << kMaxPlayers << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         this->map = mapState::MapState::NamedMapState(mapName);
         this->cards = cardsState::CardsState::Europe(map.getStations(), static_cast<int>(playersInfos.size()));
         this->players = playersState::PlayersState(playersInfos, cards.playersCards);
@@ -61,6 +71,13 @@ namespace state
 
         if (root.isObject())
         {
+            if (root.isMember("players") && root["players"].isArray() &&
+                root["players"].size() > static_cast<Json::ArrayIndex>(kMaxPlayers))
+            {
+                std::cerr << "Error: too many players (" << root["players"].size()
+                          << "). Maximum is " << kMaxPlayers << "." << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
             if (root.isMember("players"))
             {
                 jsonPlayers = Json::writeString(writer, root["players"]);
@@ -84,6 +101,12 @@ namespace state
         }
         else if (root.isArray())
         {
+            if (root.size() > static_cast<Json::ArrayIndex>(kMaxPlayers))
+            {
+                std::cerr << "Error: too many players (" << root.size()
+                          << "). Maximum is " << kMaxPlayers << "." << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
             jsonPlayers = jsonContent;
         }
 

@@ -1,0 +1,127 @@
+{
+  "players": [
+    {
+      "name": "P1",
+      "color": "RED",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [],
+      "hand": 0
+    },
+    {
+      "name": "P2",
+      "color": "BLUE",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [],
+      "hand": 1
+    },
+    {
+      "name": "P3",
+      "color": "GREEN",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [],
+      "hand": 2
+    },
+    {
+      "name": "P4",
+      "color": "YELLOW",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [],
+      "hand": 3
+    },
+    {
+      "name": "P5",
+      "color": "BLACK",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [],
+      "hand": 4
+    },
+    {
+      "name": "P6",
+      "color": "RED",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [],
+      "hand": 5
+    }
+  ],
+  "map": {
+    "stations": [
+      {
+        "name": "alpha",
+        "owner": null,
+        "TUIrow": 0,
+        "TUIcolumn": 0,
+        "TUInickname": "ALP"
+      },
+      {
+        "name": "beta",
+        "owner": null,
+        "TUIrow": 0,
+        "TUIcolumn": 6,
+        "TUInickname": "BET"
+      }
+    ],
+    "roads": [
+      {
+        "id": 0,
+        "stationA": "alpha",
+        "stationB": "beta",
+        "length": 2,
+        "color": "RED",
+        "type": "ROAD",
+        "owner": null
+      }
+    ]
+  },
+  "cards": {
+    "outOfGame": {
+      "destinationCards": [],
+      "wagonCards": []
+    },
+    "faceUp": {
+      "destinationCards": [],
+      "wagonCards": []
+    },
+    "faceDown": {
+      "destinationCards": [],
+      "wagonCards": []
+    },
+    "playerCards": [
+      {
+        "destinationCards": [],
+        "wagonCards": []
+      },
+      {
+        "destinationCards": [],
+        "wagonCards": []
+      },
+      {
+        "destinationCards": [],
+        "wagonCards": []
+      },
+      {
+        "destinationCards": [],
+        "wagonCards": []
+      },
+      {
+        "destinationCards": [],
+        "wagonCards": []
+      },
+      {
+        "destinationCards": [],
+        "wagonCards": []
+      }
+    ]
+  }
+}

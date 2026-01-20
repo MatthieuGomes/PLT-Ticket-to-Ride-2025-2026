@@ -1,0 +1,157 @@
+{
+  "players": [
+    {
+      "name": "Alice",
+      "color": "RED",
+      "score": 5,
+      "nbWagons": 40,
+      "nbStations": 2,
+      "borrowedRoads": [
+        0,
+        2
+      ],
+      "hand": 0
+    },
+    {
+      "name": "Bob",
+      "color": "BLUE",
+      "score": 0,
+      "nbWagons": 45,
+      "nbStations": 3,
+      "borrowedRoads": [
+        1
+      ],
+      "hand": 1
+    }
+  ],
+  "map": {
+    "stations": [
+      {
+        "name": "alpha",
+        "owner": "Alice",
+        "TUIrow": 0,
+        "TUIcolumn": 0,
+        "TUInickname": "ALP"
+      },
+      {
+        "name": "beta",
+        "owner": null,
+        "TUIrow": 1,
+        "TUIcolumn": 4,
+        "TUInickname": "BET"
+      },
+      {
+        "name": "gamma",
+        "owner": null,
+        "TUIrow": 2,
+        "TUIcolumn": 8,
+        "TUInickname": "GAM"
+      },
+      {
+        "name": "omega",
+        "owner": null,
+        "TUIrow": 4,
+        "TUIcolumn": 12,
+        "TUInickname": "OME"
+      }
+    ],
+    "roads": [
+      {
+        "id": 0,
+        "stationA": "alpha",
+        "stationB": "beta",
+        "length": 3,
+        "color": "BLUE",
+        "type": "ROAD",
+        "owner": "Alice"
+      },
+      {
+        "id": 1,
+        "stationA": "beta",
+        "stationB": "gamma",
+        "length": 4,
+        "color": "GREEN",
+        "type": "TUNNEL",
+        "owner": "Bob"
+      },
+      {
+        "id": 2,
+        "stationA": "alpha",
+        "stationB": "gamma",
+        "length": 5,
+        "type": "FERRY",
+        "locomotives": 1,
+        "owner": "Alice"
+      }
+    ]
+  },
+  "cards": {
+    "outOfGame": {
+      "destinationCards": [],
+      "wagonCards": []
+    },
+    "faceUp": {
+      "destinationCards": [],
+      "wagonCards": []
+    },
+    "faceDown": {
+      "destinationCards": [
+        {
+          "stationA": "alpha",
+          "stationB": "gamma",
+          "points": 8,
+          "isLong": false,
+          "completed": false
+        }
+      ],
+      "wagonCards": [
+        {
+          "color": "YELLOW"
+        },
+        {
+          "color": "BLACK"
+        }
+      ]
+    },
+    "playerCards": [
+      {
+        "destinationCards": [
+          {
+            "stationA": "alpha",
+            "stationB": "beta",
+            "points": 7,
+            "isLong": false,
+            "completed": true
+          }
+        ],
+        "wagonCards": [
+          {
+            "color": "RED"
+          },
+          {
+            "color": "LOCOMOTIVE"
+          }
+        ]
+      },
+      {
+        "destinationCards": [
+          {
+            "stationA": "alpha",
+            "stationB": "gamma",
+            "points": 8,
+            "isLong": false,
+            "completed": false
+          }
+        ],
+        "wagonCards": [
+          {
+            "color": "BLUE"
+          },
+          {
+            "color": "BLUE"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -4,11 +4,14 @@
 #include "../../src/shared/mapState/Station.h"
 #include "../../src/shared/mapState/Road.h"
 #include "../../src/shared/playersState/Player.h"
+#include "../../src/shared/playersState/PlayersState.h"
 #include "../../src/shared/mapState/Tunnel.h"
 #include "../../src/shared/mapState/Ferry.h"
 #include "../../src/shared/cardsState/DestinationCard.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <memory>
+#include <json/json.h>
+#include <cstdlib>
 
 #define DEBUG_MODE true
 #if DEBUG_MODE == true

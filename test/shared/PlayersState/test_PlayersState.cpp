@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include "../../src/shared/playersState/PlayersState.h"
+#include <cstdlib>
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true
@@ -86,6 +87,26 @@ TEST(Basic)
   CHECK_EQ(ps.getPlayers().size(), 1);
   CHECK_EQ(ps.getPlayers()[0], test_owner);
   ANN_END("Basic Constructor")
+}
+
+TEST(MaxPlayersAllowed)
+{
+  ANN_START("MaxPlayersAllowed Constructor")
+  std::vector<std::shared_ptr<Player>> players;
+  for (int i = 0; i < 5; ++i)
+  {
+    std::string name = std::string("Player") + std::to_string(i);
+    players.push_back(std::make_shared<Player>(name,
+                                               playersState::PlayerColor::RED,
+                                               0,
+                                               test_init_player1_nbWagons,
+                                               test_init_player1_nbStations,
+                                               test_borrowed_roads,
+                                               nullptr));
+  }
+  PlayersState ps = PlayersState(players);
+  CHECK_EQ(ps.getPlayers().size(), 5);
+  ANN_END("MaxPlayersAllowed Constructor")
 }
 
 TEST(FromInfos)

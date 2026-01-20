@@ -17,6 +17,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <json/json.h>
 
 #include <boost/graph/adjacency_list.hpp>
@@ -105,6 +106,72 @@ namespace mapState
                 return node[key].asInt();
             }
             return fallback;
+        }
+
+        bool findIsolatedStations(
+            const std::vector<std::shared_ptr<Station>>& stations,
+            const std::vector<std::shared_ptr<Road>>& roads,
+            std::vector<std::string>& isolated)
+        {
+            isolated.clear();
+            if (stations.empty())
+            {
+                return false;
+            }
+
+            std::unordered_map<std::string, int> degreeByName;
+            for (const std::shared_ptr<Station>& station : stations)
+            {
+                if (!station)
+                {
+                    continue;
+                }
+                const std::string& name = station->getName();
+                if (!name.empty())
+                {
+                    degreeByName[name] = 0;
+                }
+            }
+
+            for (const std::shared_ptr<Road>& road : roads)
+            {
+                if (!road || !road->getStationA() || !road->getStationB())
+                {
+                    continue;
+                }
+                const std::string& nameA = road->getStationA()->getName();
+                const std::string& nameB = road->getStationB()->getName();
+                if (!nameA.empty())
+                {
+                    degreeByName[nameA] += 1;
+                }
+                if (!nameB.empty())
+                {
+                    degreeByName[nameB] += 1;
+                }
+            }
+
+            for (const std::shared_ptr<Station>& station : stations)
+            {
+                if (!station)
+                {
+                    continue;
+                }
+                const std::string& name = station->getName();
+                std::unordered_map<std::string, int>::const_iterator it =
+                    degreeByName.find(name);
+                int degree = 0;
+                if (it != degreeByName.end())
+                {
+                    degree = it->second;
+                }
+                if (degree == 0)
+                {
+                    isolated.push_back(name);
+                }
+            }
+
+            return !isolated.empty();
         }
 
         mapState::RoadColor parseRoadColorValue(const Json::Value& value)
@@ -506,6 +573,22 @@ namespace mapState
         this->roads = roadObjects;
         this->roads.insert(this->roads.end(), tunnelObjects.begin(), tunnelObjects.end());
         this->roads.insert(this->roads.end(), ferryObjects.begin(), ferryObjects.end());
+
+        std::vector<std::string> isolated;
+        if (findIsolatedStations(this->stations, this->roads, isolated))
+        {
+            std::cerr << "Error: map has isolated stations: ";
+            for (std::size_t i = 0; i < isolated.size(); ++i)
+            {
+                if (i > 0)
+                {
+                    std::cerr << ", ";
+                }
+                std::cerr << isolated[i];
+            }
+            std::cerr << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
         DEBUG_PRINT("MapState fillMapWithInfos finished !");
     }
 
