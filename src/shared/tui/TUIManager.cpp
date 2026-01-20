@@ -602,6 +602,8 @@ void TUIManager::runMainLoop() {
   shutdown();
   term->write(kEnableLineWrap);
   term->resetStyles();
+  term->clearRegion(kTerminalOrigin, kTerminalOrigin, cols, rows);
+  term->moveTo(kTerminalOrigin, kTerminalOrigin);
   term->flush();
 
   // Restore terminal settings on exit.
