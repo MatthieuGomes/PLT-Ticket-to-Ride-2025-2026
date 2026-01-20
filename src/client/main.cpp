@@ -69,6 +69,17 @@ static void configureCoverageOutput() {
     setenv(kGcovPrefixStripEnv, "0", 0);
 }
 
+static bool fileExists(const char* path) {
+    if (path == nullptr || path[0] == '\0') {
+        return false;
+    }
+    struct stat sb;
+    if (stat(path, &sb) != 0) {
+        return false;
+    }
+    return S_ISREG(sb.st_mode);
+}
+
 using namespace std;
 
 int main(int argc,char* argv[])
@@ -90,16 +101,23 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"render")==0) {
-        if (argc >= 4 && strcmp(argv[2], "--json") == 0) {
+        if (argc >= 4 && strcmp(argv[2], "--custom") == 0) {
+            if (!fileExists(argv[3])) {
+                std::cerr << "Invalid json path for --custom: " << argv[3] << std::endl;
+                return EXIT_FAILURE;
+            }
             setenv("RENDER_STATE_PATH", argv[3], 1);
             setenv("TUI_LAYOUT_PATH", argv[3], 1);
-        } else if (argc >= 4 && strcmp(argv[2], "--state") == 0) {
+        } else if (argc >= 4 && strcmp(argv[2], "--json") == 0) {
             if (strcmp(argv[3], "1") == 0) {
                 setenv("RENDER_STATE_PATH", "static/europe_state_1.json", 1);
                 setenv("TUI_LAYOUT_PATH", "static/europe_state_1.json", 1);
             } else if (strcmp(argv[3], "2") == 0) {
                 setenv("RENDER_STATE_PATH", "static/europe_state_2.json", 1);
                 setenv("TUI_LAYOUT_PATH", "static/europe_state_2.json", 1);
+            } else {
+                std::cerr << "Unknown json state loading option: " << argv[3] << std::endl;
+                return EXIT_FAILURE;
             }
         }
         client.callRender();
