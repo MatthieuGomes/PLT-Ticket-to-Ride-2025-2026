@@ -101,6 +101,11 @@ int main(int argc,char* argv[])
         return EXIT_SUCCESS;
     }
     if (strcmp(argv[1],"render")==0) {
+        if (argc >= 3 && (strcmp(argv[2], "--custom") == 0 || strcmp(argv[2], "--json") == 0) &&
+            argc < 4) {
+            std::cerr << "Missing argument for " << argv[2] << std::endl;
+            return EXIT_FAILURE;
+        }
         if (argc >= 4 && strcmp(argv[2], "--custom") == 0) {
             if (!fileExists(argv[3])) {
                 std::cerr << "Invalid json path for --custom: " << argv[3] << std::endl;
@@ -119,6 +124,9 @@ int main(int argc,char* argv[])
                 std::cerr << "Unknown json state loading option: " << argv[3] << std::endl;
                 return EXIT_FAILURE;
             }
+        } else if (argc >= 3) {
+            std::cerr << "Unknown render option: " << argv[2] << std::endl;
+            return EXIT_FAILURE;
         }
         client.callRender();
         return EXIT_SUCCESS;
