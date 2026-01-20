@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "tui/TUIManager.h"
+#include "engine/Engine.h"
 
 namespace {
 
@@ -76,16 +77,18 @@ namespace render
       statePath = pathOverride;
     }
 
-    state::State debugState(statePath);
+    std::shared_ptr<state::State> debugState(new state::State(statePath));
     playersState::PlayersState::nbPlayers =
-        static_cast<int>(debugState.players.getPlayers().size());
+        static_cast<int>(debugState->players.getPlayers().size());
+    std::shared_ptr<engine::Engine> engine(new engine::Engine(debugState));
 
     tui::Terminal term;
     tui::TUIManager manager(&term, cols, rows,
-                            &debugState.map,
-                            &debugState.players,
-                            &debugState.cards);
+                            &debugState->map,
+                            &debugState->players,
+                            &debugState->cards);
     manager.setDebugRender(true);
+    manager.setEngine(engine);
     manager.runMainLoop();
     return EXIT_SUCCESS;
   }

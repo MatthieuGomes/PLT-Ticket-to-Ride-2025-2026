@@ -23,6 +23,7 @@
 #include "cardsState/Deck.h"
 #include "cardsState/DestinationCard.h"
 #include "state/State.h"
+#include "engine/Engine.h"
 
 void testSFML()
 {
@@ -174,13 +175,15 @@ int main(int argc, char *argv[])
             getTerminalSize(cols, rows);
 
             tui::Terminal term;
-            state::State state("static/europe_state.json");
-            playersState::PlayersState::nbPlayers = static_cast<int>(state.players.getPlayers().size());
+            std::shared_ptr<state::State> state(new state::State("static/europe_state.json"));
+            playersState::PlayersState::nbPlayers = static_cast<int>(state->players.getPlayers().size());
+            std::shared_ptr<engine::Engine> engine(new engine::Engine(state));
 
             tui::TUIManager manager(&term, cols, rows,
-                                    &state.map,
-                                    &state.players,
-                                    &state.cards);
+                                    &state->map,
+                                    &state->players,
+                                    &state->cards);
+            manager.setEngine(engine);
             manager.runMainLoop();
 
             return EXIT_SUCCESS;

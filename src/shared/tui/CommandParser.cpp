@@ -76,12 +76,18 @@ ParseResult CommandParser::parse(const std::string& input) {
     action = "exit";
   }
 
-  result.ok = true;
-  result.json = std::string("{\"action\":\"") + escapeJson(action) + "\"";
+  parser::CommandMessage message;
+  message.kind = "command";
+  message.origin = "tui";
+  message.version = 1;
+  message.name = action;
+  message.payload = Json::Value(Json::objectValue);
   if (!args.empty()) {
-    result.json += std::string(",\"args\":\"") + escapeJson(args) + "\"";
+    message.payload["args"] = args;
   }
-  result.json += "}";
+
+  result.ok = true;
+  result.json = jsonparser.serializeCommand(message);
   return result;
 }
 

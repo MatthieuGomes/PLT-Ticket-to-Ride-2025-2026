@@ -20,6 +20,7 @@
 #include "mapState/MapState.h"
 #include "playersState/PlayersState.h"
 #include "cardsState/CardsState.h"
+#include "engine/CommandParser.h"
 
 namespace tui {
 
@@ -83,12 +84,18 @@ void handleSigInt(int) {
 }
 
 std::string extractAction(const std::string& json) {
-  const std::string key = "\"action\":\"";
-  const std::size_t start = json.find(key);
+  const std::string name_key = "\"name\":\"";
+  const std::string action_key = "\"action\":\"";
+  std::size_t start = json.find(name_key);
+  std::size_t key_len = name_key.size();
+  if (start == std::string::npos) {
+    start = json.find(action_key);
+    key_len = action_key.size();
+  }
   if (start == std::string::npos) {
     return "";
   }
-  const std::size_t value_start = start + key.size();
+  const std::size_t value_start = start + key_len;
   const std::size_t end = json.find('"', value_start);
   if (end == std::string::npos || end <= value_start) {
     return "";
@@ -136,6 +143,7 @@ TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
       mapstate(nullptr),
       playerstate(nullptr),
       cardstate(nullptr),
+      engine(std::shared_ptr<engine::Engine>()),
       ownsMapState(true),
       ownsPlayerState(true),
       ownsCardState(true),
@@ -162,6 +170,7 @@ TUIManager::TUIManager(
       mapstate(mapState),
       playerstate(playerState),
       cardstate(cardState),
+      engine(std::shared_ptr<engine::Engine>()),
       ownsMapState(mapState == nullptr),
       ownsPlayerState(playerState == nullptr),
       ownsCardState(cardState == nullptr),
@@ -248,6 +257,10 @@ void TUIManager::setDebugRender(bool enabled) {
   if (statusbar) {
     statusbar->setDebugRender(debugRender);
   }
+}
+
+void TUIManager::setEngine(std::shared_ptr<engine::Engine> engineInstance) {
+  engine = engineInstance;
 }
 
 void TUIManager::updateLayout(int newCols, int newRows) {
@@ -372,14 +385,30 @@ void TUIManager::handleInput(const std::string& input) {
       infopanel->addMessage(result.error);
     }
   } else {
-    const std::string action = extractAction(result.json);
-    if (action == "exit") {
-      infopanel->addMessage("Exiting...");
-      running = false;
-    } else if (action == "help") {
-      infopanel->addMessage("Available commands: exit");
+    if (!engine) {
+      const std::string action = extractAction(result.json);
+      if (action == "exit") {
+        infopanel->addMessage("Exiting...");
+        running = false;
+      } else if (action == "help") {
+        infopanel->addMessage("Available commands: exit");
+      }
     } else {
-      // JSON payload is ready for the engine when it's wired in.
+      engine::EngineResult engineResult = engineParser.parseAndApply(engine, result.json);
+      std::string responseJson = engineParser.encodeResult(engineResult);
+      parser::ResultMessage response;
+      std::string error;
+      parser::JSONParser jsonParser;
+      if (!jsonParser.parseResult(responseJson, response, error)) {
+        infopanel->addMessage("Engine response parse error: " + error);
+      } else {
+        for (std::size_t i = 0; i < response.events.size(); ++i) {
+          const parser::EventMessage& event = response.events[i];
+          if (!event.message.empty()) {
+            infopanel->addMessage(event.message);
+          }
+        }
+      }
     }
   }
 
