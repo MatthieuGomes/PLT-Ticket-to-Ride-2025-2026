@@ -215,11 +215,6 @@ namespace engine
         extra.payload = "";
         result.events.push_back(extra);
       }
-      EngineEvent confirm;
-      confirm.type = EngineEventType::INFO;
-      confirm.message = "Confirmation state: end turn or borrow roads allowed.";
-      confirm.payload = "";
-      result.events.push_back(confirm);
       return result;
     }
 

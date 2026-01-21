@@ -240,7 +240,13 @@ namespace engine
     {
       return buildErrorResult("No state machine", engine->phase);
     }
-    return engine->stateMachine->handleCommand(engine, command);
+    EngineResult result = engine->stateMachine->handleCommand(engine, command);
+    if (engine && !engine->pendingEvents.empty())
+    {
+      result.events.insert(result.events.end(), engine->pendingEvents.begin(), engine->pendingEvents.end());
+      engine->pendingEvents.clear();
+    }
+    return result;
   }
 
   EngineResult CommandParser::parseAndApply(std::shared_ptr<Engine> engine, const std::string& json)

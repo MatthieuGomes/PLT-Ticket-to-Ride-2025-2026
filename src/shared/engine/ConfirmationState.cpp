@@ -53,6 +53,11 @@ namespace engine
     engine->phase = Phase::CONFIRMATION;
     engine->context.drawsRemaining = 0;
     engine->context.drawSource = 0;
+    EngineEvent event;
+    event.type = EngineEventType::INFO;
+    event.message = "Confirmation state: end turn or borrow roads allowed.";
+    event.payload = "";
+    engine->pendingEvents.push_back(event);
   }
 
   std::vector<EngineCommandType> ConfirmationState::getAllowedCommands()

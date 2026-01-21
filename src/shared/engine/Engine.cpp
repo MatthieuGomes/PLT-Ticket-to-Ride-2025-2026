@@ -2,6 +2,7 @@
 
 #include "CommandParser.h"
 #include "SetupState.h"
+#include "EngineEvent.h"
 
 namespace engine
 {
@@ -31,6 +32,7 @@ namespace engine
     this->context.pendingTunnel.baseLength = 0;
     this->context.pendingTunnel.extraRequired = 0;
     this->context.pendingTunnel.revealed.clear();
+    this->pendingEvents.clear();
 
     if (this->stateMachine)
     {
@@ -66,6 +68,7 @@ namespace engine
     this->context.pendingTunnel.baseLength = 0;
     this->context.pendingTunnel.extraRequired = 0;
     this->context.pendingTunnel.revealed.clear();
+    this->pendingEvents.clear();
 
     if (this->stateMachine)
     {
