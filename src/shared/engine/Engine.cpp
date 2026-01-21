@@ -1,6 +1,7 @@
 #include "Engine.h"
 
 #include "CommandParser.h"
+#include "SetupState.h"
 
 namespace engine
 {
@@ -29,6 +30,13 @@ namespace engine
     this->context.pendingTunnel.baseLength = 0;
     this->context.pendingTunnel.extraRequired = 0;
     this->context.pendingTunnel.revealed.clear();
+
+    if (this->stateMachine)
+    {
+      std::shared_ptr<Engine> engineRef(this, [](Engine*) {});
+      std::shared_ptr<GameState> startState(new SetupState());
+      this->stateMachine->transitionTo(engineRef, startState);
+    }
   }
 
   Engine::Engine(std::shared_ptr<state::State> state)
@@ -56,6 +64,13 @@ namespace engine
     this->context.pendingTunnel.baseLength = 0;
     this->context.pendingTunnel.extraRequired = 0;
     this->context.pendingTunnel.revealed.clear();
+
+    if (this->stateMachine)
+    {
+      std::shared_ptr<Engine> engineRef(this, [](Engine*) {});
+      std::shared_ptr<GameState> startState(new SetupState());
+      this->stateMachine->transitionTo(engineRef, startState);
+    }
   }
 
   EngineResult Engine::applyCommand(const std::string& json)
