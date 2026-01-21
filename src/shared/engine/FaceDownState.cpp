@@ -83,6 +83,10 @@ namespace engine
     {
       return buildError(engine, "Face-down draw: no engine");
     }
+    if (engine->context.drawSource == 1)
+    {
+      return buildError(engine, "Draw blocked: can't draw from face-up and face-down piles at the same turn.");
+    }
     std::shared_ptr<state::State> state = engine->getState();
     if (!state)
     {
@@ -106,42 +110,51 @@ namespace engine
       return buildError(engine, "Face-down draw: player hand missing");
     }
 
-    std::shared_ptr<cardsState::WagonCard> drawnCard;
-    if (deck->faceDownCards->cards.empty())
+    if (deck->faceDownCards->cards.size() < 2)
     {
-      return buildError(engine, "Face-down draw: deck is empty");
-    }
-    std::shared_ptr<cardsState::Card> removed = deck->faceDownCards->takeLastCard();
-    drawnCard = std::dynamic_pointer_cast<cardsState::WagonCard>(removed);
-    if (!drawnCard)
-    {
-      return buildError(engine, "Face-down draw: invalid card");
+      return buildError(engine, "Face-down draw: not enough cards");
     }
     if (!hand->wagonCards)
     {
       return buildError(engine, "Face-down draw: hand missing wagon deck");
     }
-    hand->wagonCards->addCard(drawnCard);
-    engine->context.drawsRemaining -= 1;
+    EngineResult result;
+    result.ok = true;
+    result.error = "";
+    result.nextPhase = Phase::CONFIRMATION;
 
-    std::ostringstream msg;
-    msg << "Wagon card " << colorLabel(drawnCard->getColor()) << " drawn";
-
-    if (engine->context.drawsRemaining <= 0)
+    for (int i = 0; i < 2; ++i)
     {
-      std::shared_ptr<GameState> nextState(new ConfirmationState());
-      if (engine->stateMachine)
+      std::shared_ptr<cardsState::Card> removed = deck->faceDownCards->takeLastCard();
+      std::shared_ptr<cardsState::WagonCard> drawnCard =
+          std::dynamic_pointer_cast<cardsState::WagonCard>(removed);
+      if (!drawnCard)
       {
-        engine->stateMachine->transitionTo(engine, nextState);
+        return buildError(engine, "Face-down draw: invalid card");
       }
-      return buildInfo(Phase::CONFIRMATION, msg.str());
+      hand->wagonCards->addCard(drawnCard);
+      EngineEvent event;
+      event.type = EngineEventType::INFO;
+      std::ostringstream msg;
+      msg << "Wagon card " << colorLabel(drawnCard->getColor()) << " drawn";
+      event.message = msg.str();
+      event.payload = "";
+      result.events.push_back(event);
     }
 
-    std::shared_ptr<GameState> nextState(new DrawWagonCardState());
+    engine->context.drawsRemaining = 0;
+    engine->context.drawSource = 2;
+
+    std::shared_ptr<GameState> nextState(new ConfirmationState());
     if (engine->stateMachine)
     {
       engine->stateMachine->transitionTo(engine, nextState);
     }
-    return buildInfo(Phase::DRAW_WAGON, msg.str());
+    EngineEvent confirm;
+    confirm.type = EngineEventType::INFO;
+    confirm.message = "Confirmation state: end turn or borrow roads allowed.";
+    confirm.payload = "";
+    result.events.push_back(confirm);
+    return result;
   }
 }

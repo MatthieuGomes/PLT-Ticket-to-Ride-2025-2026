@@ -610,7 +610,7 @@
         <dia:point val="2.95,10.7"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="2.9,10.65;15.435,19.15"/>
+        <dia:rectangle val="2.9,10.65;15.435,19.95"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="2.95,10.7"/>
@@ -619,7 +619,7 @@
         <dia:real val="12.434999999999999"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="8.4000000000000004"/>
+        <dia:real val="9.2000000000000011"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#TurnContext#</dia:string>
@@ -871,6 +871,29 @@
           </dia:attribute>
           <dia:attribute name="class_scope">
             <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#drawSource#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#int#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="true"/>
           </dia:attribute>
         </dia:composite>
       </dia:attribute>
@@ -4077,16 +4100,16 @@
         <dia:point val="-22.5325,23.3446"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-22.5825,23.2946;-1.5775,26.9946"/>
+        <dia:rectangle val="-22.5825,23.2946;0.3475,28.5946"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-22.5325,23.3446"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="20.905000000000001"/>
+        <dia:real val="22.830000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="3.5999999999999996"/>
+        <dia:real val="5.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#PlayerTurnState#</dia:string>
@@ -4258,7 +4281,6 @@
           </dia:attribute>
           <dia:attribute name="parameters"/>
         </dia:composite>
-      
         <dia:composite type="umloperation">
           <dia:attribute name="name">
             <dia:string>#handleCommand#</dia:string>
@@ -4324,7 +4346,7 @@
             </dia:composite>
           </dia:attribute>
         </dia:composite>
-</dia:attribute>
+      </dia:attribute>
       <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
@@ -4438,7 +4460,7 @@
         <dia:real val="0.69999999999999996"/>
       </dia:attribute>
       <dia:attribute name="attributes"/>
-            <dia:attribute name="operations">
+      <dia:attribute name="operations">
         <dia:composite type="umloperation">
           <dia:attribute name="name">
             <dia:string>#onEnter#</dia:string>
@@ -4553,7 +4575,7 @@
           </dia:attribute>
         </dia:composite>
       </dia:attribute>
-<dia:attribute name="template">
+      <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="templates"/>
@@ -10042,16 +10064,16 @@
         <dia:point val="-22.669,36.4135"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-22.719,36.3635;-16.4165,38.6635"/>
+        <dia:rectangle val="-22.719,36.3635;0.211,40.8635"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-22.669,36.4135"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="6.2024999999999997"/>
+        <dia:real val="22.830000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="2.1999999999999997"/>
+        <dia:real val="4.4000000000000004"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#FaceUpState#</dia:string>
@@ -10144,7 +10166,7 @@
         <dia:real val="0.69999999999999996"/>
       </dia:attribute>
       <dia:attribute name="attributes"/>
-            <dia:attribute name="operations">
+      <dia:attribute name="operations">
         <dia:composite type="umloperation">
           <dia:attribute name="name">
             <dia:string>#onEnter#</dia:string>
@@ -10259,7 +10281,7 @@
           </dia:attribute>
         </dia:composite>
       </dia:attribute>
-<dia:attribute name="template">
+      <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="templates"/>
@@ -10270,16 +10292,16 @@
         <dia:point val="-30.969,36.2135"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-31.019,36.1635;-23.414,38.4635"/>
+        <dia:rectangle val="-31.019,36.1635;-8.089,40.6635"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-30.969,36.2135"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="7.5049999999999999"/>
+        <dia:real val="22.830000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="2.1999999999999997"/>
+        <dia:real val="4.4000000000000004"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#FaceDownState#</dia:string>
@@ -10372,7 +10394,7 @@
         <dia:real val="0.69999999999999996"/>
       </dia:attribute>
       <dia:attribute name="attributes"/>
-            <dia:attribute name="operations">
+      <dia:attribute name="operations">
         <dia:composite type="umloperation">
           <dia:attribute name="name">
             <dia:string>#onEnter#</dia:string>
@@ -10487,7 +10509,7 @@
           </dia:attribute>
         </dia:composite>
       </dia:attribute>
-<dia:attribute name="template">
+      <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="templates"/>
@@ -10612,16 +10634,16 @@
         <dia:point val="-26.219,45.3635"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-26.269,45.3135;-5.264,48.2135"/>
+        <dia:rectangle val="-26.269,45.3135;-3.339,50.6135"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-26.219,45.3635"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="20.905000000000001"/>
+        <dia:real val="22.830000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="2.7999999999999998"/>
+        <dia:real val="5.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#ConfirmationState#</dia:string>
@@ -10714,42 +10736,11 @@
         <dia:real val="0.69999999999999996"/>
       </dia:attribute>
       <dia:attribute name="attributes"/>
-            <dia:attribute name="operations">
+      <dia:attribute name="operations">
         <dia:composite type="umloperation">
           <dia:attribute name="name">
             <dia:string>#onEnter#</dia:string>
-          
-        <dia:composite type="umloperation">
-          <dia:attribute name="name">
-            <dia:string>#getAllowedCommands#</dia:string>
           </dia:attribute>
-          <dia:attribute name="stereotype">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="type">
-            <dia:string>#std::vector&lt;EngineCommandType&gt;#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="visibility">
-            <dia:enum val="0"/>
-          </dia:attribute>
-          <dia:attribute name="comment">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="abstract">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="inheritance_type">
-            <dia:enum val="2"/>
-          </dia:attribute>
-          <dia:attribute name="query">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="class_scope">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="parameters"/>
-        </dia:composite>
-</dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
           </dia:attribute>
@@ -10890,7 +10881,7 @@
           <dia:attribute name="parameters"/>
         </dia:composite>
       </dia:attribute>
-<dia:attribute name="template">
+      <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="templates"/>

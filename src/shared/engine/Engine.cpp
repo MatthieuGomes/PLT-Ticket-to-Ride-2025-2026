@@ -21,6 +21,7 @@ namespace engine
 
     this->context.currentPlayer = kDefaultPlayer;
     this->context.drawsRemaining = kDefaultDrawsRemaining;
+    this->context.drawSource = 0;
     this->context.finalRound = false;
     this->context.finalRoundStarter = kNoFinalRoundStarter;
     this->context.minKeepTickets = kDefaultMinKeepTickets;
@@ -55,6 +56,7 @@ namespace engine
 
     this->context.currentPlayer = kDefaultPlayer;
     this->context.drawsRemaining = kDefaultDrawsRemaining;
+    this->context.drawSource = 0;
     this->context.finalRound = false;
     this->context.finalRoundStarter = kNoFinalRoundStarter;
     this->context.minKeepTickets = kDefaultMinKeepTickets;

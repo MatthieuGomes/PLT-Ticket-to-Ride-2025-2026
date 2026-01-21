@@ -57,6 +57,7 @@ namespace engine
     if (engine->context.drawsRemaining <= 0)
     {
       engine->context.drawsRemaining = kDefaultDrawsRemaining;
+      engine->context.drawSource = 0;
     }
   }
 

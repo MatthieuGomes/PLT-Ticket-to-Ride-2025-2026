@@ -123,6 +123,10 @@ namespace engine
     {
       return buildError(engine, "Face-up draw: no engine");
     }
+    if (engine->context.drawSource == 2)
+    {
+      return buildError(engine, "Draw blocked: can't draw from face-up and face-down piles at the same turn.");
+    }
     std::shared_ptr<state::State> state = engine->getState();
     if (!state)
     {
@@ -169,11 +173,20 @@ namespace engine
     {
       return buildError(engine, "Face-up draw: selected card missing");
     }
+    bool isLocomotive = (selected->getColor() == cardsState::ColorCard::LOCOMOTIVE);
+    bool firstDraw = (engine->context.drawsRemaining >= 2);
+    if (engine->context.drawSource == 1 && !firstDraw && isLocomotive)
+    {
+      return buildError(engine, "Draw blocked: can't draw a locomotive + another card from faceup pile.");
+    }
+
     deck->drawCard(hand, selected, 0);
     deck->turnCardUp();
 
-    bool isLocomotive = (selected->getColor() == cardsState::ColorCard::LOCOMOTIVE);
-    bool firstDraw = (engine->context.drawsRemaining >= 2);
+    if (engine->context.drawSource == 0)
+    {
+      engine->context.drawSource = 1;
+    }
     if (isLocomotive && firstDraw)
     {
       engine->context.drawsRemaining = 0;
@@ -193,7 +206,21 @@ namespace engine
       {
         engine->stateMachine->transitionTo(engine, nextState);
       }
-      return buildInfo(Phase::CONFIRMATION, msg.str());
+      EngineResult result = buildInfo(Phase::CONFIRMATION, msg.str());
+      if (isLocomotive && firstDraw)
+      {
+        EngineEvent extra;
+        extra.type = EngineEventType::INFO;
+        extra.message = "Draw phase ended: face-up locomotive obtained.";
+        extra.payload = "";
+        result.events.push_back(extra);
+      }
+      EngineEvent confirm;
+      confirm.type = EngineEventType::INFO;
+      confirm.message = "Confirmation state: end turn or borrow roads allowed.";
+      confirm.payload = "";
+      result.events.push_back(confirm);
+      return result;
     }
 
     std::shared_ptr<GameState> nextState(new DrawWagonCardState());

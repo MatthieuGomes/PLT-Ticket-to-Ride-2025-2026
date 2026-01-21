@@ -52,6 +52,7 @@ namespace engine
     }
     engine->phase = Phase::CONFIRMATION;
     engine->context.drawsRemaining = 0;
+    engine->context.drawSource = 0;
   }
 
   std::vector<EngineCommandType> ConfirmationState::getAllowedCommands()
