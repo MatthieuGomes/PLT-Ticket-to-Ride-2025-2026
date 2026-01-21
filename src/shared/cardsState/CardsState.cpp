@@ -11,6 +11,7 @@
 
 #include "DestinationCard.h"
 #include "WagonCard.h"
+#include "Card.h"
 
 #define DEBUG_MODE false
 #if DEBUG_MODE == true

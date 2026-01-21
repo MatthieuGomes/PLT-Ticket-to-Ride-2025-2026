@@ -94,6 +94,9 @@ ParseResult CommandParser::parse(const std::string& input) {
       }
     }
   }
+  if (!tokens.empty() && tokens[0] == "take") {
+    action = "take";
+  }
 
   if (action.empty()) {
     if (tokens.empty()) {
@@ -136,6 +139,20 @@ ParseResult CommandParser::parse(const std::string& input) {
     }
     if (index > 0) {
       message.payload["index"] = index;
+    }
+  }
+  if (action == "take" && tokens.size() >= 2) {
+    int roadId = 0;
+    try {
+      roadId = std::stoi(tokens[1]);
+    } catch (...) {
+      roadId = 0;
+    }
+    if (roadId > 0) {
+      message.payload["roadId"] = roadId;
+    }
+    if (tokens.size() >= 3) {
+      message.payload["color"] = tokens[2];
     }
   }
 
