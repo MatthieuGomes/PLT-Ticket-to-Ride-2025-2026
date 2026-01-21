@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <functional>
 #include <cctype>
 #include <json/json.h>
 
@@ -217,6 +218,88 @@ namespace cardsState
     }
 
     std::cout << indentation << "~~~~~~~~~~~~~~~~~~~~~\n";
+  }
+
+  int CardsState::countWagonCards(std::shared_ptr<PlayerCards> hand, cardsState::ColorCard color, bool includeLocomotives)
+  {
+    if (!hand || !hand->wagonCards)
+    {
+      return 0;
+    }
+
+    int count = 0;
+    for (const std::shared_ptr<WagonCard>& card : hand->wagonCards->cards)
+    {
+      if (!card)
+      {
+        continue;
+      }
+      if (card->getColor() == color || (includeLocomotives && card->getColor() == cardsState::ColorCard::LOCOMOTIVE))
+      {
+        ++count;
+      }
+    }
+    return count;
+  }
+
+  bool CardsState::discardWagonCards(std::shared_ptr<PlayerCards> hand, cardsState::ColorCard color, int count, bool allowLocomotives)
+  {
+    if (count <= 0)
+    {
+      return true;
+    }
+    if (!hand || !hand->wagonCards || !gameWagonCards || !gameWagonCards->trash)
+    {
+      return false;
+    }
+
+    std::vector<int> indices;
+    for (int i = 0; i < static_cast<int>(hand->wagonCards->cards.size()); ++i)
+    {
+      std::shared_ptr<WagonCard> card = hand->wagonCards->cards[static_cast<std::size_t>(i)];
+      if (card && card->getColor() == color)
+      {
+        indices.push_back(i);
+        if (static_cast<int>(indices.size()) >= count)
+        {
+          break;
+        }
+      }
+    }
+
+    if (allowLocomotives && static_cast<int>(indices.size()) < count)
+    {
+      for (int i = 0; i < static_cast<int>(hand->wagonCards->cards.size()); ++i)
+      {
+        std::shared_ptr<WagonCard> card = hand->wagonCards->cards[static_cast<std::size_t>(i)];
+        if (card && card->getColor() == cardsState::ColorCard::LOCOMOTIVE)
+        {
+          indices.push_back(i);
+          if (static_cast<int>(indices.size()) >= count)
+          {
+            break;
+          }
+        }
+      }
+    }
+
+    if (static_cast<int>(indices.size()) < count)
+    {
+      return false;
+    }
+
+    std::sort(indices.begin(), indices.end(), std::greater<int>());
+    for (int i = 0; i < count; ++i)
+    {
+      int idx = indices[static_cast<std::size_t>(i)];
+      std::shared_ptr<Card> removed = hand->wagonCards->removeCard(idx);
+      std::shared_ptr<WagonCard> wagon = std::dynamic_pointer_cast<WagonCard>(removed);
+      if (wagon)
+      {
+        gameWagonCards->trash->addCard(wagon);
+      }
+    }
+    return true;
   }
 
   CardsState CardsState::ParseFromJSON(std::string json, std::shared_ptr<mapState::MapState> mapState)

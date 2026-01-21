@@ -653,6 +653,18 @@ namespace mapState
         return Station::getStationByName(this->stations, name);
     }
 
+    std::shared_ptr<Road> MapState::getRoadByID(int id)
+    {
+        for (const std::shared_ptr<Road> &road : this->roads)
+        {
+            if (road && road->id == id)
+            {
+                return road;
+            }
+        }
+        return nullptr;
+    }
+
     std::vector<std::shared_ptr<Road>> MapState::getRoadsBetweenStations(std::shared_ptr<Station> stationA, std::shared_ptr<Station> stationB)
     {
         return Road::getRoadsBetweenStations(this->roads, stationA, stationB);
