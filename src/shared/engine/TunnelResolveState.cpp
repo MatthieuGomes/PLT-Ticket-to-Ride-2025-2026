@@ -2,6 +2,7 @@
 
 #include <json/json.h>
 
+#include <cctype>
 #include <sstream>
 
 #include "ConfirmationState.h"
@@ -37,25 +38,18 @@ namespace engine
       return result;
     }
 
-    EngineResult buildInfo(Phase nextPhase, const std::string& message)
+    void addInfo(EngineResult& result, const std::string& message)
     {
-      EngineResult result;
-      result.ok = true;
-      result.error = "";
-      result.nextPhase = nextPhase;
-
       EngineEvent event;
       event.type = EngineEventType::INFO;
       event.message = message;
       event.payload = "";
       result.events.push_back(event);
-
-      return result;
     }
 
-    cardsState::ColorCard roadColorToCard(mapState::RoadColor color)
+    cardsState::ColorCard roadColorToCard(mapState::RoadColor roadColor)
     {
-      switch (color)
+      switch (roadColor)
       {
         case mapState::RoadColor::RED: return cardsState::ColorCard::RED;
         case mapState::RoadColor::BLUE: return cardsState::ColorCard::BLUE;
@@ -71,6 +65,88 @@ namespace engine
           return cardsState::ColorCard::UNKNOWN;
       }
     }
+
+    mapState::RoadColor cardToRoadColor(cardsState::ColorCard color)
+    {
+      switch (color)
+      {
+        case cardsState::ColorCard::RED: return mapState::RoadColor::RED;
+        case cardsState::ColorCard::BLUE: return mapState::RoadColor::BLUE;
+        case cardsState::ColorCard::GREEN: return mapState::RoadColor::GREEN;
+        case cardsState::ColorCard::BLACK: return mapState::RoadColor::BLACK;
+        case cardsState::ColorCard::YELLOW: return mapState::RoadColor::YELLOW;
+        case cardsState::ColorCard::ORANGE: return mapState::RoadColor::ORANGE;
+        case cardsState::ColorCard::PINK: return mapState::RoadColor::PINK;
+        case cardsState::ColorCard::WHITE: return mapState::RoadColor::WHITE;
+        case cardsState::ColorCard::UNKNOWN:
+        case cardsState::ColorCard::LOCOMOTIVE:
+        default:
+          return mapState::RoadColor::UNKNOWN;
+      }
+    }
+
+    cardsState::ColorCard parseColorToken(const std::string& token)
+    {
+      std::string upper;
+      for (std::size_t i = 0; i < token.size(); ++i)
+      {
+        upper.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(token[i]))));
+      }
+      if (upper == "RED") return cardsState::ColorCard::RED;
+      if (upper == "BLUE") return cardsState::ColorCard::BLUE;
+      if (upper == "GREEN") return cardsState::ColorCard::GREEN;
+      if (upper == "BLACK") return cardsState::ColorCard::BLACK;
+      if (upper == "YELLOW") return cardsState::ColorCard::YELLOW;
+      if (upper == "ORANGE") return cardsState::ColorCard::ORANGE;
+      if (upper == "PINK") return cardsState::ColorCard::PINK;
+      if (upper == "WHITE") return cardsState::ColorCard::WHITE;
+      if (upper == "LOCOMOTIVE") return cardsState::ColorCard::LOCOMOTIVE;
+      return cardsState::ColorCard::UNKNOWN;
+    }
+
+    std::string colorToString(cardsState::ColorCard color)
+    {
+      switch (color)
+      {
+        case cardsState::ColorCard::RED: return "RED";
+        case cardsState::ColorCard::BLUE: return "BLUE";
+        case cardsState::ColorCard::GREEN: return "GREEN";
+        case cardsState::ColorCard::BLACK: return "BLACK";
+        case cardsState::ColorCard::YELLOW: return "YELLOW";
+        case cardsState::ColorCard::ORANGE: return "ORANGE";
+        case cardsState::ColorCard::PINK: return "PINK";
+        case cardsState::ColorCard::WHITE: return "WHITE";
+        case cardsState::ColorCard::LOCOMOTIVE: return "LOCOMOTIVE";
+        case cardsState::ColorCard::UNKNOWN:
+        default:
+          return "UNKNOWN";
+      }
+    }
+
+    bool parsePayload(const std::string& payload, Json::Value& root, std::string& error)
+    {
+      error.clear();
+      if (payload.empty())
+      {
+        error = "Missing payload";
+        return false;
+      }
+      Json::CharReaderBuilder builder;
+      builder["collectComments"] = false;
+      std::string errs;
+      std::istringstream stream(payload);
+      if (!Json::parseFromStream(builder, stream, &root, &errs))
+      {
+        error = "Invalid payload: " + errs;
+        return false;
+      }
+      if (!root.isObject())
+      {
+        error = "Payload must be an object";
+        return false;
+      }
+      return true;
+    }
   }
 
   void TunnelResolveState::onEnter(std::shared_ptr<Engine> engine)
@@ -84,10 +160,13 @@ namespace engine
 
   EngineResult TunnelResolveState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)
   {
-    (void)command;
     if (!engine || !engine->stateMachine)
     {
       return buildError(engine, "Tunnel resolve: engine not initialized");
+    }
+    if (command.type != EngineCommandType::CMD_TUNNEL_COLOR)
+    {
+      return buildError(engine, "Tunnel resolve: command not allowed");
     }
 
     std::shared_ptr<state::State> state = engine->getState();
@@ -133,6 +212,24 @@ namespace engine
       return buildError(engine, "Tunnel resolve: insufficient resources");
     }
 
+    Json::Value root;
+    std::string error;
+    if (!parsePayload(command.payload, root, error))
+    {
+      return buildError(engine, error);
+    }
+
+    cardsState::ColorCard selected = cardsState::ColorCard::UNKNOWN;
+    if (root.isMember("color") && root["color"].isString())
+    {
+      selected = parseColorToken(root["color"].asString());
+    }
+    if (selected == cardsState::ColorCard::UNKNOWN || selected == cardsState::ColorCard::LOCOMOTIVE)
+    {
+      return buildError(engine, "Tunnel resolve: invalid color selection");
+    }
+    engine->context.pendingTunnel.color = cardToRoadColor(selected);
+
     std::shared_ptr<cardsState::SharedDeck<cardsState::WagonCard>> deck = cardsState->gameWagonCards;
     if (!deck || !deck->faceDownCards || !deck->trash)
     {
@@ -144,14 +241,23 @@ namespace engine
       return buildError(engine, "Tunnel resolve: not enough cards in deck");
     }
 
-    cardsState::ColorCard color = roadColorToCard(engine->context.pendingTunnel.color);
-    if (color == cardsState::ColorCard::UNKNOWN)
-    {
-      return buildError(engine, "Tunnel resolve: missing color selection");
-    }
+    EngineResult result;
+    result.ok = true;
+    result.error = "";
+    result.nextPhase = Phase::TUNNEL_RESOLVE;
+    addInfo(result, "Using color " + colorToString(selected) + " for claim.");
 
+    int baseLength = engine->context.pendingTunnel.baseLength;
     int extraRequired = 0;
     engine->context.pendingTunnel.revealed.clear();
+
+    std::shared_ptr<cardsState::PlayerCards> hand = player->getHand();
+    if (!hand)
+    {
+      return buildError(engine, "Tunnel resolve: missing hand");
+    }
+    int available = cardsState->countWagonCards(hand, selected, true);
+
     for (int i = 0; i < 3; ++i)
     {
       std::shared_ptr<cardsState::Card> removed = deck->faceDownCards->takeLastCard();
@@ -163,38 +269,55 @@ namespace engine
       engine->context.pendingTunnel.revealed.push_back(drawn);
       deck->trash->addCard(drawn);
 
-      if (drawn->getColor() == color || drawn->getColor() == cardsState::ColorCard::LOCOMOTIVE)
+      cardsState::ColorCard drawnColor = drawn->getColor();
+      std::string drawMessage = "Drew card " + colorToString(drawnColor) + ".";
+      if (drawnColor == selected || drawnColor == cardsState::ColorCard::LOCOMOTIVE)
       {
         ++extraRequired;
+        int totalNeeded = baseLength + extraRequired;
+        drawMessage += " Tunnel cost increased to " + std::to_string(totalNeeded) + ".";
+        addInfo(result, drawMessage);
+        if (totalNeeded > available)
+        {
+          break;
+        }
+      }
+      else
+      {
+        addInfo(result, drawMessage);
       }
     }
 
     engine->context.pendingTunnel.extraRequired = extraRequired;
-
-    int length = engine->context.pendingTunnel.baseLength;
-    int totalNeeded = length + extraRequired;
-    std::shared_ptr<cardsState::PlayerCards> hand = player->getHand();
-    if (!hand)
-    {
-      return buildError(engine, "Tunnel resolve: missing hand");
-    }
-
-    if (cardsState->countWagonCards(hand, color, true) < totalNeeded)
+    int totalNeeded = baseLength + extraRequired;
+    if (available < totalNeeded)
     {
       std::shared_ptr<GameState> nextState(new ConfirmationState());
       engine->stateMachine->transitionTo(engine, nextState);
-      return buildInfo(Phase::CONFIRMATION, "Tunnel failed: not enough cards");
+      result.nextPhase = Phase::CONFIRMATION;
+      addInfo(result, "Tunnel claim failed. Number of cards inferior to " + std::to_string(totalNeeded) + ".");
+      return result;
     }
 
-    if (!cardsState->discardWagonCards(hand, color, totalNeeded, true))
+    if (!cardsState->discardWagonCards(hand, selected, totalNeeded, true))
     {
       return buildError(engine, "Tunnel resolve: failed to discard cards");
     }
-    player->removeTrain(length);
+    player->removeTrain(baseLength);
     road->setOwner(player);
 
     std::shared_ptr<GameState> nextState(new ConfirmationState());
     engine->stateMachine->transitionTo(engine, nextState);
-    return buildInfo(Phase::CONFIRMATION, "Tunnel claimed");
+    result.nextPhase = Phase::CONFIRMATION;
+    addInfo(result, "Tunnel claimed.");
+    return result;
+  }
+
+  std::vector<EngineCommandType> TunnelResolveState::getAllowedCommands()
+  {
+    std::vector<EngineCommandType> allowed;
+    allowed.push_back(EngineCommandType::CMD_TUNNEL_COLOR);
+    allowed.push_back(EngineCommandType::CMD_EXIT);
+    return allowed;
   }
 }

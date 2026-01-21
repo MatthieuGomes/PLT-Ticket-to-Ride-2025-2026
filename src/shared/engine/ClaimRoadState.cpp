@@ -58,6 +58,15 @@ namespace engine
       return result;
     }
 
+    void addInfo(EngineResult& result, const std::string& message)
+    {
+      EngineEvent event;
+      event.type = EngineEventType::INFO;
+      event.message = message;
+      event.payload = "";
+      result.events.push_back(event);
+    }
+
     bool parsePayload(const std::string& payload, Json::Value& root, std::string& error)
     {
       error.clear();
@@ -245,29 +254,20 @@ namespace engine
       engine->context.pendingTunnel.baseLength = road->getLength();
       engine->context.pendingTunnel.extraRequired = 0;
       engine->context.pendingTunnel.revealed.clear();
-
-      cardsState::ColorCard selected = cardsState::ColorCard::UNKNOWN;
-      if (root.isMember("color") && root["color"].isString())
-      {
-        selected = parseColorToken(root["color"].asString());
-      }
-      if (selected == cardsState::ColorCard::UNKNOWN)
-      {
-        selected = roadColorToCard(road->getColor());
-      }
-      if (selected == cardsState::ColorCard::UNKNOWN)
-      {
-        selected = pickBestColor(*cardsState, hand);
-      }
-      if (selected == cardsState::ColorCard::UNKNOWN || selected == cardsState::ColorCard::LOCOMOTIVE)
-      {
-        return buildError(engine, "Claim road: missing tunnel color selection");
-      }
-      engine->context.pendingTunnel.color = static_cast<mapState::RoadColor>(selected);
+      engine->context.pendingTunnel.color = mapState::RoadColor::UNKNOWN;
 
       std::shared_ptr<GameState> nextState(new TunnelResolveState());
       engine->stateMachine->transitionTo(engine, nextState);
-      return engine->stateMachine->handleCommand(engine, command);
+      EngineResult result;
+      result.ok = true;
+      result.error = "";
+      result.nextPhase = Phase::TUNNEL_RESOLVE;
+
+      std::string stationA = road->getStationA() ? road->getStationA()->getName() : "?";
+      std::string stationB = road->getStationB() ? road->getStationB()->getName() : "?";
+      addInfo(result, "Claim of tunnel " + stationA + "-" + stationB + " started");
+      addInfo(result, "Select your color.");
+      return result;
     }
 
     std::shared_ptr<GameState> nextState(new RoadResolveState());

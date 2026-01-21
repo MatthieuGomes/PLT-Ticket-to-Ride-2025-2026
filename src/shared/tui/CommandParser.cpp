@@ -97,6 +97,9 @@ ParseResult CommandParser::parse(const std::string& input) {
   if (!tokens.empty() && tokens[0] == "take") {
     action = "take";
   }
+  if (!tokens.empty() && (tokens[0] == "color" || tokens[0] == "colour")) {
+    action = "color";
+  }
 
   if (action.empty()) {
     if (tokens.empty()) {
@@ -154,6 +157,9 @@ ParseResult CommandParser::parse(const std::string& input) {
     if (tokens.size() >= 3) {
       message.payload["color"] = tokens[2];
     }
+  }
+  if (action == "color" && tokens.size() >= 2) {
+    message.payload["color"] = tokens[1];
   }
 
   result.ok = true;
