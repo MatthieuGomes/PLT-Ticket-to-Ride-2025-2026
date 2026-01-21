@@ -103,7 +103,7 @@ std::string extractAction(const std::string& json) {
   return json.substr(value_start, end - value_start);
 }
 
-bool pollChar(char& ch) {
+  bool pollChar(char& ch) {
   // Non-blocking single character read from stdin.
   fd_set readfds;
   FD_ZERO(&readfds);
@@ -125,8 +125,29 @@ bool pollChar(char& ch) {
   }
   ch = buffer;
   return true;
-}
+  }
 
+  std::string getActivePlayerName(const std::shared_ptr<engine::Engine>& engine) {
+    if (!engine) {
+      return "Player";
+    }
+    std::shared_ptr<state::State> state = engine->getState();
+    if (!state) {
+      return "Player";
+    }
+    std::vector<std::shared_ptr<playersState::Player>> players = state->players.getPlayers();
+    if (players.empty()) {
+      return "Player";
+    }
+    int index = engine->context.currentPlayer;
+    if (index < 0 || index >= static_cast<int>(players.size())) {
+      index = 0;
+    }
+    if (players[index]) {
+      return players[index]->getName();
+    }
+    return "Player";
+  }
 }  // namespace
 
 TUIManager::TUIManager(Terminal* terminal, int cols, int rows)
@@ -233,6 +254,10 @@ void TUIManager::init() {
         kInfoPanelMaxMessages);
     infopanel->setTitle("InfoPanel");
     infopanel->addMessage("Welcome to Ticket to Ride!");
+    if (engine) {
+      std::string activeName = getActivePlayerName(engine);
+      infopanel->addMessage("It's " + activeName + "'s turn!");
+    }
   }
   if (!commandinput) {
     commandinput = new CommandInput(

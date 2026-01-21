@@ -18,8 +18,11 @@ namespace engine
       return;
     }
 
-    std::shared_ptr<state::State> newState(new state::State());
-    engine->setState(newState);
+    if (!engine->getState())
+    {
+      std::shared_ptr<state::State> newState(new state::State());
+      engine->setState(newState);
+    }
     engine->phase = Phase::SETUP;
     engine->context.currentPlayer = kInitialPlayerIndex;
 
