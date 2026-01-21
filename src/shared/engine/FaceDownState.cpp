@@ -78,13 +78,30 @@ namespace engine
 
   EngineResult FaceDownState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)
   {
-    (void)command;
     if (!engine)
     {
       return buildError(engine, "Face-down draw: no engine");
     }
+    if (command.type == EngineCommandType::CMD_DRAW_WAGON_FACEUP)
+    {
+      if (engine->stateMachine)
+      {
+        std::shared_ptr<GameState> nextState(new DrawWagonCardState());
+        engine->stateMachine->transitionTo(engine, nextState);
+        return engine->stateMachine->handleCommand(engine, command);
+      }
+    }
+    if (command.type != EngineCommandType::CMD_DRAW_WAGON_FACEDOWN)
+    {
+      return buildError(engine, "Face-down draw: command not allowed");
+    }
     if (engine->context.drawSource == 1)
     {
+      if (engine->stateMachine)
+      {
+        std::shared_ptr<GameState> nextState(new DrawWagonCardState());
+        engine->stateMachine->transitionTo(engine, nextState);
+      }
       return buildError(engine, "Draw blocked: can't draw from face-up and face-down piles at the same turn.");
     }
     std::shared_ptr<state::State> state = engine->getState();
