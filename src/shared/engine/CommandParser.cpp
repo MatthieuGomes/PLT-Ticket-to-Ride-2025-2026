@@ -9,6 +9,7 @@
 #include "parser/EventMessage.h"
 #include "parser/ResultMessage.h"
 
+#include <cctype>
 #include <json/json.h>
 
 namespace engine
@@ -16,6 +17,62 @@ namespace engine
   namespace
   {
     const int kDefaultVersion = 1;
+
+    std::string toLower(const std::string& value)
+    {
+      std::string lowered = value;
+      for (std::size_t i = 0; i < lowered.size(); ++i)
+      {
+        lowered[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(lowered[i])));
+      }
+      return lowered;
+    }
+
+    EngineCommandType mapCommandType(const std::string& name)
+    {
+      const std::string lowered = toLower(name);
+      if (lowered == "exit" || lowered == "quit")
+      {
+        return EngineCommandType::CMD_EXIT;
+      }
+      if (lowered == "help")
+      {
+        return EngineCommandType::CMD_HELP;
+      }
+      if (lowered == "take" || lowered == "take_road")
+      {
+        return EngineCommandType::CMD_TAKE_ROAD;
+      }
+      if (lowered == "draw_destination")
+      {
+        return EngineCommandType::CMD_DRAW_DESTINATION;
+      }
+      if (lowered == "draw_faceup")
+      {
+        return EngineCommandType::CMD_DRAW_WAGON_FACEUP;
+      }
+      if (lowered == "draw_facedown")
+      {
+        return EngineCommandType::CMD_DRAW_WAGON_FACEDOWN;
+      }
+      if (lowered == "select_destination")
+      {
+        return EngineCommandType::CMD_SELECT_DESTINATION;
+      }
+      if (lowered == "claim_station")
+      {
+        return EngineCommandType::CMD_CLAIM_STATION;
+      }
+      if (lowered == "borrow")
+      {
+        return EngineCommandType::CMD_BORROW_ROAD;
+      }
+      if (lowered == "confirm")
+      {
+        return EngineCommandType::CMD_CONFIRM_ENDTURN;
+      }
+      return EngineCommandType::CMD_UNKNOWN;
+    }
 
     std::string serializePayload(const Json::Value& payload)
     {
@@ -29,6 +86,7 @@ namespace engine
     {
       EngineCommand command;
       command.name = message.name;
+      command.type = mapCommandType(message.name);
       command.payload = serializePayload(message.payload);
       return command;
     }
@@ -59,6 +117,7 @@ namespace engine
       message.error = result.error;
       message.payload = Json::Value(Json::objectValue);
       message.payload["nextPhase"] = static_cast<int>(result.nextPhase);
+      message.payload["exit"] = (result.nextPhase == Phase::EXIT);
       message.events.clear();
 
       for (std::size_t i = 0; i < result.events.size(); ++i)
@@ -151,6 +210,28 @@ namespace engine
 
   EngineResult CommandParser::apply(std::shared_ptr<Engine> engine, const EngineCommand& command)
   {
+    if (command.type == EngineCommandType::CMD_EXIT || command.name == "exit")
+    {
+      EngineResult result;
+      result.ok = true;
+      result.error = "";
+      result.nextPhase = Phase::EXIT;
+
+      EngineEvent event;
+      event.type = EngineEventType::INFO;
+      event.message = "Exit requested";
+      event.payload = "";
+      result.events.push_back(event);
+
+      if (engine)
+      {
+        engine->phase = Phase::EXIT;
+        engine->stateMachine.reset();
+        engine->state.reset();
+      }
+      return result;
+    }
+
     if (!engine)
     {
       return buildErrorResult("No engine instance", Phase::SETUP);

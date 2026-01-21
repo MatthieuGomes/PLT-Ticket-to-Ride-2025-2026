@@ -408,6 +408,11 @@ void TUIManager::handleInput(const std::string& input) {
             infopanel->addMessage(event.message);
           }
         }
+        if (response.payload.isObject() && response.payload.isMember("exit") && response.payload["exit"].asBool()) {
+          infopanel->addMessage("Engine exit confirmed.");
+          running = false;
+          engine.reset();
+        }
       }
     }
   }

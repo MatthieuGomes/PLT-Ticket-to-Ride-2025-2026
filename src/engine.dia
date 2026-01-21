@@ -8754,7 +8754,7 @@
       <dia:attribute name="attributes">
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#UNKNOWN#</dia:string>
+            <dia:string>#CMD_UNKNOWN#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8777,7 +8777,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#HELP#</dia:string>
+            <dia:string>#CMD_HELP#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8800,7 +8800,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#EXIT#</dia:string>
+            <dia:string>#CMD_EXIT#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8823,7 +8823,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#TAKE_ROAD#</dia:string>
+            <dia:string>#CMD_TAKE_ROAD#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8846,7 +8846,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#DRAW_DESTINATION#</dia:string>
+            <dia:string>#CMD_DRAW_DESTINATION#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8869,7 +8869,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#DRAW_WAGON_FACEUP#</dia:string>
+            <dia:string>#CMD_DRAW_WAGON_FACEUP#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8892,7 +8892,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#DRAW_WAGON_FACEDOWN#</dia:string>
+            <dia:string>#CMD_DRAW_WAGON_FACEDOWN#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8915,7 +8915,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#SELECT_DESTINATION#</dia:string>
+            <dia:string>#CMD_SELECT_DESTINATION#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8938,7 +8938,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#CLAIM_STATION#</dia:string>
+            <dia:string>#CMD_CLAIM_STATION#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8961,7 +8961,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#BORROW_ROAD#</dia:string>
+            <dia:string>#CMD_BORROW_ROAD#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -8984,7 +8984,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#CONFIRM_ENDTURN#</dia:string>
+            <dia:string>#CMD_CONFIRM_ENDTURN#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>##</dia:string>
@@ -10064,6 +10064,59 @@
         <dia:connection handle="1" to="O84" connection="6"/>
       </dia:connections>
       <dia:childnode parent="O0"/>
+    </dia:object>
+  <dia:object type="UML - Dependency" version="1" id="O91">
+      <dia:attribute name="obj_pos">
+        <dia:point val="41.67,12.05"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="41.62,7.25;58.45,12.1"/>
+      </dia:attribute>
+      <dia:attribute name="meta">
+        <dia:composite type="dict"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="41.67,12.05"/>
+        <dia:point val="49.635,12.05"/>
+        <dia:point val="49.635,7.7"/>
+        <dia:point val="58,7.7"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="draw_arrow">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="text_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="text_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="text_colour">
+        <dia:color val="#000000ff"/>
+      </dia:attribute>
+      <dia:attribute name="line_width">
+        <dia:real val="0.10000000000000001"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000ff"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O11" connection="9"/>
+        <dia:connection handle="1" to="O78" connection="3"/>
+      </dia:connections>
     </dia:object>
   </dia:layer>
 </dia:diagram>

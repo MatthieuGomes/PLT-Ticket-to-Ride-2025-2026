@@ -34,4 +34,10 @@ namespace engine
 
     return result;
   }
+
+  std::vector<EngineCommandType> GameState::getAllowedCommands()
+  {
+    std::vector<EngineCommandType> commands;
+    return commands;
+  }
 }
