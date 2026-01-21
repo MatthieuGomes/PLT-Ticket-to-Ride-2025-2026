@@ -1,9 +1,32 @@
 #include "PlayerTurnState.h"
 
+#include "DrawWagonCardState.h"
 #include "Engine.h"
+#include "EngineCommand.h"
+#include "EngineEvent.h"
+#include "StateMachine.h"
 
 namespace engine
 {
+  namespace
+  {
+    EngineResult buildError(std::shared_ptr<Engine> engine, const std::string& message)
+    {
+      EngineResult result;
+      result.ok = false;
+      result.error = message;
+      result.nextPhase = engine ? engine->phase : Phase::SETUP;
+
+      EngineEvent event;
+      event.type = EngineEventType::ERROR;
+      event.message = message;
+      event.payload = "";
+      result.events.push_back(event);
+
+      return result;
+    }
+  }
+
   void PlayerTurnState::onEnter(std::shared_ptr<Engine> engine)
   {
     if (!engine)
@@ -17,6 +40,26 @@ namespace engine
   {
     std::vector<EngineCommandType> commands;
     commands.push_back(EngineCommandType::CMD_EXIT);
+    commands.push_back(EngineCommandType::CMD_DRAW_WAGON_FACEUP);
+    commands.push_back(EngineCommandType::CMD_DRAW_WAGON_FACEDOWN);
     return commands;
+  }
+
+  EngineResult PlayerTurnState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)
+  {
+    if (!engine || !engine->stateMachine)
+    {
+      return buildError(engine, "Player turn: engine not initialized");
+    }
+
+    if (command.type == EngineCommandType::CMD_DRAW_WAGON_FACEUP ||
+        command.type == EngineCommandType::CMD_DRAW_WAGON_FACEDOWN)
+    {
+      std::shared_ptr<GameState> nextState(new DrawWagonCardState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      return engine->stateMachine->handleCommand(engine, command);
+    }
+
+    return buildError(engine, "Player turn: command not allowed");
   }
 }
