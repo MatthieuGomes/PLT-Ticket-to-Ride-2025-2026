@@ -14,6 +14,7 @@
 #include "cardsState/WagonCard.h"
 #include "mapState/MapState.h"
 #include "mapState/Road.h"
+#include "mapState/Tunnel.h"
 #include "playersState/Player.h"
 
 namespace engine
@@ -117,6 +118,19 @@ namespace engine
     if (!road)
     {
       return buildError(engine, "Tunnel resolve: no pending tunnel");
+    }
+    if (!std::dynamic_pointer_cast<mapState::Tunnel>(road))
+    {
+      return buildError(engine, "Tunnel resolve: pending road is not a tunnel");
+    }
+
+    if (!playersState::PlayersState::isRoadClaimable(mapState, road, player))
+    {
+      return buildError(engine, "Tunnel resolve: road not claimable");
+    }
+    if (!player->isRoadBuildable(mapState, road))
+    {
+      return buildError(engine, "Tunnel resolve: insufficient resources");
     }
 
     std::shared_ptr<cardsState::SharedDeck<cardsState::WagonCard>> deck = cardsState->gameWagonCards;

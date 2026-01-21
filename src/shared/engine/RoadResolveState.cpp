@@ -1,17 +1,15 @@
-#include "ClaimRoadState.h"
+#include "RoadResolveState.h"
 
 #include <json/json.h>
 
 #include <cctype>
-
 #include <sstream>
 
+#include "ConfirmationState.h"
 #include "Engine.h"
 #include "EngineCommand.h"
 #include "EngineEvent.h"
-#include "RoadResolveState.h"
 #include "StateMachine.h"
-#include "TunnelResolveState.h"
 #include "cardsState/CardsState.h"
 #include "cardsState/ColorCard.h"
 #include "mapState/Ferry.h"
@@ -119,9 +117,9 @@ namespace engine
       return cardsState::ColorCard::UNKNOWN;
     }
 
-    cardsState::ColorCard roadColorToCard(mapState::RoadColor color)
+    cardsState::ColorCard roadColorToCard(mapState::RoadColor roadColor)
     {
-      switch (color)
+      switch (roadColor)
       {
         case mapState::RoadColor::RED: return cardsState::ColorCard::RED;
         case mapState::RoadColor::BLUE: return cardsState::ColorCard::BLUE;
@@ -166,24 +164,23 @@ namespace engine
     }
   }
 
-  void ClaimRoadState::onEnter(std::shared_ptr<Engine> engine)
+  void RoadResolveState::onEnter(std::shared_ptr<Engine> engine)
   {
-    if (!engine)
+    if (engine)
     {
-      return;
+      engine->phase = Phase::ROAD_RESOLVE;
     }
-    engine->phase = Phase::CLAIM_ROAD;
   }
 
-  EngineResult ClaimRoadState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)
+  EngineResult RoadResolveState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)
   {
     if (!engine || !engine->stateMachine)
     {
-      return buildError(engine, "Claim road: engine not initialized");
+      return buildError(engine, "Road resolve: engine not initialized");
     }
     if (command.type != EngineCommandType::CMD_TAKE_ROAD)
     {
-      return buildError(engine, "Claim road: command not allowed");
+      return buildError(engine, "Road resolve: command not allowed");
     }
 
     Json::Value root;
@@ -196,82 +193,85 @@ namespace engine
     int roadId = readRoadId(root);
     if (roadId < 0)
     {
-      return buildError(engine, "Claim road: missing road id");
+      return buildError(engine, "Road resolve: missing road id");
     }
 
     std::shared_ptr<state::State> state = engine->getState();
     if (!state)
     {
-      return buildError(engine, "Claim road: missing state");
+      return buildError(engine, "Road resolve: missing state");
     }
     std::shared_ptr<mapState::MapState> mapState(state, &state->map);
-    if (!mapState)
-    {
-      return buildError(engine, "Claim road: missing map");
-    }
     std::shared_ptr<cardsState::CardsState> cardsState(state, &state->cards);
-    if (!cardsState)
+    if (!mapState || !cardsState)
     {
-      return buildError(engine, "Claim road: missing cards state");
+      return buildError(engine, "Road resolve: missing map/cards");
     }
 
     std::vector<std::shared_ptr<playersState::Player>> players = state->players.getPlayers();
     int playerIndex = engine->context.currentPlayer;
     if (players.empty() || playerIndex < 0 || playerIndex >= static_cast<int>(players.size()))
     {
-      return buildError(engine, "Claim road: invalid player");
+      return buildError(engine, "Road resolve: invalid player");
     }
     std::shared_ptr<playersState::Player> player = players[playerIndex];
     if (!player)
     {
-      return buildError(engine, "Claim road: missing player");
+      return buildError(engine, "Road resolve: missing player");
     }
 
     std::shared_ptr<mapState::Road> road = mapState->getRoadByID(roadId);
     if (!road)
     {
-      return buildError(engine, "Claim road: road not found");
+      return buildError(engine, "Road resolve: road not found");
+    }
+    if (std::dynamic_pointer_cast<mapState::Tunnel>(road))
+    {
+      return buildError(engine, "Road resolve: tunnel requires tunnel resolve");
+    }
+
+    if (!playersState::PlayersState::isRoadClaimable(mapState, road, player))
+    {
+      return buildError(engine, "Road resolve: road not claimable");
+    }
+    if (!player->isRoadBuildable(mapState, road))
+    {
+      return buildError(engine, "Road resolve: insufficient resources");
     }
 
     std::shared_ptr<cardsState::PlayerCards> hand = player->getHand();
     if (!hand)
     {
-      return buildError(engine, "Claim road: missing player hand");
+      return buildError(engine, "Road resolve: missing player hand");
     }
 
-    if (std::dynamic_pointer_cast<mapState::Tunnel>(road))
+    cardsState::ColorCard roadColor = roadColorToCard(road->getColor());
+    if (roadColor == cardsState::ColorCard::UNKNOWN)
     {
-      engine->context.pendingTunnel.route = road;
-      engine->context.pendingTunnel.baseLength = road->getLength();
-      engine->context.pendingTunnel.extraRequired = 0;
-      engine->context.pendingTunnel.revealed.clear();
-
-      cardsState::ColorCard selected = cardsState::ColorCard::UNKNOWN;
       if (root.isMember("color") && root["color"].isString())
       {
-        selected = parseColorToken(root["color"].asString());
+        roadColor = parseColorToken(root["color"].asString());
       }
-      if (selected == cardsState::ColorCard::UNKNOWN)
-      {
-        selected = roadColorToCard(road->getColor());
-      }
-      if (selected == cardsState::ColorCard::UNKNOWN)
-      {
-        selected = pickBestColor(*cardsState, hand);
-      }
-      if (selected == cardsState::ColorCard::UNKNOWN || selected == cardsState::ColorCard::LOCOMOTIVE)
-      {
-        return buildError(engine, "Claim road: missing tunnel color selection");
-      }
-      engine->context.pendingTunnel.color = static_cast<mapState::RoadColor>(selected);
-
-      std::shared_ptr<GameState> nextState(new TunnelResolveState());
-      engine->stateMachine->transitionTo(engine, nextState);
-      return engine->stateMachine->handleCommand(engine, command);
+    }
+    if (roadColor == cardsState::ColorCard::UNKNOWN)
+    {
+      roadColor = pickBestColor(*cardsState, hand);
+    }
+    if (roadColor == cardsState::ColorCard::UNKNOWN)
+    {
+      return buildError(engine, "Road resolve: missing color selection");
     }
 
-    std::shared_ptr<GameState> nextState(new RoadResolveState());
+    int length = road->getLength();
+    if (!cardsState->discardWagonCards(hand, roadColor, length, true))
+    {
+      return buildError(engine, "Road resolve: unable to discard cards");
+    }
+    player->removeTrain(length);
+    road->setOwner(player);
+
+    std::shared_ptr<GameState> nextState(new ConfirmationState());
     engine->stateMachine->transitionTo(engine, nextState);
-    return engine->stateMachine->handleCommand(engine, command);
+    return buildInfo(Phase::CONFIRMATION, "Road claimed");
   }
 }
