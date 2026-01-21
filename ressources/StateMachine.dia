@@ -88,6 +88,7 @@
       </dia:composite>
     </dia:attribute>
   </dia:diagramdata>
+  <dia:layer name="Segundo plano" visible="true" connectable="false"/>
   <dia:layer name="Segundo plano" visible="true" connectable="true" active="true">
     <dia:object type="Flowchart - Ellipse" version="0" id="O0">
       <dia:attribute name="obj_pos">
@@ -2229,7 +2230,7 @@
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#End Turn#</dia:string>
+            <dia:string>#EndTurn#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -3309,7 +3310,7 @@
         <dia:point val="49.4079,43.6721"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="32.1382,20.6;51.05,44.5121"/>
+        <dia:rectangle val="32.1382,20.24;51.05,44.5121"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -3391,7 +3392,7 @@
         <dia:point val="28,-3.49832"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="3.95,-4.29832;30.05,93.6645"/>
+        <dia:rectangle val="3.95,-4.76;30.05,93.6645"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -3473,7 +3474,7 @@
         <dia:point val="28.1868,21.612"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="7.52,21.562;30.2608,92.5836"/>
+        <dia:rectangle val="7.52,21.24;30.2608,92.5836"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -3555,7 +3556,7 @@
         <dia:point val="38.4314,-6.57982"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="38.3814,-6.62982;44.5253,-0.366818"/>
+        <dia:rectangle val="38.3814,-6.62982;44.5254,-0.36682"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="38.4314,-6.57982"/>
@@ -3805,7 +3806,7 @@
         <dia:point val="33.5389,14.6113"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="33.4889,13.8113;37.05,15.4513"/>
+        <dia:rectangle val="33.4682,13.8113;37.05,15.4513"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -4043,7 +4044,7 @@
         <dia:point val="19.9608,30.9798"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="19.9108,23.5605;28.9868,31.8198"/>
+        <dia:rectangle val="19.9108,23.0134;28.9868,31.8198"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
