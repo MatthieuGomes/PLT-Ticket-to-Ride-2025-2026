@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <string>
+#include <vector>
 
 namespace tui {
 
@@ -63,17 +64,57 @@ ParseResult CommandParser::parse(const std::string& input) {
 
   std::string action;
   std::string args;
+  std::string lowered = toLower(trimmed);
 
-  const std::size_t space = trimmed.find(' ');
-  if (space == std::string::npos) {
-    action = toLower(trimmed);
-  } else {
-    action = toLower(trimmed.substr(0, space));
-    args = trim(trimmed.substr(space + 1));
+  std::vector<std::string> tokens;
+  std::string current;
+  for (std::size_t i = 0; i < lowered.size(); ++i) {
+    char ch = lowered[i];
+    if (std::isspace(static_cast<unsigned char>(ch)) != 0) {
+      if (!current.empty()) {
+        tokens.push_back(current);
+        current.clear();
+      }
+    } else {
+      current.push_back(ch);
+    }
+  }
+  if (!current.empty()) {
+    tokens.push_back(current);
+  }
+
+  if (!tokens.empty() && tokens[0] == "draw") {
+    if (tokens.size() >= 2 && (tokens[1] == "dest" || tokens[1] == "destination" || tokens[1] == "destcard")) {
+      action = "draw_destination";
+    } else if (tokens.size() >= 3 && tokens[1] == "card") {
+      if (tokens[2] == "faceup") {
+        action = "draw_faceup";
+      } else if (tokens[2] == "facedown") {
+        action = "draw_facedown";
+      }
+    }
+  }
+
+  if (action.empty()) {
+    if (tokens.empty()) {
+      return result;
+    }
+    action = tokens[0];
   }
 
   if (action == "quit") {
     action = "exit";
+  }
+
+  if (tokens.size() > 1) {
+    std::string rebuilt;
+    for (std::size_t i = 1; i < tokens.size(); ++i) {
+      if (i > 1) {
+        rebuilt.push_back(' ');
+      }
+      rebuilt += tokens[i];
+    }
+    args = rebuilt;
   }
 
   parser::CommandMessage message;
@@ -84,6 +125,18 @@ ParseResult CommandParser::parse(const std::string& input) {
   message.payload = Json::Value(Json::objectValue);
   if (!args.empty()) {
     message.payload["args"] = args;
+  }
+  if (action == "draw_faceup" && tokens.size() >= 4) {
+    const std::string& indexToken = tokens[3];
+    int index = 0;
+    try {
+      index = std::stoi(indexToken);
+    } catch (...) {
+      index = 0;
+    }
+    if (index > 0) {
+      message.payload["index"] = index;
+    }
   }
 
   result.ok = true;

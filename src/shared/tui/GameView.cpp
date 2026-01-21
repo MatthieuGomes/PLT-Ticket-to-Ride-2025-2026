@@ -943,6 +943,30 @@ void GameView::drawContent(Terminal& term) {
           ++currentRow;
         }
       }
+
+      if (currentRow >= endRow) {
+        continue;
+      }
+      if (isLocal && cardState && cardState->gameWagonCards) {
+        if (cardState->gameWagonCards->faceUpCards) {
+          writeClampedLine(term, currentRow, col, columnWidth, "Face up:");
+          ++currentRow;
+          if (currentRow < endRow) {
+            drawWagonBlocks(term, currentRow, col, columnWidth,
+                            cardState->gameWagonCards->faceUpCards->cards,
+                            fgColor, bgColor);
+            ++currentRow;
+          }
+        }
+        if (currentRow < endRow && cardState->gameWagonCards->faceDownCards) {
+          const int faceDownCount =
+              static_cast<int>(cardState->gameWagonCards->faceDownCards->cards.size());
+          std::ostringstream faceDownLine;
+          faceDownLine << "Face down: " << faceDownCount;
+          writeClampedLine(term, currentRow, col, columnWidth, faceDownLine.str());
+          ++currentRow;
+        }
+      }
     }
     return;
   }

@@ -438,6 +438,12 @@ void TUIManager::handleInput(const std::string& input) {
           running = false;
           engine.reset();
         }
+        if (gameview) {
+          gameview->requestRedraw();
+        }
+        if (statusbar) {
+          statusbar->requestRedraw();
+        }
       }
     }
   }
