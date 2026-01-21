@@ -63,6 +63,7 @@ const int kTableMinLengthWidth = 2;
 const int kTableMinColorWidth = 3;
 const int kTableMinOwnerWidth = 5;
 const int kTableMinLocsWidth = 4;
+const int kPlayerFooterLines = 5;
 
 Color roadColorToAnsi(mapState::RoadColor color) {
   switch (color) {
@@ -767,6 +768,10 @@ void GameView::drawContent(Terminal& term) {
     }
 
     int playerCount = static_cast<int>(playerState->players.size());
+    int playerEndRow = endRow - kPlayerFooterLines;
+    if (playerEndRow < row) {
+      playerEndRow = row;
+    }
     int maxPlayers = contentWidth / kMinPlayerColumnWidth;
     if (maxPlayers < 1) {
       maxPlayers = 1;
@@ -854,7 +859,7 @@ void GameView::drawContent(Terminal& term) {
       const bool isLocal = (player == displayPlayers[0]);
       const bool showFullDetails = (!compactOtherPlayers) || isLocal;
 
-      if (currentRow >= endRow) {
+      if (currentRow >= playerEndRow) {
         continue;
       }
       std::ostringstream scoreLine;
@@ -862,7 +867,7 @@ void GameView::drawContent(Terminal& term) {
       writeClampedLine(term, currentRow, col, columnWidth, scoreLine.str());
       ++currentRow;
 
-      if (currentRow >= endRow) {
+      if (currentRow >= playerEndRow) {
         continue;
       }
       std::ostringstream wagonsLine;
@@ -870,7 +875,7 @@ void GameView::drawContent(Terminal& term) {
       writeClampedLine(term, currentRow, col, columnWidth, wagonsLine.str());
       ++currentRow;
 
-      if (currentRow >= endRow) {
+      if (currentRow >= playerEndRow) {
         continue;
       }
       std::ostringstream stationsLine;
@@ -878,20 +883,20 @@ void GameView::drawContent(Terminal& term) {
       writeClampedLine(term, currentRow, col, columnWidth, stationsLine.str());
       ++currentRow;
 
-      if (!showFullDetails || currentRow >= endRow) {
+      if (!showFullDetails || currentRow >= playerEndRow) {
         continue;
       }
       writeClampedLine(term, currentRow, col, columnWidth, "Hand:");
       ++currentRow;
 
       std::shared_ptr<cardsState::PlayerCards> hand = player->getHand();
-      if (currentRow < endRow && hand && hand->wagonCards) {
+      if (currentRow < playerEndRow && hand && hand->wagonCards) {
         drawWagonBlocks(term, currentRow, col, columnWidth, hand->wagonCards->cards,
                         fgColor, bgColor);
         ++currentRow;
       }
 
-      if (currentRow >= endRow) {
+      if (currentRow >= playerEndRow) {
         continue;
       }
       writeClampedLine(term, currentRow, col, columnWidth, "Destinations:");
@@ -900,7 +905,7 @@ void GameView::drawContent(Terminal& term) {
       if (hand && hand->destinationCards) {
         const std::vector<std::shared_ptr<cardsState::DestinationCard>> destCards =
             hand->destinationCards->cards;
-        for (std::size_t j = 0; j < destCards.size() && currentRow < endRow; ++j) {
+        for (std::size_t j = 0; j < destCards.size() && currentRow < playerEndRow; ++j) {
           if (!destCards[j]) {
             continue;
           }
@@ -944,27 +949,29 @@ void GameView::drawContent(Terminal& term) {
         }
       }
 
-      if (currentRow >= endRow) {
-        continue;
+    }
+
+    const int footerStart = endRow - kPlayerFooterLines;
+    if (footerStart >= row && footerStart < endRow) {
+      std::string separator(contentWidth, '-');
+      writeClampedLine(term, footerStart, x + kFrameOffset, contentWidth, separator);
+      if (footerStart + 1 < endRow) {
+        writeClampedLine(term, footerStart + 1, x + kFrameOffset, contentWidth, "Card info:");
       }
-      if (isLocal && cardState && cardState->gameWagonCards) {
-        if (cardState->gameWagonCards->faceUpCards) {
-          writeClampedLine(term, currentRow, col, columnWidth, "Face up:");
-          ++currentRow;
-          if (currentRow < endRow) {
-            drawWagonBlocks(term, currentRow, col, columnWidth,
-                            cardState->gameWagonCards->faceUpCards->cards,
-                            fgColor, bgColor);
-            ++currentRow;
-          }
+      if (cardState && cardState->gameWagonCards) {
+        if (footerStart + 2 < endRow) {
+          writeClampedLine(term, footerStart + 2, x + kFrameOffset, contentWidth, "Face-up cards:");
         }
-        if (currentRow < endRow && cardState->gameWagonCards->faceDownCards) {
+        if (footerStart + 3 < endRow && cardState->gameWagonCards->faceUpCards) {
+          drawWagonBlocks(term, footerStart + 3, x + kFrameOffset, contentWidth,
+                          cardState->gameWagonCards->faceUpCards->cards, fgColor, bgColor);
+        }
+        if (footerStart + 4 < endRow && cardState->gameWagonCards->faceDownCards) {
           const int faceDownCount =
               static_cast<int>(cardState->gameWagonCards->faceDownCards->cards.size());
           std::ostringstream faceDownLine;
           faceDownLine << "Face down: " << faceDownCount;
-          writeClampedLine(term, currentRow, col, columnWidth, faceDownLine.str());
-          ++currentRow;
+          writeClampedLine(term, footerStart + 4, x + kFrameOffset, contentWidth, faceDownLine.str());
         }
       }
     }
