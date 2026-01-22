@@ -257,6 +257,15 @@ namespace engine
       return buildError(engine, "Tunnel resolve: missing hand");
     }
     int available = cardsState->countWagonCards(hand, selected, true);
+    if (available < baseLength)
+    {
+      std::shared_ptr<GameState> nextState(new ConfirmationState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      result.nextPhase = Phase::CONFIRMATION;
+      addInfo(result, "Tunnel claim failed. Number of cards (" + std::to_string(available)
+          + ") inferior to " + std::to_string(baseLength) + ".");
+      return result;
+    }
 
     for (int i = 0; i < 3; ++i)
     {
@@ -295,7 +304,8 @@ namespace engine
       std::shared_ptr<GameState> nextState(new ConfirmationState());
       engine->stateMachine->transitionTo(engine, nextState);
       result.nextPhase = Phase::CONFIRMATION;
-      addInfo(result, "Tunnel claim failed. Number of cards inferior to " + std::to_string(totalNeeded) + ".");
+      addInfo(result, "Tunnel claim failed. Number of cards (" + std::to_string(available)
+          + ") inferior to " + std::to_string(totalNeeded) + ".");
       return result;
     }
 
