@@ -1239,6 +1239,20 @@
             "points": 5,
             "isLong": false,
             "completed": false
+          },
+          {
+          "stationA": "sarajevo",
+          "stationB": "sevastopol",
+          "points": 8,
+          "isLong": false,
+          "completed": false
+          },
+          {
+          "stationA": "brest",
+          "stationB": "petrograd",
+          "points": 20,
+          "isLong": true,
+          "completed": false
           }
         ],
         "wagonCards": [
