@@ -88,6 +88,7 @@ This document records the current engine state machine definitions, valid comman
 Commands are sent from the TUI and interpreted by the engine:
 
 - `DRAW DEST` → DestinationCard
+- `SELECT <number>` → DestinationChoice
 - `DRAW CARD FACEUP <index>` → FaceUp
 - `DRAW CARD FACEDOWN` → FaceDown
 - `TAKE <stationA>-<stationB> [roadId]` → ClaimRoad
@@ -118,7 +119,7 @@ Commands are sent from the TUI and interpreted by the engine:
 | PlayerTurn | BORROW ROAD | BorrowRoad |
 | PlayerTurn | END TURN | Confirmation |
 | DestinationCard | Draw complete | DestinationChoice |
-| DestinationChoice | Selection complete | Confirmation |
+| DestinationChoice | SELECT <number> | Confirmation |
 | FaceUp | Draw complete | Confirmation |
 | FaceDown | Draw complete | Confirmation |
 | ClaimRoad | Tunnel | TunnelResolve |
