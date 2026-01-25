@@ -1,137 +1,237 @@
-# Engine State Machine (Draft)
+# Engine State Machine (Current)
 
-This document records the current engine state machine definitions, valid commands, and transition table.
+This document describes the current engine implementation (code + UML) and the runtime flow between TUI and engine.
 
-## State Definitions
+## 1) Architecture Overview
 
-**Intro**
-- Displays the game title and entry menu.
-- Transitions: `Setup`, `PrintInstructions`, `Exit`.
+The engine is a state machine that receives JSON commands from the TUI, validates them, applies game logic to the affected game modules, and returns JSON results with events/messages. The main data structures are:
 
-**PrintInstructions**
-- Scrollable rules view.
-- Transition: back to `Intro`.
+- **Engine** (`src/shared/engine/Engine.h`, `src/shared/engine/Engine.cpp`)
+  - Owns `state::State` and the current `GameState` via `StateMachine`.
+  - Holds `TurnContext` (current player, draw phase data, pending tunnel/tickets, last round flags).
+  - Stores `pendingEvents` for out-of-band messages (InfoPanel).
+- **StateMachine** (`src/shared/engine/StateMachine.h`, `src/shared/engine/StateMachine.cpp`)
+  - Holds `currentState`.
+  - `transitionTo()` runs `onExit()` then `onEnter()` of the next state.
+  - `handleCommand()` delegates to the current state.
+- **GameState** base class (`src/shared/engine/GameState.h`, `src/shared/engine/GameState.cpp`)
+  - Virtual `onEnter()`, `handleCommand()`, `getAllowedCommands()`.
+- **CommandParser** (`src/shared/engine/CommandParser.h`, `src/shared/engine/CommandParser.cpp`)
+  - Parses JSON to `EngineCommand`, then delegates to the StateMachine.
+  - Builds `EngineResult` to JSON and adds `EngineEvent` messages.
+- **PlayerController** hierarchy (`src/shared/engine/PlayerController.h`, `HumanController`, `AIController`)
+  - Determines how commands are produced (human via TUI, AI via auto-play).
+  - The engine uses controllers stored in `TurnContext`.
 
-**Setup**
-- Initializes map, decks, players, starting hands.
-- Transitions: `PlayerAnnounce`.
+## 2) JSON Command/Result Flow (TUI <-> Engine)
 
-**PlayerAnnounce**
-- Announces the active player in the InfoPanel and sets TurnContext.
-- Transitions: `PlayerTurn` for the active player, `WaitTurn` for inactive players.
+**TUI -> Engine**
+1. `tui::CommandInput` gathers user text.
+2. `tui::CommandParser::parse()` turns text into a JSON command string.
+3. `TUIManager::handleInput()` sends JSON to `engine::CommandParser::parseAndApply()`.
+4. The engine returns a JSON result containing `events[]` and `payload.exit`.
 
-**WaitTurn**
-- Inactive player state (no input).
-- Transition: when player becomes active → `PlayerAnnounce`.
+**Engine -> TUI**
+1. `TUIManager` parses the JSON result with `parser::JSONParser::parseResult()`.
+2. Each `EventMessage.message` is appended to InfoPanel.
+3. If `payload.exit == true`, TUI exits.
 
-**PlayerTurn**
-- Main command hub for the active player.
-- Transitions: `DestinationCard`, `FaceUp`, `FaceDown`, `ClaimRoad`, `ClaimStation`, `BorrowRoad`, `Confirmation`.
+Files:
+- TUI parsing + routing: `src/shared/tui/TUIManager.cpp`, `src/shared/tui/CommandParser.cpp`.
+- Engine command parsing: `src/shared/engine/CommandParser.cpp`.
+- JSON serialization: `src/shared/parser/JSONParser.cpp`.
 
-**DestinationCard**
-- Draws 3 destination cards and stores them as pending.
-- Transition: `DestinationChoice`.
+## 3) Core Engine Data Structures
 
-**DestinationChoice**
-- Player selects which cards to keep (min 1).
-- Unkept cards return to the deck.
-- Transition: `Confirmation`.
+**TurnContext** (`src/shared/engine/TurnContext.h`)
+- `currentPlayer`: active player index
+- `drawsRemaining`, `drawSource`: wagon draw tracking
+- `finalRound`, `finalRoundStarter`: last-round logic
+- `pendingTickets`: temporary destination tickets
+- `pendingTunnel`: tunnel claim tracking
+- `controllers`: list of `PlayerController` for AI/human
 
-**FaceUp**
-- Handles drawing a face-up wagon card.
-- Locomotive drawn first ends draw phase immediately.
-- Transition: `Confirmation`.
+**EngineResult / EngineEvent** (`src/shared/engine/EngineResult.h`, `EngineEvent.h`)
+- Engine states return `EngineResult` with `ok`, `error`, `nextPhase`, `events`.
+- Events are surfaced to the TUI InfoPanel.
 
-**FaceDown**
-- Handles drawing a face-down wagon card.
-- Transition: `Confirmation` after draw phase completes.
+**PendingTickets / PendingTunnel**
+- `PendingTickets` stores drawn destination cards before selection.
+- `PendingTunnel` stores tunnel claim data (route, base length, color, extraRequired, revealed cards).
 
-**ClaimRoad**
-- Validates and begins road claiming.
-- If tunnel → `TunnelResolve`, else → `RoadResolve`.
-- On failure → `PlayerTurn`.
+## 4) State Machine: Current State Logic
 
-**TunnelResolve**
-- Draws extra cards to resolve tunnel cost.
-- If player can pay, road is acquired and cards removed.
-- Transition: `Confirmation`.
+### SetupState
+- Creates the default game state or uses provided `state::State`.
+- Initializes `TurnContext` (players/controllers).
+- Transitions to `PlayerAnnounceState`.
++Files: `src/shared/engine/SetupState.cpp`
 
-**RoadResolve**
-- Applies ownership, updates wagons and score.
-- Transition: `Confirmation`.
+### PlayerAnnounceState
+- Announces the active player via `EngineEvent`.
+- Also checks final round condition early (used for testing).
+- Transitions to `PlayerTurnState`.
++Files: `src/shared/engine/PlayerAnnounceState.cpp`
 
-**ClaimStation**
-- Validates and applies station build.
-- Transition: `Confirmation`.
+### PlayerTurnState
+- Main hub for player commands.
+- Allowed commands: draw destination, draw wagon faceup/facedown, claim road, claim station, borrow road, exit.
+- For AI controllers, auto-sends one command immediately on enter.
++Files: `src/shared/engine/PlayerTurnState.cpp`
 
-**BorrowRoad**
-- Validates and registers a borrowed road.
-- Transition: `Confirmation`.
+### DrawDestinationCardState
+- Draws destination tickets from deck; handles cases with 1–3 cards left.
+- Sets `pendingTickets` and `minKeepTickets`.
+- If only one card remains, auto-add to player and return to PlayerTurn.
+- Otherwise transitions to DestinationChoiceState.
++Files: `src/shared/engine/DrawDestinationCardState.cpp`
 
-**Confirmation**
-- Allows only: `EndTurn` or `BorrowRoad`.
-- Transition: `EndTurn`.
+### DestinationChoiceState
+- Player selects which destination cards to keep (JSON payload `indices`).
+- Must keep at least `minKeepTickets`.
+- Unselected cards return to destination deck.
+- Transitions to ConfirmationState.
++Files: `src/shared/engine/DestinationChoiceState.cpp`
 
-**EndTurn**
-- Advances active player and checks last-round logic.
-- Transition: `PlayerAnnounce` or `EndGame`.
+### DrawWagonCardState
+- Controls draw phase (2 cards max).
+- Routes to FaceUpState or FaceDownState based on command.
+- AI auto-plays a draw (honors source constraints).
++Files: `src/shared/engine/DrawWagonCardState.cpp`
 
-**EndGame**
-- Final scoring, determine winner.
-- Transition: `Exit`.
+### FaceUpState
+- Draws a selected face-up card.
+- If locomotive drawn first, draw phase ends immediately.
+- Enforces “same source” rule (only face-up once started).
++Files: `src/shared/engine/FaceUpState.cpp`
 
-**Exit**
-- Cleanup and quit.
+### FaceDownState
+- Draws from face-down pile.
+- If face-down draw is chosen, draws 2 cards at once and ends phase.
++Files: `src/shared/engine/FaceDownState.cpp`
 
-## Commands
+### ClaimRoadState
+- Parses road id and color choice.
+- Validates ownership, availability, and card counts.
+- If tunnel, transitions to TunnelResolveState.
+- Else transitions to RoadResolveState.
++Files: `src/shared/engine/ClaimRoadState.cpp`
 
-Commands are sent from the TUI and interpreted by the engine:
+### TunnelResolveState
+- Tunnel claim flow:
+  - Player selects color.
+  - Draws 3 extra cards, increases cost if matching.
+  - Checks if player can pay (color + locomotives).
+  - If fail, returns cards to hand and ends.
+  - If success, removes cards and continues.
+- Transition: RoadResolveState.
++Files: `src/shared/engine/TunnelResolveState.cpp`
 
-- `DRAW DEST` → DestinationCard
-- `SELECT <number>` → DestinationChoice
-- `DRAW CARD FACEUP <index>` → FaceUp
-- `DRAW CARD FACEDOWN` → FaceDown
-- `TAKE <stationA>-<stationB> [roadId]` → ClaimRoad
-- `BUILD STATION <station> <color>` → ClaimStation
-- `BORROW ROAD <stationA>-<stationB> [roadId]` → BorrowRoad
-- `END TURN` → Confirmation → EndTurn
-- `EXIT` → Exit
+### RoadResolveState
+- Applies road ownership, wagon deduction, score update.
+- Transition: ConfirmationState.
++Files: `src/shared/engine/RoadResolveState.cpp`
 
-*(Exact argument structure will match the JSON command schema used by the parser.)*
+### ClaimStationState
+- Allows building a station on an unowned station.
+- Cost depends on remaining station pieces (3→cost1, 2→cost2, 1→cost3).
+- Adds station ownership and updates player resources.
+- Transition: ConfirmationState.
++Files: `src/shared/engine/ClaimStationState.cpp`
 
-## Transition Table (Summary)
+### BorrowRoadState
+- Validates a road owned by another player.
+- Registers borrowed road for the active player.
+- Transition: ConfirmationState.
++Files: `src/shared/engine/BorrowRoadState.cpp`
+
+### ConfirmationState
+- End-of-turn gate; only allows `confirm` or `borrow`.
+- For AI, auto-confirms.
+- Transition: EndTurnState or BorrowRoadState.
++Files: `src/shared/engine/ConfirmationState.cpp`
+
+### EndTurnState
+- Advances `currentPlayer`.
+- Triggers final round if any player drops to 2 wagons.
+- If last round ends, transitions to EndGameState.
+- Otherwise goes to PlayerAnnounceState (or WaitTurn for AI-controlled players).
++Files: `src/shared/engine/EndTurnState.cpp`
+
+### WaitTurnState
+- Used for non-active players (AI step between turns).
+- Logs “Waiting for other players...”, then immediately transitions to PlayerAnnounceState.
+- Only `exit` allowed.
++Files: `src/shared/engine/WaitTurnState.cpp`
+
+### EndGameState
+- Computes final scores (including destination completion).
+- Announces winner.
+- Transitions to ExitState on player command.
++Files: `src/shared/engine/EndGameState.cpp`
+
+### ExitState
+- Confirms exit to TUI via EngineResult.
+- Engine is destroyed by TUI after exit confirmation.
++Files: `src/shared/engine/ExitState.cpp`
+
+## 5) Command Set (Current)
+
+Commands are JSON-based, with `name` and optional `payload`:
+
+- `exit`
+- `draw_destination`
+- `select_destination` (payload: `indices`)
+- `draw_faceup` (payload: `index`)
+- `draw_facedown`
+- `take` (payload: `roadId`, optional `color`)
+- `claim_station` (payload: `station`)
+- `borrow` (payload: `roadId`)
+- `confirm`
+- `color` (tunnel color selection)
+
+Parsing is implemented in `src/shared/engine/CommandParser.cpp`.
+
+## 6) Player / AI Control Flow
+
+**PlayerController** provides:
+- `nextCommand(state, engine)`
+- `notify(result)`
+
+**HumanController**
+- Pass-through for now; the TUI provides commands.
+
+**AIController**
+- Chooses from `currentState->getAllowedCommands()` (filters help/exit).
+- Builds a JSON command (e.g., draw or claim).
+- The engine auto-executes the command in `PlayerTurnState`/draw/choice/confirmation states.
+
+## 7) Transition Table (Summary)
 
 | From State | Trigger / Condition | To State |
 |-----------|---------------------|---------|
-| Intro | Start | Setup |
-| Intro | Instructions | PrintInstructions |
-| Intro | Exit | Exit |
-| PrintInstructions | Back | Intro |
 | Setup | Done | PlayerAnnounce |
-| PlayerAnnounce | Active player | PlayerTurn |
-| PlayerAnnounce | Inactive player | WaitTurn |
-| WaitTurn | Player becomes active | PlayerAnnounce |
-| PlayerTurn | DRAW DEST | DestinationCard |
-| PlayerTurn | DRAW CARD FACEUP | FaceUp |
-| PlayerTurn | DRAW CARD FACEDOWN | FaceDown |
-| PlayerTurn | TAKE road | ClaimRoad |
-| PlayerTurn | BUILD STATION | ClaimStation |
-| PlayerTurn | BORROW ROAD | BorrowRoad |
-| PlayerTurn | END TURN | Confirmation |
-| DestinationCard | Draw complete | DestinationChoice |
-| DestinationChoice | SELECT <number> | Confirmation |
+| PlayerAnnounce | Always | PlayerTurn |
+| PlayerTurn | draw_destination | DrawDestinationCard |
+| PlayerTurn | draw_faceup/draw_facedown | DrawWagonCard |
+| DrawWagonCard | draw_faceup | FaceUp |
+| DrawWagonCard | draw_facedown | FaceDown |
 | FaceUp | Draw complete | Confirmation |
 | FaceDown | Draw complete | Confirmation |
+| PlayerTurn | take | ClaimRoad |
 | ClaimRoad | Tunnel | TunnelResolve |
 | ClaimRoad | Non-tunnel | RoadResolve |
-| ClaimRoad | Failure | PlayerTurn |
-| TunnelResolve | Resolved | Confirmation |
 | RoadResolve | Applied | Confirmation |
+| TunnelResolve | Resolved | RoadResolve |
+| PlayerTurn | claim_station | ClaimStation |
 | ClaimStation | Applied | Confirmation |
+| PlayerTurn | borrow | BorrowRoad |
 | BorrowRoad | Applied | Confirmation |
-| Confirmation | End turn | EndTurn |
-| Confirmation | Borrow road | BorrowRoad |
-| EndTurn | Next player | PlayerAnnounce |
+| DrawDestinationCard | Draw complete | DestinationChoice |
+| DestinationChoice | select_destination | Confirmation |
+| Confirmation | confirm | EndTurn |
+| Confirmation | borrow | BorrowRoad |
+| EndTurn | Next player | PlayerAnnounce / WaitTurn |
 | EndTurn | Last round complete | EndGame |
 | EndGame | Done | Exit |
-
+| Exit | Done | (TUI exits) |
