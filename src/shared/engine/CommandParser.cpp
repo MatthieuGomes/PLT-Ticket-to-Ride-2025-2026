@@ -71,6 +71,10 @@ namespace engine
       {
         return EngineCommandType::CMD_CONFIRM_ENDTURN;
       }
+      if (lowered == "endturn" || lowered == "end_turn" || lowered == "end")
+      {
+        return EngineCommandType::CMD_CONFIRM_ENDTURN;
+      }
       if (lowered == "color" || lowered == "tunnel_color")
       {
         return EngineCommandType::CMD_TUNNEL_COLOR;

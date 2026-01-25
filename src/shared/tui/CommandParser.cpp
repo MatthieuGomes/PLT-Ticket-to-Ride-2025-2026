@@ -97,6 +97,12 @@ ParseResult CommandParser::parse(const std::string& input) {
   if (!tokens.empty() && tokens[0] == "take") {
     action = "take";
   }
+  if (!tokens.empty() && (tokens[0] == "confirm" || tokens[0] == "endturn" || tokens[0] == "end")) {
+    action = "confirm";
+  }
+  if (tokens.size() >= 2 && tokens[0] == "end" && tokens[1] == "turn") {
+    action = "confirm";
+  }
   if (!tokens.empty() && (tokens[0] == "select" || tokens[0] == "choose")) {
     action = "select_destination";
   }
