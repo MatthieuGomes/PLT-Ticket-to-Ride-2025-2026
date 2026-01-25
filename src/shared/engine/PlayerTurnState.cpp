@@ -9,6 +9,10 @@
 #include "ClaimStationState.h"
 #include "BorrowRoadState.h"
 #include "StateMachine.h"
+#include "AIController.h"
+#include "HumanController.h"
+#include "PlayerController.h"
+#include "parser/JSONParser.h"
 
 namespace engine
 {
@@ -38,6 +42,34 @@ namespace engine
       return;
     }
     engine->phase = Phase::PLAYER_TURN;
+
+    if (!engine->stateMachine || engine->context.controllers.empty())
+    {
+      return;
+    }
+
+    int playerIndex = engine->context.currentPlayer;
+    if (playerIndex < 0 || playerIndex >= static_cast<int>(engine->context.controllers.size()))
+    {
+      return;
+    }
+
+    std::shared_ptr<PlayerController> controller = engine->context.controllers[static_cast<std::size_t>(playerIndex)];
+    if (!controller)
+    {
+      return;
+    }
+
+    // If not a human controller, auto-play one command.
+    if (std::dynamic_pointer_cast<HumanController>(controller))
+    {
+      return;
+    }
+
+    parser::CommandMessage command = controller->nextCommand(engine->getState(), engine);
+    parser::JSONParser jsonParser;
+    std::string json = jsonParser.serializeCommand(command);
+    engine->applyCommand(json);
   }
 
   std::vector<EngineCommandType> PlayerTurnState::getAllowedCommands()

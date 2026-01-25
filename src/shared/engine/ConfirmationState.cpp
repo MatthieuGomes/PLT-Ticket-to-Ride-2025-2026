@@ -6,6 +6,11 @@
 #include "Engine.h"
 #include "EngineEvent.h"
 #include "StateMachine.h"
+#include "AIController.h"
+#include "HumanController.h"
+#include "PlayerController.h"
+#include "parser/JSONParser.h"
+#include "playersState/Player.h"
 
 namespace engine
 {
@@ -58,6 +63,54 @@ namespace engine
     event.message = "Confirmation state: end turn or borrow roads allowed.";
     event.payload = "";
     engine->pendingEvents.push_back(event);
+
+    if (!engine->stateMachine || engine->context.controllers.empty())
+    {
+      return;
+    }
+
+    int playerIndex = engine->context.currentPlayer;
+    if (playerIndex < 0 || playerIndex >= static_cast<int>(engine->context.controllers.size()))
+    {
+      return;
+    }
+
+    std::shared_ptr<PlayerController> controller = engine->context.controllers[static_cast<std::size_t>(playerIndex)];
+    if (!controller)
+    {
+      return;
+    }
+
+    if (std::dynamic_pointer_cast<HumanController>(controller))
+    {
+      return;
+    }
+
+    parser::CommandMessage message;
+    message.kind = "command";
+    message.origin = "tui";
+    message.version = 1;
+    message.name = "confirm";
+
+    std::string playerName = "AI";
+    std::shared_ptr<state::State> state = engine->getState();
+    if (state)
+    {
+      std::vector<std::shared_ptr<playersState::Player>> players = state->players.getPlayers();
+      if (playerIndex >= 0 && playerIndex < static_cast<int>(players.size()) && players[playerIndex])
+      {
+        playerName = players[playerIndex]->getName();
+      }
+    }
+    EngineEvent logEvent;
+    logEvent.type = EngineEventType::INFO;
+    logEvent.message = "AI " + playerName + ": confirm";
+    logEvent.payload = "";
+    engine->pendingEvents.push_back(logEvent);
+
+    parser::JSONParser jsonParser;
+    std::string json = jsonParser.serializeCommand(message);
+    engine->applyCommand(json);
   }
 
   std::vector<EngineCommandType> ConfirmationState::getAllowedCommands()

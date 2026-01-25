@@ -6,6 +6,11 @@
 #include "FaceDownState.h"
 #include "FaceUpState.h"
 #include "StateMachine.h"
+#include "AIController.h"
+#include "HumanController.h"
+#include "PlayerController.h"
+#include "parser/JSONParser.h"
+#include "playersState/Player.h"
 
 namespace engine
 {
@@ -59,6 +64,64 @@ namespace engine
       engine->context.drawsRemaining = kDefaultDrawsRemaining;
       engine->context.drawSource = 0;
     }
+
+    if (!engine->stateMachine || engine->context.controllers.empty())
+    {
+      return;
+    }
+
+    int playerIndex = engine->context.currentPlayer;
+    if (playerIndex < 0 || playerIndex >= static_cast<int>(engine->context.controllers.size()))
+    {
+      return;
+    }
+
+    std::shared_ptr<PlayerController> controller = engine->context.controllers[static_cast<std::size_t>(playerIndex)];
+    if (!controller)
+    {
+      return;
+    }
+
+    if (std::dynamic_pointer_cast<HumanController>(controller))
+    {
+      return;
+    }
+
+    parser::CommandMessage message;
+    message.kind = "command";
+    message.origin = "tui";
+    message.version = 1;
+
+    if (engine->context.drawSource == 2)
+    {
+      message.name = "draw_facedown";
+    }
+    else
+    {
+      message.name = "draw_faceup";
+      message.payload = Json::Value(Json::objectValue);
+      message.payload["index"] = 1;
+    }
+
+    std::string playerName = "AI";
+    std::shared_ptr<state::State> state = engine->getState();
+    if (state)
+    {
+      std::vector<std::shared_ptr<playersState::Player>> players = state->players.getPlayers();
+      if (playerIndex >= 0 && playerIndex < static_cast<int>(players.size()) && players[playerIndex])
+      {
+        playerName = players[playerIndex]->getName();
+      }
+    }
+    EngineEvent event;
+    event.type = EngineEventType::INFO;
+    event.message = "AI " + playerName + ": " + message.name;
+    event.payload = "";
+    engine->pendingEvents.push_back(event);
+
+    parser::JSONParser jsonParser;
+    std::string json = jsonParser.serializeCommand(message);
+    engine->applyCommand(json);
   }
 
   EngineResult DrawWagonCardState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)

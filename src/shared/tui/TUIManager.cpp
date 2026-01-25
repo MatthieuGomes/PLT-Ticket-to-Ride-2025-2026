@@ -670,6 +670,25 @@ void TUIManager::runMainLoop() {
       }
     }
 
+    if (engine && infopanel) {
+      if (!engine->pendingEvents.empty()) {
+        for (std::size_t i = 0; i < engine->pendingEvents.size(); ++i) {
+          const engine::EngineEvent& event = engine->pendingEvents[i];
+          if (!event.message.empty()) {
+            infopanel->addMessage(event.message);
+          }
+        }
+        engine->pendingEvents.clear();
+        infopanel->requestRedraw();
+        if (gameview) {
+          gameview->requestRedraw();
+        }
+        if (statusbar) {
+          statusbar->requestRedraw();
+        }
+      }
+    }
+
     drawAll();
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopSleepMs));
   }
