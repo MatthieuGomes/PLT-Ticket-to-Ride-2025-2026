@@ -20,6 +20,7 @@
 #include "mapState/MapState.h"
 #include "playersState/PlayersState.h"
 #include "cardsState/CardsState.h"
+#include "engine/EngineEvent.h"
 #include "engine/CommandParser.h"
 
 namespace tui {
@@ -257,6 +258,15 @@ void TUIManager::init() {
     if (engine) {
       std::string activeName = getActivePlayerName(engine);
       infopanel->addMessage("It's " + activeName + "'s turn!");
+      if (!engine->pendingEvents.empty()) {
+        for (std::size_t i = 0; i < engine->pendingEvents.size(); ++i) {
+          const engine::EngineEvent& event = engine->pendingEvents[i];
+          if (!event.message.empty()) {
+            infopanel->addMessage(event.message);
+          }
+        }
+        engine->pendingEvents.clear();
+      }
     }
   }
   if (!commandinput) {

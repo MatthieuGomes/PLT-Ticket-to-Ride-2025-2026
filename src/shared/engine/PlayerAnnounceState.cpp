@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Engine.h"
+#include "EngineEvent.h"
 #include "PlayerTurnState.h"
 #include "StateMachine.h"
 #include "playersState/Player.h"
@@ -47,6 +48,11 @@ namespace engine
             {
               engine->context.finalRound = true;
               engine->context.finalRoundStarter = (index < 0) ? kDefaultPlayerIndex : index;
+              EngineEvent event;
+              event.type = EngineEventType::INFO;
+              event.message = "Final round triggered.";
+              event.payload = "";
+              engine->pendingEvents.push_back(event);
               break;
             }
           }
