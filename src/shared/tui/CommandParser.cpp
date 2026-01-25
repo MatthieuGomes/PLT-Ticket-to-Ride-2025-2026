@@ -100,6 +100,9 @@ ParseResult CommandParser::parse(const std::string& input) {
   if (!tokens.empty() && (tokens[0] == "select" || tokens[0] == "choose")) {
     action = "select_destination";
   }
+  if (!tokens.empty() && tokens[0] == "build" && tokens.size() >= 2 && tokens[1] == "station") {
+    action = "claim_station";
+  }
   if (!tokens.empty() && (tokens[0] == "color" || tokens[0] == "colour")) {
     action = "color";
   }
@@ -179,6 +182,12 @@ ParseResult CommandParser::parse(const std::string& input) {
     }
     if (!indices.empty()) {
       message.payload["indices"] = indices;
+    }
+  }
+  if (action == "claim_station" && tokens.size() >= 3) {
+    message.payload["station"] = tokens[2];
+    if (tokens.size() >= 4) {
+      message.payload["color"] = tokens[3];
     }
   }
 

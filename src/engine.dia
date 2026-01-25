@@ -5422,7 +5422,7 @@
         <dia:point val="-55.7447,22.8473"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-55.7947,22.7973;-32.8647,27.2973"/>
+        <dia:rectangle val="-55.7947,22.7973;-32.8647,28.0973"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="-55.7447,22.8473"/>
@@ -5431,7 +5431,7 @@
         <dia:real val="22.830000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="4.4000000000000004"/>
+        <dia:real val="5.2000000000000002"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#ClaimStationState#</dia:string>
@@ -5637,6 +5637,36 @@
               </dia:attribute>
             </dia:composite>
           </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#getAllowedCommands#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="stereotype">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#std::vector&lt;EngineCommandType&gt;#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="inheritance_type">
+            <dia:enum val="2"/>
+          </dia:attribute>
+          <dia:attribute name="query">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters"/>
         </dia:composite>
       </dia:attribute>
       <dia:attribute name="template">
@@ -7170,7 +7200,7 @@
         <dia:point val="-42.6662,36.8581"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-44.3797,27.1973;-41.8162,36.9081"/>
+        <dia:rectangle val="-44.3797,27.9973;-41.8162,36.9081"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -7179,7 +7209,7 @@
         <dia:point val="-42.6662,36.8581"/>
         <dia:point val="-42.6662,32.9497"/>
         <dia:point val="-44.3297,32.9497"/>
-        <dia:point val="-44.3297,27.2473"/>
+        <dia:point val="-44.3297,28.0473"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>

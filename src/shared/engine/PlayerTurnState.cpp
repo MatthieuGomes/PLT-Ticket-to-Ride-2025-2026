@@ -6,6 +6,7 @@
 #include "EngineCommand.h"
 #include "EngineEvent.h"
 #include "ClaimRoadState.h"
+#include "ClaimStationState.h"
 #include "StateMachine.h"
 
 namespace engine
@@ -45,6 +46,7 @@ namespace engine
     commands.push_back(EngineCommandType::CMD_DRAW_WAGON_FACEUP);
     commands.push_back(EngineCommandType::CMD_DRAW_WAGON_FACEDOWN);
     commands.push_back(EngineCommandType::CMD_DRAW_DESTINATION);
+    commands.push_back(EngineCommandType::CMD_CLAIM_STATION);
     commands.push_back(EngineCommandType::CMD_TAKE_ROAD);
     return commands;
   }
@@ -73,6 +75,12 @@ namespace engine
     if (command.type == EngineCommandType::CMD_DRAW_DESTINATION)
     {
       std::shared_ptr<GameState> nextState(new DrawDestinationCardState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      return engine->stateMachine->handleCommand(engine, command);
+    }
+    if (command.type == EngineCommandType::CMD_CLAIM_STATION)
+    {
+      std::shared_ptr<GameState> nextState(new ClaimStationState());
       engine->stateMachine->transitionTo(engine, nextState);
       return engine->stateMachine->handleCommand(engine, command);
     }
