@@ -5,7 +5,7 @@
       "color": "RED",
       "score": 19,
       "nbWagons": 32,
-      "nbStations": 3,
+      "nbStations": 1,
       "borrowedRoads": [],
       "hand": 0
     },
@@ -34,14 +34,14 @@
     "stations": [
       {
         "name": "amsterdam",
-        "owner": null,
+        "owner": "Player1",
         "TUIrow": 3,
         "TUIcolumn": 24,
         "TUInickname": "AMS"
       },
       {
         "name": "angora",
-        "owner": null,
+        "owner": "Player1",
         "TUIrow": 11,
         "TUIcolumn": 79,
         "TUInickname": "ANG"
@@ -237,7 +237,7 @@
       },
       {
         "name": "paris",
-        "owner": null,
+        "owner": "Player3",
         "TUIrow": 6,
         "TUIcolumn": 20,
         "TUInickname": "PAR"
@@ -328,7 +328,7 @@
       },
       {
         "name": "warszawa",
-        "owner": null,
+        "owner": "Player2",
         "TUIrow": 4,
         "TUIcolumn": 60,
         "TUInickname": "WAR"

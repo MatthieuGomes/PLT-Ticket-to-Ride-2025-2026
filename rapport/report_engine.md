@@ -92,7 +92,7 @@ Commands are sent from the TUI and interpreted by the engine:
 - `DRAW CARD FACEUP <index>` → FaceUp
 - `DRAW CARD FACEDOWN` → FaceDown
 - `TAKE <stationA>-<stationB> [roadId]` → ClaimRoad
-- `BUILD STATION <station>` → ClaimStation
+- `BUILD STATION <station> <color>` → ClaimStation
 - `BORROW ROAD <stationA>-<stationB> [roadId]` → BorrowRoad
 - `END TURN` → Confirmation → EndTurn
 - `EXIT` → Exit

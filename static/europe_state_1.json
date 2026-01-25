@@ -237,7 +237,7 @@
       },
       {
         "name": "paris",
-        "owner": null,
+        "owner": "Player3",
         "TUIrow": 6,
         "TUIcolumn": 20,
         "TUInickname": "PAR"
@@ -328,7 +328,7 @@
       },
       {
         "name": "warszawa",
-        "owner": null,
+        "owner": "Player2",
         "TUIrow": 4,
         "TUIcolumn": 60,
         "TUInickname": "WAR"
