@@ -13,7 +13,7 @@
       "name": "Player2",
       "color": "BLUE",
       "score": 15,
-      "nbWagons": 35,
+      "nbWagons": 30,
       "nbStations": 2,
       "borrowedRoads": [
         1
@@ -24,7 +24,7 @@
       "name": "Player3",
       "color": "GREEN",
       "score": 4,
-      "nbWagons": 42,
+      "nbWagons": 2,
       "nbStations": 2,
       "borrowedRoads": [],
       "hand": 2
