@@ -51,7 +51,7 @@ If the state does not allow any usable command, the AI returns an empty command 
 - **No planning:** No pathfinding or ticket completion logic.
 - **No awareness of game phase:** AI only obeys allowed command lists.
 
-## 6) Planned Evolution (Later)
+## 6) Planned Evolution
 
 - Move AI to a dedicated `ai/` package.
 - Add strategic planners (destination completion, longest path heuristics, scoring goals) with existing functions.
