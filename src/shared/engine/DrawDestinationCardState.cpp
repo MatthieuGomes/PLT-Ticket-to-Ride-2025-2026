@@ -5,6 +5,8 @@
 #include "DestinationChoiceState.h"
 #include "Engine.h"
 #include "EngineEvent.h"
+#include "ConfirmationState.h"
+#include "PlayerTurnState.h"
 #include "StateMachine.h"
 #include "cardsState/CardsState.h"
 #include "cardsState/DestinationCard.h"
@@ -39,6 +41,23 @@ namespace engine
       result.events.push_back(event);
     }
 
+    void pushErrorAndReturnToPlayer(std::shared_ptr<Engine> engine, const std::string& message)
+    {
+      if (!engine)
+      {
+        return;
+      }
+      engine->pendingEvents.clear();
+      engine->pendingEvents.push_back(EngineEvent{EngineEventType::ERROR, message, ""});
+      engine->context.pendingTickets.offered.clear();
+
+      if (engine->stateMachine)
+      {
+        std::shared_ptr<GameState> nextState(new PlayerTurnState());
+        engine->stateMachine->transitionTo(engine, nextState);
+      }
+    }
+
     std::string cardToString(const std::shared_ptr<cardsState::DestinationCard>& card)
     {
       if (!card)
@@ -65,44 +84,94 @@ namespace engine
     std::shared_ptr<state::State> state = engine->getState();
     if (!state)
     {
-      engine->pendingEvents.clear();
-      engine->pendingEvents.push_back(EngineEvent{EngineEventType::ERROR, "Draw destination: missing state", ""});
+      pushErrorAndReturnToPlayer(engine, "Draw destination: missing state");
       return;
     }
 
     std::shared_ptr<cardsState::CardsState> cardsState(state, &state->cards);
     if (!cardsState || !cardsState->gameDestinationCards || !cardsState->gameDestinationCards->faceDownCards)
     {
-      engine->pendingEvents.clear();
-      engine->pendingEvents.push_back(EngineEvent{EngineEventType::ERROR, "Draw destination: deck not ready", ""});
+      pushErrorAndReturnToPlayer(engine, "Draw destination: deck not ready");
       return;
     }
 
     std::shared_ptr<cardsState::SharedDeck<cardsState::DestinationCard>> deck = cardsState->gameDestinationCards;
-    if (deck->faceDownCards->cards.size() < 3)
+    std::size_t available = deck->faceDownCards->cards.size();
+    if (available == 0)
     {
-      engine->pendingEvents.clear();
-      engine->pendingEvents.push_back(EngineEvent{EngineEventType::ERROR, "Draw destination: not enough cards", ""});
+      pushErrorAndReturnToPlayer(engine, "Draw destination: no cards available");
       return;
     }
 
     engine->context.pendingTickets.offered.clear();
 
-    for (int i = 0; i < 3; ++i)
+    int toDraw = static_cast<int>(available);
+    if (toDraw > 3)
+    {
+      toDraw = 3;
+    }
+
+    for (int i = 0; i < toDraw; ++i)
     {
       std::shared_ptr<cardsState::Card> removed = deck->faceDownCards->takeLastCard();
       std::shared_ptr<cardsState::DestinationCard> drawn = std::dynamic_pointer_cast<cardsState::DestinationCard>(removed);
       if (!drawn)
       {
-        engine->pendingEvents.clear();
-        engine->pendingEvents.push_back(EngineEvent{EngineEventType::ERROR, "Draw destination: invalid card", ""});
+        pushErrorAndReturnToPlayer(engine, "Draw destination: invalid card");
         return;
       }
       engine->context.pendingTickets.offered.push_back(drawn);
     }
 
+    if (engine->context.pendingTickets.offered.size() == 1)
+    {
+      if (engine->context.currentPlayer >= 0
+          && engine->context.currentPlayer < static_cast<int>(cardsState->playersCards.size()))
+      {
+        std::shared_ptr<cardsState::PlayerCards> hand = cardsState->playersCards[engine->context.currentPlayer];
+        if (hand && hand->destinationCards)
+        {
+          hand->destinationCards->addCard(engine->context.pendingTickets.offered[0]);
+        }
+      }
+      engine->context.pendingTickets.offered.clear();
+      engine->pendingEvents.clear();
+      engine->pendingEvents.push_back(EngineEvent{EngineEventType::INFO, "Only one destination card available; it was kept.", ""});
+      std::shared_ptr<GameState> nextState(new ConfirmationState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      return;
+    }
+
+    int minKeep = engine->context.minKeepTickets;
+    if (minKeep > static_cast<int>(engine->context.pendingTickets.offered.size()))
+    {
+      minKeep = static_cast<int>(engine->context.pendingTickets.offered.size());
+    }
+
+    if (minKeep == static_cast<int>(engine->context.pendingTickets.offered.size()))
+    {
+      if (engine->context.currentPlayer >= 0
+          && engine->context.currentPlayer < static_cast<int>(cardsState->playersCards.size()))
+      {
+        std::shared_ptr<cardsState::PlayerCards> hand = cardsState->playersCards[engine->context.currentPlayer];
+        if (hand && hand->destinationCards)
+        {
+          for (std::size_t i = 0; i < engine->context.pendingTickets.offered.size(); ++i)
+          {
+            hand->destinationCards->addCard(engine->context.pendingTickets.offered[i]);
+          }
+        }
+      }
+      engine->context.pendingTickets.offered.clear();
+      engine->pendingEvents.clear();
+      engine->pendingEvents.push_back(EngineEvent{EngineEventType::INFO, "All available destination cards were kept.", ""});
+      std::shared_ptr<GameState> nextState(new ConfirmationState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      return;
+    }
+
     std::ostringstream prompt;
-    prompt << "Destination choices (keep at least " << engine->context.minKeepTickets << "):";
+    prompt << "Destination choices (keep at least " << minKeep << "):";
 
     EngineResult result;
     result.ok = true;
