@@ -100,7 +100,30 @@ namespace engine
     {
       message.name = "draw_faceup";
       message.payload = Json::Value(Json::objectValue);
-      message.payload["index"] = 1;
+      int index = 1;
+      if (engine->context.drawSource == 1)
+      {
+        std::shared_ptr<state::State> localState = engine->getState();
+        if (localState && localState->cards.gameWagonCards && localState->cards.gameWagonCards->faceUpCards)
+        {
+          const std::vector<std::shared_ptr<cardsState::WagonCard>> &cards =
+              localState->cards.gameWagonCards->faceUpCards->cards;
+          for (std::size_t i = 0; i < cards.size(); ++i)
+          {
+            if (cards[i] && cards[i]->getColor() != cardsState::ColorCard::LOCOMOTIVE)
+            {
+              index = static_cast<int>(i + 1);
+              break;
+            }
+          }
+        }
+      }
+      message.payload["index"] = index;
+    }
+
+    if (message.name.empty())
+    {
+      return;
     }
 
     std::string playerName = "AI";
@@ -113,15 +136,29 @@ namespace engine
         playerName = players[playerIndex]->getName();
       }
     }
+
+    parser::JSONParser jsonParser;
+    std::string json = jsonParser.serializeCommand(message);
+    std::vector<EngineEvent> priorEvents = engine->pendingEvents;
+    engine->pendingEvents.clear();
+    EngineResult result = engine->applyCommand(json);
+
     EngineEvent event;
     event.type = EngineEventType::INFO;
     event.message = "AI " + playerName + ": " + message.name;
     event.payload = "";
-    engine->pendingEvents.push_back(event);
+    result.events.insert(result.events.begin(), event);
+    if (!priorEvents.empty())
+    {
+      result.events.insert(result.events.begin(), priorEvents.begin(), priorEvents.end());
+    }
 
-    parser::JSONParser jsonParser;
-    std::string json = jsonParser.serializeCommand(message);
-    engine->applyCommand(json);
+    if (!result.events.empty())
+    {
+      engine->pendingEvents.insert(engine->pendingEvents.end(),
+                                   result.events.begin(),
+                                   result.events.end());
+    }
   }
 
   EngineResult DrawWagonCardState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)

@@ -167,15 +167,29 @@ namespace engine
         playerName = players[playerIndex]->getName();
       }
     }
+
+    parser::JSONParser jsonParser;
+    std::string json = jsonParser.serializeCommand(message);
+    std::vector<EngineEvent> priorEvents = engine->pendingEvents;
+    engine->pendingEvents.clear();
+    EngineResult result = engine->applyCommand(json);
+
     EngineEvent event;
     event.type = EngineEventType::INFO;
     event.message = "AI " + playerName + ": select " + std::to_string(minKeep) + " destination(s)";
     event.payload = "";
-    engine->pendingEvents.push_back(event);
+    result.events.insert(result.events.begin(), event);
+    if (!priorEvents.empty())
+    {
+      result.events.insert(result.events.begin(), priorEvents.begin(), priorEvents.end());
+    }
 
-    parser::JSONParser jsonParser;
-    std::string json = jsonParser.serializeCommand(message);
-    engine->applyCommand(json);
+    if (!result.events.empty())
+    {
+      engine->pendingEvents.insert(engine->pendingEvents.end(),
+                                   result.events.begin(),
+                                   result.events.end());
+    }
   }
 
   EngineResult DestinationChoiceState::handleCommand(std::shared_ptr<Engine> engine, const EngineCommand& command)

@@ -71,6 +71,11 @@ namespace engine
     }
 
     std::cout << "It's " << playerName << "'s turn!" << std::endl;
+    EngineEvent announce;
+    announce.type = EngineEventType::INFO;
+    announce.message = "It's " + playerName + "'s turn!";
+    announce.payload = "";
+    engine->pendingEvents.push_back(announce);
 
     if (engine->stateMachine)
     {

@@ -256,8 +256,6 @@ void TUIManager::init() {
     infopanel->setTitle("InfoPanel");
     infopanel->addMessage("Welcome to Ticket to Ride!");
     if (engine) {
-      std::string activeName = getActivePlayerName(engine);
-      infopanel->addMessage("It's " + activeName + "'s turn!");
       if (!engine->pendingEvents.empty()) {
         for (std::size_t i = 0; i < engine->pendingEvents.size(); ++i) {
           const engine::EngineEvent& event = engine->pendingEvents[i];

@@ -24,7 +24,7 @@
       "name": "Player3",
       "color": "GREEN",
       "score": 4,
-      "nbWagons": 2,
+      "nbWagons": 20,
       "nbStations": 2,
       "borrowedRoads": [],
       "hand": 2

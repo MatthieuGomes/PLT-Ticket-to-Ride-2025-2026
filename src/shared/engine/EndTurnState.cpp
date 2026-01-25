@@ -4,8 +4,10 @@
 #include "EngineEvent.h"
 #include "EndGameState.h"
 #include "PlayerAnnounceState.h"
+#include "WaitTurnState.h"
 #include "StateMachine.h"
 #include "playersState/Player.h"
+#include "HumanController.h"
 
 namespace engine
 {
@@ -87,6 +89,15 @@ namespace engine
     if (engine->context.finalRound && next == engine->context.finalRoundStarter)
     {
       std::shared_ptr<GameState> nextState(new EndGameState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      return;
+    }
+
+    if (!engine->context.controllers.empty() && next >= 0
+        && next < static_cast<int>(engine->context.controllers.size())
+        && !std::dynamic_pointer_cast<HumanController>(engine->context.controllers[static_cast<std::size_t>(next)]))
+    {
+      std::shared_ptr<GameState> nextState(new WaitTurnState());
       engine->stateMachine->transitionTo(engine, nextState);
       return;
     }

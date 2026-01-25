@@ -67,9 +67,43 @@ namespace engine
     }
 
     parser::CommandMessage command = controller->nextCommand(engine->getState(), engine);
+    if (command.name.empty())
+    {
+      return;
+    }
+    std::string playerName = "AI";
+    std::shared_ptr<state::State> state = engine->getState();
+    if (state)
+    {
+      std::vector<std::shared_ptr<playersState::Player>> players = state->players.getPlayers();
+      if (playerIndex >= 0 && playerIndex < static_cast<int>(players.size()) && players[playerIndex])
+      {
+        playerName = players[playerIndex]->getName();
+      }
+    }
+
     parser::JSONParser jsonParser;
     std::string json = jsonParser.serializeCommand(command);
-    engine->applyCommand(json);
+    std::vector<EngineEvent> priorEvents = engine->pendingEvents;
+    engine->pendingEvents.clear();
+    EngineResult result = engine->applyCommand(json);
+
+    EngineEvent event;
+    event.type = EngineEventType::INFO;
+    event.message = "AI " + playerName + ": " + command.name;
+    event.payload = "";
+    result.events.insert(result.events.begin(), event);
+    if (!priorEvents.empty())
+    {
+      result.events.insert(result.events.begin(), priorEvents.begin(), priorEvents.end());
+    }
+
+    if (!result.events.empty())
+    {
+      engine->pendingEvents.insert(engine->pendingEvents.end(),
+                                   result.events.begin(),
+                                   result.events.end());
+    }
   }
 
   std::vector<EngineCommandType> PlayerTurnState::getAllowedCommands()

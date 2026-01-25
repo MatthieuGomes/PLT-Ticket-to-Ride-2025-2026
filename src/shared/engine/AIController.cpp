@@ -137,7 +137,12 @@ namespace engine
 
     if (usable.empty())
     {
-      return makeCommand("confirm");
+      parser::CommandMessage message;
+      message.kind = "command";
+      message.origin = "tui";
+      message.version = 1;
+      message.name = "";
+      return message;
     }
 
     int index = std::rand() % static_cast<int>(usable.size());

@@ -58,12 +58,6 @@ namespace engine
     engine->phase = Phase::CONFIRMATION;
     engine->context.drawsRemaining = 0;
     engine->context.drawSource = 0;
-    EngineEvent event;
-    event.type = EngineEventType::INFO;
-    event.message = "Confirmation state: end turn or borrow roads allowed.";
-    event.payload = "";
-    engine->pendingEvents.push_back(event);
-
     if (!engine->stateMachine || engine->context.controllers.empty())
     {
       return;
@@ -81,8 +75,14 @@ namespace engine
       return;
     }
 
-    if (std::dynamic_pointer_cast<HumanController>(controller))
+    bool isHuman = (std::dynamic_pointer_cast<HumanController>(controller) != nullptr);
+    if (isHuman)
     {
+      EngineEvent event;
+      event.type = EngineEventType::INFO;
+      event.message = "Confirmation state: end turn or borrow roads allowed.";
+      event.payload = "";
+      engine->pendingEvents.push_back(event);
       return;
     }
 
@@ -91,6 +91,11 @@ namespace engine
     message.origin = "tui";
     message.version = 1;
     message.name = "confirm";
+
+    if (message.name.empty())
+    {
+      return;
+    }
 
     std::string playerName = "AI";
     std::shared_ptr<state::State> state = engine->getState();
@@ -102,15 +107,29 @@ namespace engine
         playerName = players[playerIndex]->getName();
       }
     }
+
+    parser::JSONParser jsonParser;
+    std::string json = jsonParser.serializeCommand(message);
+    std::vector<EngineEvent> priorEvents = engine->pendingEvents;
+    engine->pendingEvents.clear();
+    EngineResult result = engine->applyCommand(json);
+
     EngineEvent logEvent;
     logEvent.type = EngineEventType::INFO;
     logEvent.message = "AI " + playerName + ": confirm";
     logEvent.payload = "";
-    engine->pendingEvents.push_back(logEvent);
+    result.events.insert(result.events.begin(), logEvent);
+    if (!priorEvents.empty())
+    {
+      result.events.insert(result.events.begin(), priorEvents.begin(), priorEvents.end());
+    }
 
-    parser::JSONParser jsonParser;
-    std::string json = jsonParser.serializeCommand(message);
-    engine->applyCommand(json);
+    if (!result.events.empty())
+    {
+      engine->pendingEvents.insert(engine->pendingEvents.end(),
+                                   result.events.begin(),
+                                   result.events.end());
+    }
   }
 
   std::vector<EngineCommandType> ConfirmationState::getAllowedCommands()
