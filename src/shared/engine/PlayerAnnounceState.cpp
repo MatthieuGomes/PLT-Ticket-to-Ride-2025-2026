@@ -37,6 +37,21 @@ namespace engine
       }
       else
       {
+        // Early final-round trigger for testing: if any player is at or below 2 wagons,
+        // mark final round before announcing the next player.
+        if (!engine->context.finalRound)
+        {
+          for (std::size_t i = 0; i < players.size(); ++i)
+          {
+            if (players[i] && players[i]->getNbWagons() <= 2)
+            {
+              engine->context.finalRound = true;
+              engine->context.finalRoundStarter = (index < 0) ? kDefaultPlayerIndex : index;
+              break;
+            }
+          }
+        }
+
         if (index < 0 || index >= static_cast<int>(players.size()))
         {
           index = kDefaultPlayerIndex;

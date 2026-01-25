@@ -3,6 +3,7 @@
 #include "EngineCommand.h"
 #include "EngineEvent.h"
 #include "EngineEventType.h"
+#include "ExitState.h"
 #include "Phase.h"
 
 #include "parser/CommandMessage.h"
@@ -220,22 +221,24 @@ namespace engine
   {
     if (command.type == EngineCommandType::CMD_EXIT || command.name == "exit")
     {
+      if (!engine)
+      {
+        return buildErrorResult("No engine instance", Phase::EXIT);
+      }
+      if (engine->stateMachine)
+      {
+        std::shared_ptr<GameState> exitState(new ExitState());
+        engine->stateMachine->transitionTo(engine, exitState);
+      }
+
       EngineResult result;
       result.ok = true;
       result.error = "";
       result.nextPhase = Phase::EXIT;
-
-      EngineEvent event;
-      event.type = EngineEventType::INFO;
-      event.message = "Exit requested";
-      event.payload = "";
-      result.events.push_back(event);
-
-      if (engine)
+      if (engine && !engine->pendingEvents.empty())
       {
-        engine->phase = Phase::EXIT;
-        engine->stateMachine.reset();
-        engine->state.reset();
+        result.events.insert(result.events.end(), engine->pendingEvents.begin(), engine->pendingEvents.end());
+        engine->pendingEvents.clear();
       }
       return result;
     }
