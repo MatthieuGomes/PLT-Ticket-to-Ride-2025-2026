@@ -2,6 +2,8 @@
 #include <chrono>
 #include <csignal>
 #include <cctype>
+#include <cstdlib>
+#include <fstream>
 #include <sstream>
 #include <thread>
 
@@ -73,6 +75,29 @@ const char kNewline = '\n';
 const char kCarriageReturn = '\r';
 const char kBackspace = '\b';
 const char kDelete = 127;
+const char kInfoPanelLogEnv[] = "INFOPANEL_LOG_PATH";
+
+std::ofstream& getInfoPanelLogStream() {
+  static std::ofstream stream;
+  static bool initialized = false;
+  if (!initialized) {
+    const char* path = std::getenv(kInfoPanelLogEnv);
+    if (path != nullptr && path[0] != '\0') {
+      stream.open(path, std::ios::app);
+    }
+    initialized = true;
+  }
+  return stream;
+}
+
+void logInfoMessage(const std::string& message) {
+  std::ofstream& stream = getInfoPanelLogStream();
+  if (!stream.is_open()) {
+    return;
+  }
+  stream << message << "\n";
+  stream.flush();
+}
 
 int clampPositive(int value, int minimum) {
   return std::max(value, minimum);
@@ -255,12 +280,14 @@ void TUIManager::init() {
         kInfoPanelMaxMessages);
     infopanel->setTitle("InfoPanel");
     infopanel->addMessage("Welcome to Ticket to Ride!");
+    logInfoMessage("Welcome to Ticket to Ride!");
     if (engine) {
       if (!engine->pendingEvents.empty()) {
         for (std::size_t i = 0; i < engine->pendingEvents.size(); ++i) {
           const engine::EngineEvent& event = engine->pendingEvents[i];
           if (!event.message.empty()) {
             infopanel->addMessage(event.message);
+            logInfoMessage(event.message);
           }
         }
         engine->pendingEvents.clear();
@@ -411,20 +438,24 @@ void TUIManager::handleInput(const std::string& input) {
   std::ostringstream line;
   line << "> " << input;
   infopanel->addMessage(line.str());
+  logInfoMessage(line.str());
 
   ParseResult result = parser.parse(input);
   if (!result.ok) {
     if (!result.error.empty()) {
       infopanel->addMessage(result.error);
+      logInfoMessage(result.error);
     }
   } else {
     if (!engine) {
       const std::string action = extractAction(result.json);
       if (action == "exit") {
         infopanel->addMessage("Exiting...");
+        logInfoMessage("Exiting...");
         running = false;
       } else if (action == "help") {
         infopanel->addMessage("Available commands: exit");
+        logInfoMessage("Available commands: exit");
       }
     } else {
       engine::EngineResult engineResult = engineParser.parseAndApply(engine, result.json);
@@ -434,15 +465,18 @@ void TUIManager::handleInput(const std::string& input) {
       parser::JSONParser jsonParser;
       if (!jsonParser.parseResult(responseJson, response, error)) {
         infopanel->addMessage("Engine response parse error: " + error);
+        logInfoMessage("Engine response parse error: " + error);
       } else {
         for (std::size_t i = 0; i < response.events.size(); ++i) {
           const parser::EventMessage& event = response.events[i];
           if (!event.message.empty()) {
             infopanel->addMessage(event.message);
+            logInfoMessage(event.message);
           }
         }
         if (response.payload.isObject() && response.payload.isMember("exit") && response.payload["exit"].asBool()) {
           infopanel->addMessage("Engine exit confirmed.");
+          logInfoMessage("Engine exit confirmed.");
           running = false;
           engine.reset();
         }
@@ -674,6 +708,7 @@ void TUIManager::runMainLoop() {
           const engine::EngineEvent& event = engine->pendingEvents[i];
           if (!event.message.empty()) {
             infopanel->addMessage(event.message);
+            logInfoMessage(event.message);
           }
         }
         engine->pendingEvents.clear();

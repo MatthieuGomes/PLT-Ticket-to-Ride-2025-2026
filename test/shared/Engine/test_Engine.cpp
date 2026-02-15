@@ -3,11 +3,22 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "../../src/shared/engine/CommandParser.h"
 #include "../../src/shared/engine/Engine.h"
 #include "../../src/shared/engine/EngineResult.h"
 #include "../../src/shared/engine/Phase.h"
+#include "../../src/shared/engine/EndTurnState.h"
+#include "../../src/shared/engine/ConfirmationState.h"
+#include "../../src/shared/engine/PlayerTurnState.h"
+#include "../../src/shared/engine/PlayerAnnounceState.h"
+#include "../../src/shared/engine/AIController.h"
+#include "../../src/shared/engine/HumanController.h"
+#include "../../src/shared/playersState/Player.h"
+#include "../../src/shared/cardsState/PlayerCards.h"
+#include "../../src/shared/mapState/Road.h"
+#include "../../src/shared/state/State.h"
 
 #include <json/json.h>
 
@@ -70,6 +81,98 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_CASE(EngineJsonTestsDisabled)
 {
   BOOST_CHECK(true);
+}
+
+namespace
+{
+  std::shared_ptr<engine::Engine> buildEngineWithPlayers(int count)
+  {
+    std::shared_ptr<state::State> state(new state::State());
+    std::vector<std::shared_ptr<playersState::Player>> players;
+    for (int i = 0; i < count; ++i)
+    {
+      std::ostringstream name;
+      name << "Player" << (i + 1);
+      std::shared_ptr<cardsState::PlayerCards> hand(new cardsState::PlayerCards());
+      std::vector<std::shared_ptr<mapState::Road>> borrowed;
+      std::shared_ptr<playersState::Player> player(
+          new playersState::Player(name.str(),
+                                   playersState::PlayerColor::RED,
+                                   0,
+                                   45,
+                                   3,
+                                   borrowed,
+                                   hand));
+      players.push_back(player);
+    }
+    state->players.players = players;
+
+    std::shared_ptr<engine::Engine> engine(new engine::Engine(state));
+    engine->context.controllers.clear();
+    engine->context.currentPlayer = 0;
+    engine->context.finalRound = false;
+    engine->context.finalRoundStarter = -1;
+    engine->pendingEvents.clear();
+    for (int i = 0; i < count; ++i)
+    {
+      if (i == 0)
+      {
+        engine->context.controllers.push_back(std::shared_ptr<engine::PlayerController>(new engine::HumanController()));
+      }
+      else
+      {
+        std::shared_ptr<engine::AIController> ai(new engine::AIController());
+        ai->seed = i + 1;
+        engine->context.controllers.push_back(ai);
+      }
+    }
+    return engine;
+  }
+
+  bool hasTurnAnnouncement(const std::vector<engine::EngineEvent>& events, const std::string& playerName)
+  {
+    for (std::size_t i = 0; i < events.size(); ++i)
+    {
+      if (events[i].message.find("It's ") != std::string::npos &&
+          events[i].message.find(playerName) != std::string::npos)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+BOOST_AUTO_TEST_CASE(EndTurnTransitionsToNextPlayer)
+{
+  std::shared_ptr<engine::Engine> engine = buildEngineWithPlayers(2);
+  engine->context.currentPlayer = 0;
+  engine->pendingEvents.clear();
+
+  std::shared_ptr<engine::GameState> endState(new engine::EndTurnState());
+  engine->stateMachine->transitionTo(engine, endState);
+
+  std::shared_ptr<engine::GameState> current = engine->stateMachine->getState();
+  BOOST_CHECK(current != nullptr);
+  BOOST_CHECK(std::dynamic_pointer_cast<engine::PlayerTurnState>(current) != nullptr);
+  BOOST_CHECK_EQUAL(engine->context.currentPlayer, 1);
+  BOOST_CHECK(hasTurnAnnouncement(engine->pendingEvents, "Player2"));
+}
+
+BOOST_AUTO_TEST_CASE(ConfirmationAutoAdvancesForAI)
+{
+  std::shared_ptr<engine::Engine> engine = buildEngineWithPlayers(2);
+  engine->context.currentPlayer = 1;
+  engine->pendingEvents.clear();
+
+  std::shared_ptr<engine::GameState> confirmState(new engine::ConfirmationState());
+  engine->stateMachine->transitionTo(engine, confirmState);
+
+  std::shared_ptr<engine::GameState> current = engine->stateMachine->getState();
+  BOOST_CHECK(current != nullptr);
+  BOOST_CHECK(std::dynamic_pointer_cast<engine::ConfirmationState>(current) == nullptr);
+  BOOST_CHECK_EQUAL(engine->context.currentPlayer, 0);
+  BOOST_CHECK(hasTurnAnnouncement(engine->pendingEvents, "Player1"));
 }
 
 /* vim: set sw=2 sts=2 et : */

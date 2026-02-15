@@ -23,6 +23,9 @@ namespace engine
     }
 
     engine->phase = Phase::PLAYER_ANNOUNCE;
+    // Reset draw state so each new turn starts fresh.
+    engine->context.drawsRemaining = 0;
+    engine->context.drawSource = 0;
 
     std::shared_ptr<state::State> state = engine->getState();
     std::string playerName = "Player";

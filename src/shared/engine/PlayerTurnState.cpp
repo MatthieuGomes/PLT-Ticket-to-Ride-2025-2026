@@ -1,5 +1,7 @@
 #include "PlayerTurnState.h"
 
+#include <cctype>
+
 #include "DrawDestinationCardState.h"
 #include "DrawWagonCardState.h"
 #include "Engine.h"
@@ -32,6 +34,16 @@ namespace engine
       result.events.push_back(event);
 
       return result;
+    }
+
+    std::string toLower(const std::string& value)
+    {
+      std::string lowered = value;
+      for (std::size_t i = 0; i < lowered.size(); ++i)
+      {
+        lowered[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(lowered[i])));
+      }
+      return lowered;
     }
   }
 
@@ -71,6 +83,7 @@ namespace engine
     {
       return;
     }
+
     std::string playerName = "AI";
     std::shared_ptr<state::State> state = engine->getState();
     if (state)
@@ -80,6 +93,34 @@ namespace engine
       {
         playerName = players[playerIndex]->getName();
       }
+    }
+
+    // Draw flow for AI is executed inside DrawWagonCardState::onEnter.
+    // Do not forward a second draw command from PlayerTurn, otherwise the AI can
+    // consume an extra card and desynchronize the state machine.
+    const std::string normalizedName = toLower(command.name);
+    const bool isDrawFaceUp = (normalizedName == "draw_faceup");
+    const bool isDrawFaceDown = (normalizedName == "draw_facedown");
+    if (isDrawFaceUp || isDrawFaceDown)
+    {
+      if (isDrawFaceDown)
+      {
+        engine->context.drawSource = 2;
+      }
+      else
+      {
+        engine->context.drawSource = 0;
+      }
+
+      EngineEvent event;
+      event.type = EngineEventType::INFO;
+      event.message = "AI " + playerName + ": " + command.name;
+      event.payload = "";
+      engine->pendingEvents.push_back(event);
+
+      std::shared_ptr<GameState> nextState(new DrawWagonCardState());
+      engine->stateMachine->transitionTo(engine, nextState);
+      return;
     }
 
     parser::JSONParser jsonParser;

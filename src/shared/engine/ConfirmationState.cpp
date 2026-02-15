@@ -9,7 +9,6 @@
 #include "AIController.h"
 #include "HumanController.h"
 #include "PlayerController.h"
-#include "parser/JSONParser.h"
 #include "playersState/Player.h"
 
 namespace engine
@@ -86,17 +85,6 @@ namespace engine
       return;
     }
 
-    parser::CommandMessage message;
-    message.kind = "command";
-    message.origin = "tui";
-    message.version = 1;
-    message.name = "confirm";
-
-    if (message.name.empty())
-    {
-      return;
-    }
-
     std::string playerName = "AI";
     std::shared_ptr<state::State> state = engine->getState();
     if (state)
@@ -108,11 +96,13 @@ namespace engine
       }
     }
 
-    parser::JSONParser jsonParser;
-    std::string json = jsonParser.serializeCommand(message);
     std::vector<EngineEvent> priorEvents = engine->pendingEvents;
     engine->pendingEvents.clear();
-    EngineResult result = engine->applyCommand(json);
+    EngineCommand autoCommand;
+    autoCommand.name = "confirm";
+    autoCommand.type = EngineCommandType::CMD_CONFIRM_ENDTURN;
+    autoCommand.payload = "";
+    EngineResult result = engine->stateMachine->handleCommand(engine, autoCommand);
 
     EngineEvent logEvent;
     logEvent.type = EngineEventType::INFO;
@@ -122,6 +112,13 @@ namespace engine
     if (!priorEvents.empty())
     {
       result.events.insert(result.events.begin(), priorEvents.begin(), priorEvents.end());
+    }
+
+    std::shared_ptr<GameState> current = engine->stateMachine->getState();
+    if (current && current.get() == this)
+    {
+      std::shared_ptr<GameState> nextState(new EndTurnState());
+      engine->stateMachine->transitionTo(engine, nextState);
     }
 
     if (!result.events.empty())

@@ -25,6 +25,8 @@
 #include "state/State.h"
 #include "engine/Engine.h"
 
+#define ENABLE_INFOPANEL_LOG 1
+
 void testSFML()
 {
     sf::Texture texture;
@@ -91,6 +93,23 @@ static bool fileExists(const char *path)
         return false;
     }
     return S_ISREG(sb.st_mode);
+}
+
+static std::string buildInfoPanelLogPath()
+{
+    const char kLogsDir[] = "logs";
+    const int kLogsDirMode = 0755;
+    mkdir(kLogsDir, kLogsDirMode);
+
+    std::time_t now = std::time(nullptr);
+    std::tm localTime = *std::localtime(&now);
+    char buffer[32];
+    if (std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", &localTime) == 0)
+    {
+        return "";
+    }
+    std::string path = std::string(kLogsDir) + "/game_session_infopanel_" + buffer + ".log";
+    return path;
 }
 
 using namespace std;
@@ -184,6 +203,13 @@ int main(int argc, char *argv[])
                                     &state->players,
                                     &state->cards);
             manager.setEngine(engine);
+#if ENABLE_INFOPANEL_LOG
+            std::string logPath = buildInfoPanelLogPath();
+            if (!logPath.empty())
+            {
+                setenv("INFOPANEL_LOG_PATH", logPath.c_str(), 1);
+            }
+#endif
             manager.runMainLoop();
 
             return EXIT_SUCCESS;

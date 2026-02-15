@@ -12,12 +12,20 @@
 
 #include <cctype>
 #include <json/json.h>
+#include <iostream>
 
 namespace engine
 {
   namespace
   {
     const int kDefaultVersion = 1;
+
+#define DEBUG_MODE true
+#if DEBUG_MODE == true
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
 
     std::string toLower(const std::string& value)
     {
@@ -240,6 +248,10 @@ namespace engine
         result.events.insert(result.events.end(), engine->pendingEvents.begin(), engine->pendingEvents.end());
         engine->pendingEvents.clear();
       }
+      for (std::size_t i = 0; i < result.events.size(); ++i)
+      {
+        DEBUG_PRINT("DEBUG EVENT: " << result.events[i].message);
+      }
       return result;
     }
 
@@ -256,6 +268,10 @@ namespace engine
     {
       result.events.insert(result.events.end(), engine->pendingEvents.begin(), engine->pendingEvents.end());
       engine->pendingEvents.clear();
+    }
+    for (std::size_t i = 0; i < result.events.size(); ++i)
+    {
+      DEBUG_PRINT("DEBUG EVENT: " << result.events[i].message);
     }
     return result;
   }

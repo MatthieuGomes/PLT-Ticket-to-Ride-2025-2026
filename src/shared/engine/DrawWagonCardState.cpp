@@ -62,7 +62,10 @@ namespace engine
     if (engine->context.drawsRemaining <= 0)
     {
       engine->context.drawsRemaining = kDefaultDrawsRemaining;
-      engine->context.drawSource = 0;
+      if (engine->context.drawSource != 2)
+      {
+        engine->context.drawSource = 0;
+      }
     }
 
     if (!engine->stateMachine || engine->context.controllers.empty())
